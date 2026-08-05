@@ -12,3 +12,5 @@ Route::get('/', function () {
 // monitors call this. See App\Http\Controllers\HealthController for what
 // it does and does not expose.
 Route::get('/health', HealthController::class)->name('health');
+
+require __DIR__.'/auth.php';

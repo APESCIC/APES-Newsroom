@@ -13,7 +13,7 @@ use Illuminate\Support\ServiceProvider;
  * outbound mail) as CLOUDRON_*-prefixed environment variables, and those
  * values are rotated by the platform - they must be read at runtime, never
  * cached or committed (see docs.cloudron.io/packaging/addons). Laravel's
- * own config files expect the conventional DB_*/REDIS_*/MAIL_* names.
+ * own config files expect the conventional DB_, REDIS_, and MAIL_ names.
  * This provider translates one into the other so the same config files
  * and .env-driven local/CI setup work unchanged in both environments:
  * when a CLOUDRON_* variable is absent (local dev, CI), nothing is
@@ -31,6 +31,8 @@ class CloudronEnvironmentServiceProvider extends ServiceProvider
         $this->mapRedis();
         $this->mapMail();
         $this->mapAppOrigin();
+        $this->mapOidc();
+        $this->mapLdap();
     }
 
     private function mapMysql(): void
@@ -94,5 +96,30 @@ class CloudronEnvironmentServiceProvider extends ServiceProvider
         if (env('CLOUDRON_APP_ORIGIN')) {
             Config::set('app.url', env('CLOUDRON_APP_ORIGIN'));
         }
+    }
+
+    private function mapOidc(): void
+    {
+        if (! env('CLOUDRON_OIDC_DISCOVERY_URL')) {
+            return;
+        }
+
+        Config::set('services.cloudron_oidc.discovery_url', env('CLOUDRON_OIDC_DISCOVERY_URL'));
+        Config::set('services.cloudron_oidc.issuer', env('CLOUDRON_OIDC_ISSUER'));
+        Config::set('services.cloudron_oidc.client_id', env('CLOUDRON_OIDC_CLIENT_ID'));
+        Config::set('services.cloudron_oidc.client_secret', env('CLOUDRON_OIDC_CLIENT_SECRET'));
+    }
+
+    private function mapLdap(): void
+    {
+        if (! env('CLOUDRON_LDAP_URL')) {
+            return;
+        }
+
+        Config::set('ldap.connections.default.hosts', [env('CLOUDRON_LDAP_URL')]);
+        Config::set('ldap.connections.default.username', env('CLOUDRON_LDAP_BIND_DN'));
+        Config::set('ldap.connections.default.password', env('CLOUDRON_LDAP_BIND_PASSWORD'));
+        Config::set('ldap.connections.default.base_dn', env('CLOUDRON_LDAP_USERS_BASE_DN'));
+        Config::set('services.cloudron_oidc.ldap_groups_base_dn', env('CLOUDRON_LDAP_GROUPS_BASE_DN'));
     }
 }

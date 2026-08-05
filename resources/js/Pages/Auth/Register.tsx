@@ -1,0 +1,66 @@
+import { Head, Link, useForm } from '@inertiajs/react';
+import { FormEventHandler } from 'react';
+
+export default function Register() {
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+    });
+
+    const submit: FormEventHandler = (e) => {
+        e.preventDefault();
+        post('/register', {
+            onFinish: () => reset('password', 'password_confirmation'),
+        });
+    };
+
+    return (
+        <>
+            <Head title="Register" />
+            <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
+                <h1 className="text-2xl font-semibold text-neutral-900">Create an account</h1>
+                <form onSubmit={submit} className="flex flex-col gap-4">
+                    <div>
+                        <label htmlFor="name">Name</label>
+                        <input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} required autoFocus />
+                        {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
+                    </div>
+                    <div>
+                        <label htmlFor="email">Email</label>
+                        <input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} required />
+                        {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+                    </div>
+                    <div>
+                        <label htmlFor="password">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            value={data.password}
+                            onChange={(e) => setData('password', e.target.value)}
+                            required
+                        />
+                        {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+                    </div>
+                    <div>
+                        <label htmlFor="password_confirmation">Confirm password</label>
+                        <input
+                            id="password_confirmation"
+                            type="password"
+                            value={data.password_confirmation}
+                            onChange={(e) => setData('password_confirmation', e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit" disabled={processing}>
+                        Register
+                    </button>
+                </form>
+                <p className="text-sm">
+                    Already have an account? <Link href="/login">Log in</Link>
+                </p>
+            </main>
+        </>
+    );
+}

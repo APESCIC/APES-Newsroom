@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -26,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // address so X-Forwarded-* headers (scheme, host, client IP)
         // are honoured without trusting arbitrary upstream proxies.
         $middleware->trustProxies(at: array_filter([env('CLOUDRON_PROXY_IP')]));
+
+        $middleware->alias([
+            'role' => EnsureRole::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
