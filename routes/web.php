@@ -115,3 +115,7 @@ Route::middleware(['auth', 'verified', 'role:'.Role::Staff->value])
     });
 
 require __DIR__.'/auth.php';
+
+if (app()->environment('local')) {
+    require __DIR__.'/dev.php';
+}

@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 interface LoginProps {
@@ -6,7 +6,15 @@ interface LoginProps {
     staffLoginLabel: string | null;
 }
 
+const DEV_ROLES = [
+    { key: 'public', label: 'Public' },
+    { key: 'staff', label: 'Staff' },
+    { key: 'admin', label: 'Admin' },
+    { key: 'super_admin', label: 'Super admin' },
+] as const;
+
 export default function Login({ staffLoginUrl, staffLoginLabel }: LoginProps) {
+    const { devTools } = usePage<{ devTools?: boolean }>().props;
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -34,6 +42,23 @@ export default function Login({ staffLoginUrl, staffLoginLabel }: LoginProps) {
                             {staffLoginLabel ?? 'Staff sign in'}
                         </a>
                         <p className="text-center text-xs text-neutral-500">or use a public account below</p>
+                    </div>
+                )}
+                {devTools && (
+                    <div className="flex flex-col gap-2 rounded border border-amber-300 bg-amber-50 p-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Local role preview</p>
+                        <div className="flex flex-wrap gap-1.5">
+                            {DEV_ROLES.map((role) => (
+                                <button
+                                    key={role.key}
+                                    type="button"
+                                    onClick={() => router.post(`/_dev/login/${role.key}`)}
+                                    className="rounded border border-amber-700/30 bg-white px-2.5 py-1 text-xs font-medium text-amber-950 hover:bg-amber-100"
+                                >
+                                    {role.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 )}
                 <form onSubmit={submit} className="flex flex-col gap-4">
