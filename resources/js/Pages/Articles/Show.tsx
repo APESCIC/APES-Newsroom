@@ -1,4 +1,19 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import { FormEventHandler } from 'react';
+
+type Comment = {
+    id: number;
+    body: string;
+    created_at: string | null;
+    author: { display_name: string; avatar_url: string | null };
+};
+
+type Reactions = {
+    helpful: number;
+    support: number;
+    thank_you: number;
+    mine: string[];
+};
 
 type Article = {
     title: string;
@@ -14,7 +29,40 @@ type Article = {
     tags?: string[];
 };
 
-export default function ArticleShow({ article, preview }: { article: Article; preview?: boolean }) {
+const reactionLabels: Record<string, string> = {
+    helpful: 'Helpful',
+    support: 'Support',
+    thank_you: 'Thank You',
+};
+
+export default function ArticleShow({
+    article,
+    preview,
+    comments = [],
+    reactions = { helpful: 0, support: 0, thank_you: 0, mine: [] },
+    canEngage = false,
+    status,
+}: {
+    article: Article;
+    preview?: boolean;
+    comments?: Comment[];
+    reactions?: Reactions;
+    canEngage?: boolean;
+    status?: string;
+}) {
+    const commentForm = useForm({ body: '' });
+
+    const submitComment: FormEventHandler = (e) => {
+        e.preventDefault();
+        commentForm.post(`/articles/${article.slug}/comments`, {
+            onSuccess: () => commentForm.reset('body'),
+        });
+    };
+
+    const toggleReaction = (type: string) => {
+        router.post(`/articles/${article.slug}/reactions`, { type }, { preserveScroll: true });
+    };
+
     return (
         <>
             <Head title={article.meta_title}>
@@ -53,6 +101,91 @@ export default function ArticleShow({ article, preview }: { article: Article; pr
                         dangerouslySetInnerHTML={{ __html: article.html }}
                     />
                 </article>
+
+                {!preview && (
+                    <section className="mt-12 border-t border-neutral-200 pt-8" aria-label="Reactions">
+                        <h2 className="text-lg font-medium">Reactions</h2>
+                        <div className="mt-3 flex flex-wrap gap-3">
+                            {Object.entries(reactionLabels).map(([type, label]) => {
+                                const active = reactions.mine.includes(type);
+                                const count = reactions[type as keyof Omit<Reactions, 'mine'>] ?? 0;
+                                return (
+                                    <button
+                                        key={type}
+                                        type="button"
+                                        disabled={!canEngage}
+                                        onClick={() => toggleReaction(type)}
+                                        aria-pressed={active}
+                                        className={`rounded border px-3 py-1.5 text-sm ${active ? 'border-apes-primary bg-apes-primary/10' : 'border-neutral-300'}`}
+                                    >
+                                        {label} <span className="tabular-nums">({count})</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {!canEngage && (
+                            <p className="mt-2 text-sm text-neutral-600">
+                                <Link href="/login" className="underline">
+                                    Sign in
+                                </Link>{' '}
+                                with a verified account to react.
+                            </p>
+                        )}
+                    </section>
+                )}
+
+                {!preview && (
+                    <section className="mt-10 border-t border-neutral-200 pt-8" aria-label="Comments">
+                        <h2 className="text-lg font-medium">Comments</h2>
+                        {status === 'comment-pending' && (
+                            <p className="mt-2 text-sm text-green-700">Thanks — your comment is awaiting moderation.</p>
+                        )}
+
+                        <ul className="mt-4 flex flex-col gap-4">
+                            {comments.map((comment) => (
+                                <li key={comment.id} className="border-b border-neutral-100 pb-4">
+                                    <p className="text-sm font-medium">{comment.author.display_name}</p>
+                                    <p className="mt-1 text-neutral-800">{comment.body}</p>
+                                </li>
+                            ))}
+                            {comments.length === 0 && <li className="text-sm text-neutral-600">No approved comments yet.</li>}
+                        </ul>
+
+                        {canEngage ? (
+                            <form onSubmit={submitComment} className="mt-6 flex flex-col gap-3">
+                                <label htmlFor="comment-body" className="text-sm font-medium">
+                                    Add a comment
+                                </label>
+                                <textarea
+                                    id="comment-body"
+                                    value={commentForm.data.body}
+                                    onChange={(e) => commentForm.setData('body', e.target.value)}
+                                    rows={3}
+                                    required
+                                    maxLength={2000}
+                                    className="w-full rounded border px-3 py-2"
+                                />
+                                {commentForm.errors.body && (
+                                    <p className="text-sm text-red-600">{commentForm.errors.body}</p>
+                                )}
+                                <button
+                                    type="submit"
+                                    disabled={commentForm.processing}
+                                    className="w-fit rounded bg-apes-primary px-4 py-2 text-white"
+                                >
+                                    Submit for moderation
+                                </button>
+                            </form>
+                        ) : (
+                            <p className="mt-4 text-sm text-neutral-600">
+                                <Link href="/login" className="underline">
+                                    Sign in
+                                </Link>{' '}
+                                with a verified account to comment.
+                            </p>
+                        )}
+                    </section>
+                )}
             </main>
         </>
     );
