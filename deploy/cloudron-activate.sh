@@ -54,6 +54,8 @@ rm -rf "${RELEASE_DIR}/storage/app" "${RELEASE_DIR}/storage/logs"
 ln -sfn "${SHARED_DIR}/storage/app" "${RELEASE_DIR}/storage/app"
 ln -sfn "${SHARED_DIR}/storage/logs" "${RELEASE_DIR}/storage/logs"
 
+chown -R www-data:www-data "${SHARED_DIR}/storage" "${SHARED_DIR}/.env"
+
 # PHP session storage must not live on Cloudron's read-only path (see
 # docs.cloudron.io/packaging/cheat-sheet#php).
 mkdir -p /run/php/sessions
