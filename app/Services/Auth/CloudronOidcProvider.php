@@ -56,6 +56,8 @@ class CloudronOidcProvider
             'urlAuthorize' => $discovery['authorization_endpoint'],
             'urlAccessToken' => $discovery['token_endpoint'],
             'urlResourceOwnerDetails' => $discovery['userinfo_endpoint'],
+            // OIDC requires space-delimited scopes; league/oauth2-client defaults to commas.
+            'scopeSeparator' => ' ',
         ]);
     }
 

@@ -38,9 +38,16 @@ class StaffReconciler
 
         $role = collect($matchedRoles)->sortByDesc(fn (Role $role) => $role->rank())->first();
 
-        $user = User::firstOrNew(['external_id' => $identity->sub]);
+        $user = User::query()
+            ->where('external_id', $identity->sub)
+            ->orWhere(function ($query) use ($identity): void {
+                $query->where('email', $identity->email)
+                    ->where('auth_provider', 'cloudron_oidc');
+            })
+            ->first() ?? new User;
 
         $user->forceFill([
+            'external_id' => $identity->sub,
             'name' => $identity->name,
             'email' => $identity->email,
             'email_verified_at' => now(),
@@ -60,12 +67,35 @@ class StaffReconciler
     private function matchRoles(array $groups): array
     {
         $map = collect(config('rbac.ldap_group_map', []))
-            ->mapWithKeys(fn (Role $role, string $dn) => [mb_strtolower($dn) => $role]);
+            ->mapWithKeys(fn (Role $role, string $key) => [mb_strtolower($key) => $role]);
 
         return collect($groups)
-            ->map(fn (string $group) => $map->get(mb_strtolower($group)))
+            ->flatMap(fn (string $group) => $this->groupLookupKeys($group))
+            ->map(fn (string $key) => $map->get($key))
             ->filter()
+            ->unique()
             ->values()
             ->all();
+    }
+
+    /**
+     * Build case-insensitive lookup keys for a memberof value.
+     *
+     * Cloudron returns full DNs (`cn=newsroom.staff,ou=groups,dc=cloudron`);
+     * local OpenLDAP tests often pass bare CNs. Match both the raw value
+     * and the CN RDN when present.
+     *
+     * @return array<int, string>
+     */
+    private function groupLookupKeys(string $group): array
+    {
+        $normalized = mb_strtolower($group);
+        $keys = [$normalized];
+
+        if (preg_match('/(^|,)cn=([^,]+)/i', $group, $matches) === 1) {
+            $keys[] = mb_strtolower($matches[2]);
+        }
+
+        return array_values(array_unique($keys));
     }
 }
