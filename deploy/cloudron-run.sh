@@ -20,7 +20,9 @@ chown www-data:www-data /run/php/sessions
 
 if [ -L /app/data/current ]; then
     echo "Starting queue worker against $(readlink /app/data/current)"
-    sudo -u www-data /usr/bin/php /app/data/current/artisan queue:work \
+    # Preserve CLOUDRON_* so the worker uses MySQL/Redis/SMTP, not .env sqlite.
+    bash /app/data/current/deploy/cloudron-www-data.sh \
+        /usr/bin/php /app/data/current/artisan queue:work \
         --queue=default --sleep=3 --tries=3 --max-time=3600 &
 else
     echo "No /app/data/current release yet - skipping queue worker start."
