@@ -167,4 +167,26 @@ class StaffOidcLoginTest extends TestCase
         $this->assertSame('new-sub', $result->user->fresh()->external_id);
         $this->assertSame(1, User::count());
     }
+
+    public function test_existing_password_user_is_linked_instead_of_duplicate_insert(): void
+    {
+        $existing = User::factory()->create([
+            'email' => 'staffer@example.com',
+            'auth_provider' => 'password',
+            'external_id' => null,
+            'role' => Role::Public,
+        ]);
+
+        $result = $this->reconcilerWithGroups([self::STAFF_GROUP])->reconcile($this->identity());
+
+        $this->assertTrue($result->allowed);
+        $this->assertSame($existing->id, $result->user->id);
+        $this->assertSame(1, User::count());
+
+        $existing->refresh();
+        $this->assertSame('cloudron_oidc', $existing->auth_provider);
+        $this->assertSame('oidc-sub-1', $existing->external_id);
+        $this->assertSame(Role::Staff, $existing->role);
+        $this->assertNull($existing->password);
+    }
 }
