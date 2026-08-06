@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Role;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -14,7 +14,7 @@ use Illuminate\Notifications\Notifiable;
 
 #[Fillable(['name', 'email', 'password', 'auth_provider', 'external_id'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -40,5 +40,17 @@ class User extends Authenticatable
     public function magicLinkTokens(): HasMany
     {
         return $this->hasMany(MagicLinkToken::class);
+    }
+
+    /**
+     * Staff accounts authenticated via Cloudron OIDC are directory-verified.
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        if ($this->auth_provider === 'cloudron_oidc') {
+            return true;
+        }
+
+        return ! is_null($this->email_verified_at);
     }
 }

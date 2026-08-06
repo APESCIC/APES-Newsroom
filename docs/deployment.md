@@ -5,13 +5,15 @@ app (`74a2a784-a161-4787-84ff-2b8efc957bc8`), which currently runs Ghost
 and will be repointed at this app per the epic (#1) plan: build and accept
 at `beta.apesnews.org.uk`, then cut over `apesnews.org.uk` separately (#11).
 
-**Nothing in this document has been run.** The workflow, scripts, and
-setup steps below are written and internally consistent against
-Cloudron's documented behaviour (docs.cloudron.io), but there is no
-Cloudron API token or access from this environment to test them end to
-end. Treat the first real run as the acceptance exercise issue #3 and
-#11 both call for - run it against beta, watched, with `docs.cloudron.io`
-open, before trusting it unattended.
+**Local preflight has been run** (2026-08-06); a watched beta deploy against
+Cloudron has not yet been executed from this environment. See
+[`docs/deployment-beta-acceptance.md`](deployment-beta-acceptance.md) for
+the full acceptance checklist. The workflow, scripts, and setup steps below
+are written and internally consistent against Cloudron's documented
+behaviour (docs.cloudron.io), but there is no Cloudron API token or access
+from this environment to test them end to end. Treat the first real run as
+the acceptance exercise issue #3 and #11 both call for — run it against
+beta, watched, with `docs.cloudron.io` open, before trusting it unattended.
 
 ## How a release is structured on the server
 
@@ -137,6 +139,10 @@ runs identically from PowerShell, cmd, or bash - no separate Windows
 script to maintain. Run it locally against a non-production database
 before trusting a new environment, and it's what
 `DeployPreflightCommandTest` exercises in CI.
+
+**Local run (2026-08-06):** preflight executed from dev checkout. Expected
+failures without Cloudron credentials: uncommitted changes, `APP_DEBUG=true`,
+database unreachable. See [`deployment-beta-acceptance.md`](deployment-beta-acceptance.md).
 
 ## What this does not do
 
