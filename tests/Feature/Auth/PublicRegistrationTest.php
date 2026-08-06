@@ -20,7 +20,7 @@ class PublicRegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('verification.notice'));
         $this->assertAuthenticated();
 
         $user = User::where('email', 'jamie@example.com')->firstOrFail();

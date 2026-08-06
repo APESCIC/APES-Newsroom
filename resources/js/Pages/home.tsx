@@ -1,23 +1,89 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
-/**
- * Placeholder landing page.
- *
- * The real homepage - mission-led hero, featured/recent stories across the
- * three APES channels - lands with issue #6, built against the approved
- * design from issue #2. This exists so the Laravel foundation (issue #3)
- * has one real, working Inertia page to verify the stack end to end.
- */
-export default function Home() {
+type PostCard = {
+    title: string;
+    slug: string;
+    excerpt: string | null;
+    channel: string;
+    channel_slug: string;
+    author: string;
+    published_at: string | null;
+};
+
+type Channel = { slug: string; label: string };
+
+export default function Home({
+    featured,
+    recent,
+    channels,
+}: {
+    featured?: PostCard;
+    recent: PostCard[];
+    channels: Channel[];
+}) {
     return (
         <>
             <Head title="Home" />
-            <main className="mx-auto flex min-h-screen max-w-2xl flex-col items-start justify-center gap-4 px-6">
-                <h1 className="text-3xl font-semibold text-neutral-900">APES Newsroom</h1>
-                <p className="text-neutral-600">
-                    Laravel 13 + Inertia + React foundation is running. The public newsroom, publishing
-                    workflow, and authenticated workspaces build on top of this in later issues.
-                </p>
+            <a href="#main-content" className="sr-only focus:not-sr-only">
+                Skip to main content
+            </a>
+            <header className="border-b border-neutral-200 bg-white">
+                <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+                    <Link href="/" className="text-xl font-semibold text-apes-primary">
+                        APES Newsroom
+                    </Link>
+                    <nav className="flex gap-4 text-sm">
+                        {channels.map((c) => (
+                            <Link key={c.slug} href={`/${c.slug}`} className="text-neutral-600 hover:text-neutral-900">
+                                {c.label}
+                            </Link>
+                        ))}
+                        <Link href="/search" className="text-neutral-600 hover:text-neutral-900">
+                            Search
+                        </Link>
+                    </nav>
+                </div>
+            </header>
+
+            <main id="main-content" className="mx-auto max-w-5xl px-6 py-12">
+                <section className="mb-12">
+                    <h1 className="text-4xl font-semibold text-neutral-900">Mission-led stories from APES</h1>
+                    <p className="mt-3 max-w-2xl text-lg text-neutral-600">
+                        News and updates from APES CIC, Shelter &amp; Rescue, and Pet Care Clinic.
+                    </p>
+                </section>
+
+                {featured && (
+                    <section className="mb-12">
+                        <h2 className="mb-4 text-sm font-medium uppercase tracking-wide text-neutral-600">Featured</h2>
+                        <article className="rounded-lg border border-neutral-200 bg-white p-6">
+                            <p className="text-sm text-apes-primary">{featured.channel}</p>
+                            <h3 className="mt-2 text-2xl font-semibold">
+                                <Link href={`/articles/${featured.slug}`}>{featured.title}</Link>
+                            </h3>
+                            {featured.excerpt && <p className="mt-2 text-neutral-600">{featured.excerpt}</p>}
+                        </article>
+                    </section>
+                )}
+
+                <section>
+                    <h2 className="mb-4 text-sm font-medium uppercase tracking-wide text-neutral-600">Recent stories</h2>
+                    {recent.length === 0 ? (
+                        <p className="text-neutral-600">No published stories yet.</p>
+                    ) : (
+                        <ul className="grid gap-6 sm:grid-cols-2">
+                            {recent.map((post) => (
+                                <li key={post.slug} className="rounded-lg border border-neutral-200 bg-white p-5">
+                                    <p className="text-sm text-neutral-600">{post.channel}</p>
+                                    <h3 className="mt-1 text-lg font-semibold">
+                                        <Link href={`/articles/${post.slug}`}>{post.title}</Link>
+                                    </h3>
+                                    {post.excerpt && <p className="mt-2 text-sm text-neutral-600">{post.excerpt}</p>}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </section>
             </main>
         </>
     );

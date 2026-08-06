@@ -43,6 +43,7 @@ class StaffReconciler
         $user->forceFill([
             'name' => $identity->name,
             'email' => $identity->email,
+            'email_verified_at' => now(),
             'password' => null,
             'auth_provider' => 'cloudron_oidc',
             'role' => $role,
