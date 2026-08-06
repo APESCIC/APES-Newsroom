@@ -2,32 +2,46 @@
 
 use App\Enums\Role;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\GhostMembersImportController;
 use App\Http\Controllers\Admin\ModerationController;
+use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\Mailing\ConfirmController;
 use App\Http\Controllers\Mailing\PreferenceController;
 use App\Http\Controllers\Mailing\SignupController;
 use App\Http\Controllers\Mailing\UnsubscribeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReactionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RssController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Staff\CampaignController as StaffCampaignController;
+use App\Http\Controllers\Staff\MediaController as StaffMediaController;
 use App\Http\Controllers\Staff\PostController as StaffPostController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/legal/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
+Route::get('/legal/cookies', [LegalController::class, 'cookies'])->name('legal.cookies');
+Route::get('/legal/rights', [LegalController::class, 'rights'])->name('legal.rights');
 
 Route::get('/health', HealthController::class)->name('health');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/rss.xml', [RssController::class, 'index'])->name('rss');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/authors/{author}', [ArchiveController::class, 'author'])->name('archives.author');
+Route::get('/tags/{slug}', [ArchiveController::class, 'tag'])->name('archives.tag');
+Route::get('/archive/{year}/{month?}', [ArchiveController::class, 'date'])
+    ->whereNumber('year')
+    ->whereNumber('month')
+    ->name('archives.date');
 Route::get('/articles/{slug}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/profiles/{profile}', [ProfileController::class, 'show'])->name('profiles.show');
 
@@ -59,6 +73,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/articles/{slug}/comments', [CommentController::class, 'store'])->name('articles.comments.store');
     Route::patch('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
     Route::post('/articles/{slug}/reactions', [ReactionController::class, 'toggle'])->name('articles.reactions.toggle');
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
 });
 
 Route::middleware(['auth', 'verified', 'role:'.Role::Admin->value])
@@ -68,6 +83,11 @@ Route::middleware(['auth', 'verified', 'role:'.Role::Admin->value])
         Route::get('/moderation', [ModerationController::class, 'index'])->name('moderation.index');
         Route::post('/moderation/profiles/{profile}', [ModerationController::class, 'moderateProfile'])->name('moderation.profiles');
         Route::post('/moderation/comments/{comment}', [ModerationController::class, 'moderateComment'])->name('moderation.comments');
+        Route::post('/moderation/reports/{report}', [ModerationController::class, 'resolveReport'])->name('moderation.reports');
+        Route::post('/moderation/comments/{comment}/restore', [ModerationController::class, 'restoreComment'])->name('moderation.comments.restore');
+        Route::get('/imports/ghost-members', [GhostMembersImportController::class, 'index'])->name('imports.ghost-members');
+        Route::post('/imports/ghost-members', [GhostMembersImportController::class, 'upload'])->name('imports.ghost-members.upload');
+        Route::get('/imports/ghost-members/{run}/report', [GhostMembersImportController::class, 'report'])->name('imports.ghost-members.report');
     });
 
 Route::middleware(['auth', 'verified', 'role:'.Role::Staff->value])
@@ -75,16 +95,23 @@ Route::middleware(['auth', 'verified', 'role:'.Role::Staff->value])
     ->name('staff.')
     ->group(function () {
         Route::get('/posts', [StaffPostController::class, 'index'])->name('posts.index');
+        Route::get('/posts/review', [StaffPostController::class, 'reviewQueue'])->name('posts.review');
         Route::get('/posts/new', [StaffPostController::class, 'create'])->name('posts.create');
         Route::post('/posts', [StaffPostController::class, 'store'])->name('posts.store');
         Route::get('/posts/{post}/edit', [StaffPostController::class, 'edit'])->name('posts.edit');
         Route::patch('/posts/{post}', [StaffPostController::class, 'update'])->name('posts.update');
+        Route::delete('/posts/{post}', [StaffPostController::class, 'destroy'])->name('posts.destroy');
         Route::post('/posts/{post}/submit', [StaffPostController::class, 'submitForReview'])->name('posts.submit');
+        Route::post('/posts/{post}/reject', [StaffPostController::class, 'reject'])->name('posts.reject');
         Route::post('/posts/{post}/schedule', [StaffPostController::class, 'schedule'])->name('posts.schedule');
         Route::post('/posts/{post}/publish', [StaffPostController::class, 'publish'])->name('posts.publish');
+        Route::post('/posts/{post}/unpublish', [StaffPostController::class, 'unpublish'])->name('posts.unpublish');
+        Route::post('/posts/{post}/revisions/{revision}/restore', [StaffPostController::class, 'restoreRevision'])->name('posts.revisions.restore');
         Route::get('/posts/{post}/preview', [StaffPostController::class, 'preview'])->name('posts.preview');
         Route::get('/posts/{post}/campaign', [StaffCampaignController::class, 'preview'])->name('posts.campaign.preview');
         Route::post('/posts/{post}/campaign/test-send', [StaffCampaignController::class, 'testSend'])->name('posts.campaign.test');
+        Route::post('/media/by-url', [StaffMediaController::class, 'byUrl'])->name('media.by-url');
+        Route::post('/media/link-meta', [StaffMediaController::class, 'linkMeta'])->name('media.link-meta');
     });
 
 require __DIR__.'/auth.php';

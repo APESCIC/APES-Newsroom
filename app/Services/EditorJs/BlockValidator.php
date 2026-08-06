@@ -24,6 +24,16 @@ class BlockValidator
         'callout',
         'linkTool',
         'embed',
+        'legacy',
+    ];
+
+    /** @var array<int, string> */
+    private const APPROVED_EMBED_SERVICES = [
+        'youtube',
+        'vimeo',
+        'twitter',
+        'instagram',
+        'codepen',
     ];
 
     /**
@@ -84,10 +94,15 @@ class BlockValidator
             'list' => ['type' => $type, 'data' => $this->validateList($data, $index)],
             'quote' => ['type' => $type, 'data' => $this->validateQuote($data, $index)],
             'image' => ['type' => $type, 'data' => $this->validateImage($data, $index)],
+            'table' => ['type' => $type, 'data' => $this->validateTable($data, $index)],
             'delimiter' => ['type' => $type, 'data' => new \stdClass],
             'callout' => ['type' => $type, 'data' => $this->validateCallout($data, $index)],
             'linkTool' => ['type' => $type, 'data' => $this->validateLink($data, $index)],
-            default => ['type' => $type, 'data' => $data],
+            'embed' => ['type' => $type, 'data' => $this->validateEmbed($data, $index)],
+            'legacy' => ['type' => $type, 'data' => $this->validateLegacy($data, $index)],
+            default => throw ValidationException::withMessages([
+                'content' => "Block type '{$type}' is not allowed.",
+            ]),
         };
     }
 
@@ -97,9 +112,7 @@ class BlockValidator
      */
     private function validateParagraph(array $data, int $index): array
     {
-        $text = $this->sanitizeText($data['text'] ?? '', $index, 'paragraph');
-
-        return ['text' => $text];
+        return ['text' => $this->sanitizeText($data['text'] ?? '', $index, 'paragraph')];
     }
 
     /**
@@ -140,7 +153,13 @@ class BlockValidator
         return [
             'style' => $style,
             'items' => array_map(
-                fn ($item) => $this->sanitizeText((string) $item, $index, 'list item'),
+                function ($item) use ($index) {
+                    if (is_array($item)) {
+                        return $this->sanitizeText((string) ($item['content'] ?? $item['text'] ?? ''), $index, 'list item');
+                    }
+
+                    return $this->sanitizeText((string) $item, $index, 'list item');
+                },
                 $items
             ),
         ];
@@ -160,7 +179,7 @@ class BlockValidator
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     private function validateImage(array $data, int $index): array
     {
@@ -190,6 +209,41 @@ class BlockValidator
 
     /**
      * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function validateTable(array $data, int $index): array
+    {
+        $content = $data['content'] ?? [];
+
+        if (! is_array($content) || $content === []) {
+            throw ValidationException::withMessages([
+                'content' => "Table at index {$index} requires content rows.",
+            ]);
+        }
+
+        $rows = [];
+
+        foreach ($content as $rowIndex => $row) {
+            if (! is_array($row)) {
+                throw ValidationException::withMessages([
+                    'content' => "Table row {$rowIndex} at index {$index} is malformed.",
+                ]);
+            }
+
+            $rows[] = array_map(
+                fn ($cell) => $this->sanitizeText((string) $cell, $index, 'table cell'),
+                $row
+            );
+        }
+
+        return [
+            'withHeadings' => (bool) ($data['withHeadings'] ?? false),
+            'content' => $rows,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
      * @return array<string, string>
      */
     private function validateCallout(array $data, int $index): array
@@ -201,7 +255,7 @@ class BlockValidator
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     private function validateLink(array $data, int $index): array
     {
@@ -218,6 +272,66 @@ class BlockValidator
             'meta' => [
                 'title' => $this->sanitizeText($data['meta']['title'] ?? '', $index, 'link title'),
             ],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function validateEmbed(array $data, int $index): array
+    {
+        $service = strtolower((string) ($data['service'] ?? ''));
+        $source = (string) ($data['source'] ?? $data['embed'] ?? '');
+
+        if (! in_array($service, self::APPROVED_EMBED_SERVICES, true)) {
+            throw ValidationException::withMessages([
+                'content' => "Embed service at index {$index} is not approved.",
+            ]);
+        }
+
+        if ($source === '' || ! filter_var($source, FILTER_VALIDATE_URL)) {
+            throw ValidationException::withMessages([
+                'content' => "Embed at index {$index} requires a valid source URL.",
+            ]);
+        }
+
+        return [
+            'service' => $service,
+            'source' => $source,
+            'embed' => filter_var((string) ($data['embed'] ?? $source), FILTER_VALIDATE_URL) ?: $source,
+            'caption' => $this->sanitizeText($data['caption'] ?? '', $index, 'embed caption'),
+            'width' => min(max((int) ($data['width'] ?? 580), 100), 1200),
+            'height' => min(max((int) ($data['height'] ?? 320), 100), 900),
+        ];
+    }
+
+    /**
+     * Sanitized HTML from Ghost import for human review — never executed as script.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function validateLegacy(array $data, int $index): array
+    {
+        $html = (string) ($data['html'] ?? '');
+
+        if (strlen($html) > 100000) {
+            throw ValidationException::withMessages([
+                'content' => "Legacy block at index {$index} exceeds maximum length.",
+            ]);
+        }
+
+        if (preg_match('/<script|javascript:|on\w+=/i', $html)) {
+            throw ValidationException::withMessages([
+                'content' => "Disallowed content in legacy block at index {$index}.",
+            ]);
+        }
+
+        return [
+            'html' => strip_tags($html, '<p><br><strong><em><ul><ol><li><a><h2><h3><h4><blockquote><img><figure><figcaption><table><thead><tbody><tr><th><td><hr>'),
+            'needs_review' => true,
+            'note' => $this->sanitizeText($data['note'] ?? 'Imported legacy HTML', $index, 'legacy note'),
         ];
     }
 

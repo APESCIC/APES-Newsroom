@@ -27,7 +27,7 @@ class BlockRenderer
     private function renderBlock(array $block): string
     {
         $type = $block['type'] ?? '';
-        $data = $block['data'] ?? [];
+        $data = is_array($block['data'] ?? null) ? $block['data'] : [];
 
         return match ($type) {
             'paragraph' => '<p>'.e($data['text'] ?? '').'</p>',
@@ -35,9 +35,12 @@ class BlockRenderer
             'list' => $this->renderList($data),
             'quote' => '<blockquote><p>'.e($data['text'] ?? '').'</p>'.(($data['caption'] ?? '') ? '<cite>'.e($data['caption']).'</cite>' : '').'</blockquote>',
             'image' => $this->renderImage($data),
+            'table' => $this->renderTable($data),
             'delimiter' => '<hr />',
             'callout' => '<aside class="callout">'.e($data['text'] ?? '').'</aside>',
-            'linkTool' => '<p><a href="'.e($data['link'] ?? '').'">'.e($data['meta']['title'] ?? $data['link'] ?? '').'</a></p>',
+            'linkTool' => '<p><a href="'.e($data['link'] ?? '').'" rel="noopener noreferrer">'.e($data['meta']['title'] ?? $data['link'] ?? '').'</a></p>',
+            'embed' => $this->renderEmbed($data),
+            'legacy' => $this->renderLegacy($data),
             default => '',
         };
     }
@@ -51,7 +54,7 @@ class BlockRenderer
         $items = '';
 
         foreach ($data['items'] ?? [] as $item) {
-            $items .= '<li>'.e($item).'</li>';
+            $items .= '<li>'.e(is_array($item) ? (string) ($item['content'] ?? $item['text'] ?? '') : (string) $item).'</li>';
         }
 
         return "<{$tag}>{$items}</{$tag}>";
@@ -65,7 +68,59 @@ class BlockRenderer
         $url = e($data['file']['url'] ?? $data['url'] ?? '');
         $alt = e($data['alt'] ?? '');
         $caption = ($data['caption'] ?? '') ? '<figcaption>'.e($data['caption']).'</figcaption>' : '';
+        $credit = ($data['credit'] ?? '') ? '<p class="image-credit">'.e($data['credit']).'</p>' : '';
 
-        return "<figure><img src=\"{$url}\" alt=\"{$alt}\" loading=\"lazy\" />{$caption}</figure>";
+        return "<figure><img src=\"{$url}\" alt=\"{$alt}\" loading=\"lazy\" />{$caption}{$credit}</figure>";
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function renderTable(array $data): string
+    {
+        $rows = $data['content'] ?? [];
+        $withHeadings = (bool) ($data['withHeadings'] ?? false);
+        $body = '';
+
+        foreach ($rows as $rowIndex => $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $cells = '';
+            $tag = ($withHeadings && $rowIndex === 0) ? 'th' : 'td';
+
+            foreach ($row as $cell) {
+                $cells .= "<{$tag}>".e((string) $cell)."</{$tag}>";
+            }
+
+            $body .= "<tr>{$cells}</tr>";
+        }
+
+        return "<table>{$body}</table>";
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function renderEmbed(array $data): string
+    {
+        $src = e($data['embed'] ?? $data['source'] ?? '');
+        $width = (int) ($data['width'] ?? 580);
+        $height = (int) ($data['height'] ?? 320);
+        $caption = ($data['caption'] ?? '') ? '<figcaption>'.e($data['caption']).'</figcaption>' : '';
+
+        return "<figure class=\"embed\"><iframe src=\"{$src}\" width=\"{$width}\" height=\"{$height}\" loading=\"lazy\" referrerpolicy=\"no-referrer\" allowfullscreen title=\"Embedded content\"></iframe>{$caption}</figure>";
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function renderLegacy(array $data): string
+    {
+        $html = (string) ($data['html'] ?? '');
+        $note = e($data['note'] ?? 'Imported legacy content');
+
+        return '<div class="legacy-block" data-needs-review="true"><p class="legacy-note">'.$note.'</p>'.$html.'</div>';
     }
 }

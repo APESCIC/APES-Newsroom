@@ -1,6 +1,8 @@
 # Epic #1 build plan: APES Newsroom (replacing Ghost)
 
-Source: [Issue #1](https://github.com/APESCIC/APES-Newsroom/issues/1) and its sub-issues (#2–#11, #18). Phases 0–3 are implemented in code on the main delivery branch; #2–#6 still have residual acceptance work (Editor.js UI, discovery polish) tracked on those issues.
+Source: [Issue #1](https://github.com/APESCIC/APES-Newsroom/issues/1) and its sub-issues (#2–#11, #18).
+
+**Code-complete v1 status (2026-08-06):** Engineering acceptance for #5–#9 and #18 is implemented on `feat/v1-code-complete` (Editor.js publishing UX, discovery/archives/redirects, Ghost content CLI import, governance surfaces, admin Ghost members CSV importer). Still open / gated: #2 design approval, #3 watched beta deploy, #4 live OIDC/LDAP proof, #10 legal/a11y sign-off, #11 production cutover.
 
 ## What we're building
 
@@ -103,4 +105,9 @@ Who is doing the #2 design work — is that Bambie/a designer producing wirefram
 
 ## Suggested next step
 
-**Phase 3 (#7 mailing, #8 engagement) is implemented.** Next build focus is **#9 content/media/redirect import scaffolding** once content schemas (#5/#6) are accepted as stable enough to import into. Continue polishing #5/#6 residuals (Editor.js UI, archives) in parallel. **#18 admin-panel mailing CSV importer comes last before cutover** (after #10). #10 governance artifacts and #11 cutover remain separately gated.
+**Code-complete v1 is implemented** on `feat/v1-code-complete`. Next operational steps (not authorized by this plan alone):
+
+1. Stakeholder approval for #2 design drafts (or explicit waiver)
+2. Watched beta deploy + rollback drill (#3) and live OIDC/LDAP proof (#4)
+3. Legal/compliance + accessibility sign-off on #10 artifacts
+4. Authorized final content import (#9) then admin-panel mailing CSV import (#18) then cutover (#11)

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'mailing_contact_id', 'email', 'list', 'action', 'source',
-    'wording_version', 'evidence', 'ip_address', 'user_agent',
+    'wording_version', 'evidence', 'ip_address', 'user_agent', 'created_at',
 ])]
 class ConsentEvent extends Model
 {

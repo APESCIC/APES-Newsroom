@@ -15,3 +15,54 @@
     --color-neutral-100: #F5F5F4;
     --color-focus: #2563EB;
 }
+
+.prose {
+    line-height: 1.7;
+    color: var(--color-neutral-900);
+}
+
+.prose p,
+.prose ul,
+.prose ol,
+.prose blockquote,
+.prose table,
+.prose figure {
+    margin-block: 1rem;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+    font-weight: 600;
+    margin-top: 1.5rem;
+}
+
+.callout {
+    border-left: 4px solid var(--color-apes-primary);
+    background: var(--color-neutral-100);
+    padding: 0.75rem 1rem;
+}
+
+.legacy-block {
+    border: 1px dashed #b45309;
+    padding: 0.75rem;
+    background: #fffbeb;
+}
+
+.legacy-note {
+    font-size: 0.875rem;
+    color: #92400e;
+    margin-bottom: 0.5rem;
+}
+
+.editorjs-field .ce-block__content,
+.editorjs-field .ce-toolbar__content {
+    max-width: 100%;
+}
+
+.ce-callout {
+    border-left: 4px solid var(--color-apes-primary);
+    background: var(--color-neutral-100);
+    padding: 0.75rem 1rem;
+    min-height: 2.5rem;
+}

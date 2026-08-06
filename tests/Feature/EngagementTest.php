@@ -174,4 +174,43 @@ class EngagementTest extends TestCase
             'body' => 'Nope',
         ])->assertRedirect(); // verified middleware redirects
     }
+
+    public function test_verified_user_can_report_a_comment(): void
+    {
+        $reporter = User::factory()->create();
+        $comment = Comment::query()->create([
+            'post_id' => Post::factory()->published()->create()->id,
+            'user_id' => User::factory()->create()->id,
+            'body' => 'Reportable',
+            'moderation_status' => ModerationStatus::Approved,
+            'body_hash' => hash('sha256', 'Reportable'),
+        ]);
+
+        $this->actingAs($reporter)->post('/reports', [
+            'type' => 'comment',
+            'id' => $comment->id,
+            'reason' => 'Spam content',
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('moderation_reports', [
+            'reporter_id' => $reporter->id,
+            'reportable_id' => $comment->id,
+            'reason' => 'Spam content',
+            'status' => 'open',
+        ]);
+    }
+
+    public function test_admin_can_lift_suspension(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $user = User::factory()->create();
+        $profile = app(ProfileService::class)->forUser($user);
+        $profile->update(['moderation_status' => ModerationStatus::Suspended]);
+
+        $this->actingAs($admin)->post("/admin/moderation/profiles/{$profile->id}", [
+            'status' => ModerationStatus::Private->value,
+        ])->assertRedirect();
+
+        $this->assertSame(ModerationStatus::Private, $profile->fresh()->moderation_status);
+    }
 }

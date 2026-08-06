@@ -1,0 +1,5 @@
+id,email,name,subscribed_to_emails,labels,created_at,deleted_at
+ghost-1,active-all@example.com,Active All,true,"apes-cic,apes-shelter-rescue,apes-pet-care-clinic",2024-01-01T00:00:00.000Z,
+ghost-2,held@example.com,Held Reader,true,,2024-01-02T00:00:00.000Z,
+ghost-3,unsub@example.com,Unsub Reader,false,,2024-01-03T00:00:00.000Z,
+ghost-4,deleted@example.com,Deleted Reader,true,,2024-01-04T00:00:00.000Z,2024-06-01T00:00:00.000Z

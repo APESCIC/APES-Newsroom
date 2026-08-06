@@ -11,6 +11,9 @@ use App\Http\Requests\Staff\StorePostRequest;
 use App\Http\Requests\Staff\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\PostRevision;
+use App\Models\Redirect;
+use App\Models\Tag;
+use App\Services\Audit\AuditLogger;
 use App\Services\EditorJs\BlockRenderer;
 use App\Services\EditorJs\BlockValidator;
 use App\Services\Mailing\CampaignService;
@@ -27,6 +30,7 @@ class PostController extends Controller
         private readonly BlockValidator $validator,
         private readonly BlockRenderer $renderer,
         private readonly CampaignService $campaigns,
+        private readonly AuditLogger $audit,
     ) {}
 
     public function index(Request $request): Response
@@ -35,6 +39,10 @@ class PostController extends Controller
 
         if ($request->user()->role === Role::Staff) {
             $query->where('author_id', $request->user()->id);
+        }
+
+        if ($status = $request->string('status')->toString()) {
+            $query->where('status', $status);
         }
 
         $posts = $query->latest('updated_at')->get()->map(fn (Post $post) => [
@@ -47,15 +55,44 @@ class PostController extends Controller
             'author' => $post->author->name,
         ]);
 
-        return Inertia::render('Staff/Posts/Index', ['posts' => $posts]);
+        return Inertia::render('Staff/Posts/Index', [
+            'posts' => $posts,
+            'filterStatus' => $status ?: null,
+            'canReview' => $request->user()->role->atLeast(Role::Admin),
+        ]);
     }
 
-    public function create(): Response
+    public function reviewQueue(Request $request): Response
+    {
+        abort_unless($request->user()->role->atLeast(Role::Admin), 403);
+
+        $posts = Post::query()
+            ->with('author')
+            ->where('status', PostStatus::InReview)
+            ->latest('updated_at')
+            ->get()
+            ->map(fn (Post $post) => [
+                'id' => $post->id,
+                'title' => $post->title,
+                'slug' => $post->slug,
+                'status' => $post->status->value,
+                'channel' => $post->channel->value,
+                'updated_at' => $post->updated_at?->toIso8601String(),
+                'author' => $post->author->name,
+                'review_notes' => $post->review_notes,
+            ]);
+
+        return Inertia::render('Staff/Posts/Review', ['posts' => $posts]);
+    }
+
+    public function create(Request $request): Response
     {
         return Inertia::render('Staff/Posts/Edit', [
             'post' => null,
             'channels' => $this->channelOptions(),
             'mailingLists' => $this->mailingListOptions(),
+            'canPublish' => $request->user()->role->atLeast(Role::Admin),
+            'revisions' => [],
         ]);
     }
 
@@ -63,6 +100,8 @@ class PostController extends Controller
     {
         $validated = $request->validated();
         $content = $this->validator->validate($validated['content']);
+        $tags = $validated['tags'] ?? [];
+        unset($validated['tags']);
 
         $post = Post::create([
             ...$validated,
@@ -72,32 +111,28 @@ class PostController extends Controller
             'status' => PostStatus::Draft,
         ]);
 
+        $this->syncTags($post, $tags);
         $this->saveRevision($post, $request->user()->id);
 
         return redirect()->route('staff.posts.edit', $post);
     }
 
-    public function edit(Post $post): Response
+    public function edit(Request $request, Post $post): Response
     {
         $this->authorizeEdit($post);
+        $post->load('tags', 'revisions.editor');
 
         return Inertia::render('Staff/Posts/Edit', [
-            'post' => [
-                'id' => $post->id,
-                'title' => $post->title,
-                'slug' => $post->slug,
-                'excerpt' => $post->excerpt,
-                'content' => $post->content,
-                'status' => $post->status->value,
-                'channel' => $post->channel->value,
-                'meta_title' => $post->meta_title,
-                'meta_description' => $post->meta_description,
-                'scheduled_for' => $post->scheduled_for?->format('Y-m-d\TH:i'),
-                'email_on_publish' => $post->email_on_publish,
-                'mailing_lists' => $post->mailing_lists ?? [],
-            ],
+            'post' => $this->editPayload($post),
             'channels' => $this->channelOptions(),
             'mailingLists' => $this->mailingListOptions(),
+            'canPublish' => $request->user()->role->atLeast(Role::Admin),
+            'revisions' => $post->revisions()->latest()->limit(20)->get()->map(fn (PostRevision $revision) => [
+                'id' => $revision->id,
+                'title' => $revision->title,
+                'editor' => $revision->editor?->name,
+                'created_at' => $revision->created_at?->toIso8601String(),
+            ]),
         ]);
     }
 
@@ -106,14 +141,39 @@ class PostController extends Controller
         $this->authorizeEdit($post);
 
         $validated = $request->validated();
+
+        if (isset($validated['expected_updated_at'])) {
+            $expected = $validated['expected_updated_at'];
+            unset($validated['expected_updated_at']);
+
+            if ($post->updated_at?->toIso8601String() !== $expected) {
+                return back()->withErrors([
+                    'conflict' => 'This post was edited elsewhere. Reload to see the latest version, then retry.',
+                ]);
+            }
+        }
+
         $content = $this->validator->validate($validated['content']);
+        $tags = $validated['tags'] ?? [];
+        unset($validated['tags']);
+
+        $oldSlug = $post->slug;
+        $wasPublished = $post->status === PostStatus::Published;
 
         $post->update([
             ...$validated,
             'content' => $content,
         ]);
 
+        $this->syncTags($post, $tags);
         $this->saveRevision($post, $request->user()->id);
+
+        if ($wasPublished && $oldSlug !== $post->slug) {
+            Redirect::query()->updateOrCreate(
+                ['from_path' => '/articles/'.$oldSlug],
+                ['to_path' => '/articles/'.$post->slug, 'status_code' => 301],
+            );
+        }
 
         return back();
     }
@@ -122,7 +182,26 @@ class PostController extends Controller
     {
         $this->authorizeEdit($post);
 
-        $post->update(['status' => PostStatus::InReview]);
+        $post->update([
+            'status' => PostStatus::InReview,
+            'review_notes' => null,
+        ]);
+
+        return back();
+    }
+
+    public function reject(Request $request, Post $post): RedirectResponse
+    {
+        $this->authorizeAdmin();
+
+        $validated = $request->validate([
+            'review_notes' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $post->update([
+            'status' => PostStatus::Draft,
+            'review_notes' => $validated['review_notes'],
+        ]);
 
         return back();
     }
@@ -154,10 +233,56 @@ class PostController extends Controller
                 'status' => PostStatus::Published,
                 'published_at' => now(),
                 'scheduled_for' => null,
+                'review_notes' => null,
             ]);
 
             $this->campaigns->createFromPublishedPost($post->fresh(), $request->user());
         });
+
+        $this->audit->record($request->user(), 'post.published', $post->fresh(), [], $request);
+
+        return back();
+    }
+
+    public function unpublish(Request $request, Post $post): RedirectResponse
+    {
+        $this->authorizeAdmin();
+
+        $post->update([
+            'status' => PostStatus::Unpublished,
+            'scheduled_for' => null,
+        ]);
+
+        $this->audit->record($request->user(), 'post.unpublished', $post, [], $request);
+
+        return back();
+    }
+
+    public function destroy(Request $request, Post $post): RedirectResponse
+    {
+        $this->authorizeEdit($post);
+
+        if ($request->user()->role === Role::Staff && $post->author_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        $post->update(['status' => PostStatus::Deleted]);
+        $post->delete();
+
+        return redirect()->route('staff.posts.index');
+    }
+
+    public function restoreRevision(Request $request, Post $post, PostRevision $revision): RedirectResponse
+    {
+        $this->authorizeEdit($post);
+        abort_unless($revision->post_id === $post->id, 404);
+
+        $post->update([
+            'title' => $revision->title,
+            'content' => $revision->content,
+        ]);
+
+        $this->saveRevision($post, $request->user()->id);
 
         return back();
     }
@@ -205,6 +330,58 @@ class PostController extends Controller
     }
 
     /**
+     * @param  array<int, string>  $tagNames
+     */
+    private function syncTags(Post $post, array $tagNames): void
+    {
+        $ids = [];
+
+        foreach ($tagNames as $name) {
+            $name = trim($name);
+            if ($name === '') {
+                continue;
+            }
+
+            $tag = Tag::query()->firstOrCreate(
+                ['slug' => Str::slug($name)],
+                ['name' => $name],
+            );
+            $ids[] = $tag->id;
+        }
+
+        $post->tags()->sync($ids);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function editPayload(Post $post): array
+    {
+        return [
+            'id' => $post->id,
+            'title' => $post->title,
+            'slug' => $post->slug,
+            'excerpt' => $post->excerpt,
+            'content' => $post->content,
+            'status' => $post->status->value,
+            'channel' => $post->channel->value,
+            'hero_image' => $post->hero_image,
+            'hero_image_alt' => $post->hero_image_alt,
+            'hero_image_caption' => $post->hero_image_caption,
+            'hero_image_credit' => $post->hero_image_credit,
+            'meta_title' => $post->meta_title,
+            'meta_description' => $post->meta_description,
+            'canonical_url' => $post->canonical_url,
+            'scheduled_for' => $post->scheduled_for?->format('Y-m-d\TH:i'),
+            'email_on_publish' => $post->email_on_publish,
+            'mailing_lists' => $post->mailing_lists ?? [],
+            'review_notes' => $post->review_notes,
+            'tags' => $post->tags->pluck('name')->all(),
+            'updated_at' => $post->updated_at?->toIso8601String(),
+        ];
+    }
+
+    /**
      * @return array<int, array{value: string, label: string}>
      */
     private function channelOptions(): array
@@ -235,7 +412,7 @@ class PostController extends Controller
             'title' => $post->title,
             'slug' => $post->slug,
             'excerpt' => $post->excerpt,
-            'html' => $this->renderer->toHtml($post->content),
+            'html' => $this->renderer->toHtml($post->content ?? ['blocks' => []]),
             'channel' => $post->channel->label(),
             'author' => $post->author->name,
             'published_at' => $post->published_at?->toIso8601String(),
