@@ -244,13 +244,14 @@ class GhostContentImporter
 
         $fallbackAuthorId = User::query()->whereIn('role', [Role::Admin, Role::Staff, Role::SuperAdmin])->value('id');
         if (! $fallbackAuthorId) {
-            $fallbackAuthorId = User::query()->create([
+            $fallback = User::query()->firstOrNew(['email' => 'import-fallback@apes.local']);
+            $fallback->forceFill([
                 'name' => 'Import Fallback',
-                'email' => 'import-fallback@apes.local',
-                'password' => bcrypt(Str::random(32)),
+                'password' => $fallback->password ?: bcrypt(Str::random(32)),
                 'role' => Role::Staff,
-                'email_verified_at' => now(),
-            ])->id;
+                'email_verified_at' => $fallback->email_verified_at ?? now(),
+            ])->save();
+            $fallbackAuthorId = $fallback->id;
         }
 
         foreach ($posts as $post) {
@@ -269,13 +270,31 @@ class GhostContentImporter
 
             if ($mediaPath) {
                 $converted['blocks'] = $this->rewriteMedia($converted['blocks'], $mediaPath, $report);
+            } else {
+                $converted['blocks'] = $this->normalizeImageUrlsForImport($converted['blocks'], $report);
             }
 
-            $document = $this->validator->validate([
-                'time' => now()->getTimestampMs(),
-                'blocks' => $converted['blocks'],
-                'version' => '2.29.0',
-            ]);
+            try {
+                $document = $this->validator->validate([
+                    'time' => now()->getTimestampMs(),
+                    'blocks' => $converted['blocks'],
+                    'version' => '2.29.0',
+                ]);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $report['warnings'][] = 'Post '.$slug.' failed block validation: '.$e->getMessage();
+                $report['needs_review'][] = $slug;
+                $converted['needs_review'] = true;
+                $document = $this->validator->validate([
+                    'time' => now()->getTimestampMs(),
+                    'blocks' => [[
+                        'type' => 'paragraph',
+                        'data' => [
+                            'text' => e((string) ($post['title'] ?? $slug)).' (import needs review — original body failed block validation)',
+                        ],
+                    ]],
+                    'version' => '2.29.0',
+                ]);
+            }
 
             $authorGhostId = $authorsByPost[$ghostId][0] ?? null;
             $authorId = ($authorGhostId && ($authorMap[$authorGhostId] ?? 0) > 0)
@@ -367,19 +386,31 @@ class GhostContentImporter
      */
     private function rewriteMedia(array $blocks, string $mediaPath, array &$report): array
     {
+        $mediaRoot = rtrim($mediaPath, DIRECTORY_SEPARATOR);
+        $publicBase = rtrim((string) config('app.url'), '/');
+
         foreach ($blocks as &$block) {
             if (($block['type'] ?? '') !== 'image') {
                 continue;
             }
 
             $url = (string) ($block['data']['file']['url'] ?? '');
-            $path = parse_url($url, PHP_URL_PATH) ?: $url;
-            $basename = basename((string) $path);
-            $source = rtrim($mediaPath, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$basename;
+            $resolved = $this->resolveGhostMediaUrl($url);
+            $basename = basename(parse_url($resolved, PHP_URL_PATH) ?: $resolved);
+            $source = $this->findMediaFile($mediaRoot, $basename);
 
-            if (! is_file($source)) {
+            if ($source === null) {
                 $report['media']['missing']++;
                 $report['warnings'][] = "Missing media: {$basename}";
+                // Keep a reviewable placeholder rather than failing the whole import.
+                $alt = (string) ($block['data']['alt'] ?? 'Imported image');
+                $block = [
+                    'type' => 'paragraph',
+                    'data' => [
+                        'text' => e($alt).' (media pending import review)',
+                    ],
+                ];
+                $report['needs_review'][] = $basename;
 
                 continue;
             }
@@ -390,11 +421,95 @@ class GhostContentImporter
             if (! is_file($dest)) {
                 File::copy($source, $dest);
             }
-            $block['data']['file']['url'] = '/storage/imports/'.$basename;
+
+            $block['data']['file']['url'] = $publicBase.'/storage/imports/'.$basename;
+            if (trim((string) ($block['data']['alt'] ?? '')) === '') {
+                $block['data']['alt'] = 'Imported image';
+            }
             $report['media']['copied']++;
         }
 
         return $blocks;
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $blocks
+     * @param  array<string, mixed>  $report
+     * @return list<array<string, mixed>>
+     */
+    private function normalizeImageUrlsForImport(array $blocks, array &$report): array
+    {
+        $publicBase = rtrim((string) config('app.url'), '/');
+
+        foreach ($blocks as &$block) {
+            if (($block['type'] ?? '') !== 'image') {
+                continue;
+            }
+
+            $url = $this->resolveGhostMediaUrl((string) ($block['data']['file']['url'] ?? ''));
+            if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL)) {
+                $block['data']['file']['url'] = $url;
+                if (trim((string) ($block['data']['alt'] ?? '')) === '') {
+                    $block['data']['alt'] = 'Imported image';
+                }
+
+                continue;
+            }
+
+            if (str_starts_with($url, '/')) {
+                $block['data']['file']['url'] = $publicBase.$url;
+                if (trim((string) ($block['data']['alt'] ?? '')) === '') {
+                    $block['data']['alt'] = 'Imported image';
+                }
+
+                continue;
+            }
+
+            $alt = (string) ($block['data']['alt'] ?? 'Imported image');
+            $block = [
+                'type' => 'paragraph',
+                'data' => [
+                    'text' => e($alt).' (media pending import review)',
+                ],
+            ];
+            $report['media']['missing']++;
+            $report['warnings'][] = "Unresolvable image URL replaced with placeholder: {$url}";
+        }
+
+        return $blocks;
+    }
+
+    private function resolveGhostMediaUrl(string $url): string
+    {
+        return str_replace('__GHOST_URL__', '', $url);
+    }
+
+    private function findMediaFile(string $mediaRoot, string $basename): ?string
+    {
+        if ($basename === '' || $basename === '.' || $basename === '..') {
+            return null;
+        }
+
+        $direct = $mediaRoot.DIRECTORY_SEPARATOR.$basename;
+        if (is_file($direct)) {
+            return $direct;
+        }
+
+        if (! is_dir($mediaRoot)) {
+            return null;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($mediaRoot, \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getFilename() === $basename) {
+                return $file->getPathname();
+            }
+        }
+
+        return null;
     }
 
     /**
