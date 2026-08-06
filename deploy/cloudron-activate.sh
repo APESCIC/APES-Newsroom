@@ -44,6 +44,8 @@ mkdir -p \
 if [ ! -f "${SHARED_DIR}/.env" ]; then
     echo "==> First deploy: creating persistent .env from .env.example"
     cp "${RELEASE_DIR}/.env.example" "${SHARED_DIR}/.env"
+    sed -i 's/^APP_ENV=local$/APP_ENV=production/' "${SHARED_DIR}/.env"
+    sed -i 's/^APP_DEBUG=true$/APP_DEBUG=false/' "${SHARED_DIR}/.env"
     chown www-data:www-data "${SHARED_DIR}/.env"
 fi
 

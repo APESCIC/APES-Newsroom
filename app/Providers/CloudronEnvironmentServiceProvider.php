@@ -35,30 +35,48 @@ class CloudronEnvironmentServiceProvider extends ServiceProvider
         $this->mapLdap();
     }
 
+    /**
+     * Read Cloudron-injected environment variables at runtime.
+     *
+     * Must use getenv(), not env(), so mapping still works after
+     * `config:cache` (Laravel disables env() outside config files when
+     * configuration is cached).
+     */
+    private function cloudronEnv(string $key, mixed $default = null): mixed
+    {
+        $value = getenv($key);
+
+        if ($value === false) {
+            return $default;
+        }
+
+        return $value;
+    }
+
     private function mapMysql(): void
     {
-        if (! env('CLOUDRON_MYSQL_HOST')) {
+        if (! $this->cloudronEnv('CLOUDRON_MYSQL_HOST')) {
             return;
         }
 
         Config::set('database.default', 'mysql');
-        Config::set('database.connections.mysql.host', env('CLOUDRON_MYSQL_HOST'));
-        Config::set('database.connections.mysql.port', env('CLOUDRON_MYSQL_PORT', '3306'));
-        Config::set('database.connections.mysql.database', env('CLOUDRON_MYSQL_DATABASE'));
-        Config::set('database.connections.mysql.username', env('CLOUDRON_MYSQL_USERNAME'));
-        Config::set('database.connections.mysql.password', env('CLOUDRON_MYSQL_PASSWORD'));
+        Config::set('database.connections.mysql.host', $this->cloudronEnv('CLOUDRON_MYSQL_HOST'));
+        Config::set('database.connections.mysql.port', $this->cloudronEnv('CLOUDRON_MYSQL_PORT', '3306'));
+        Config::set('database.connections.mysql.database', $this->cloudronEnv('CLOUDRON_MYSQL_DATABASE'));
+        Config::set('database.connections.mysql.username', $this->cloudronEnv('CLOUDRON_MYSQL_USERNAME'));
+        Config::set('database.connections.mysql.password', $this->cloudronEnv('CLOUDRON_MYSQL_PASSWORD'));
     }
 
     private function mapRedis(): void
     {
-        if (! env('CLOUDRON_REDIS_HOST')) {
+        if (! $this->cloudronEnv('CLOUDRON_REDIS_HOST')) {
             return;
         }
 
         foreach (['default', 'cache'] as $connection) {
-            Config::set("database.redis.{$connection}.host", env('CLOUDRON_REDIS_HOST'));
-            Config::set("database.redis.{$connection}.port", env('CLOUDRON_REDIS_PORT', '6379'));
-            Config::set("database.redis.{$connection}.password", env('CLOUDRON_REDIS_PASSWORD'));
+            Config::set("database.redis.{$connection}.host", $this->cloudronEnv('CLOUDRON_REDIS_HOST'));
+            Config::set("database.redis.{$connection}.port", $this->cloudronEnv('CLOUDRON_REDIS_PORT', '6379'));
+            Config::set("database.redis.{$connection}.password", $this->cloudronEnv('CLOUDRON_REDIS_PASSWORD'));
         }
 
         Config::set('cache.default', 'redis');
@@ -68,22 +86,22 @@ class CloudronEnvironmentServiceProvider extends ServiceProvider
 
     private function mapMail(): void
     {
-        if (! env('CLOUDRON_MAIL_SMTP_SERVER')) {
+        if (! $this->cloudronEnv('CLOUDRON_MAIL_SMTP_SERVER')) {
             return;
         }
 
         Config::set('mail.default', 'smtp');
-        Config::set('mail.mailers.smtp.host', env('CLOUDRON_MAIL_SMTP_SERVER'));
-        Config::set('mail.mailers.smtp.port', env('CLOUDRON_MAIL_SMTP_PORT'));
-        Config::set('mail.mailers.smtp.username', env('CLOUDRON_MAIL_SMTP_USERNAME'));
-        Config::set('mail.mailers.smtp.password', env('CLOUDRON_MAIL_SMTP_PASSWORD'));
+        Config::set('mail.mailers.smtp.host', $this->cloudronEnv('CLOUDRON_MAIL_SMTP_SERVER'));
+        Config::set('mail.mailers.smtp.port', $this->cloudronEnv('CLOUDRON_MAIL_SMTP_PORT'));
+        Config::set('mail.mailers.smtp.username', $this->cloudronEnv('CLOUDRON_MAIL_SMTP_USERNAME'));
+        Config::set('mail.mailers.smtp.password', $this->cloudronEnv('CLOUDRON_MAIL_SMTP_PASSWORD'));
 
-        if (env('CLOUDRON_MAIL_FROM')) {
-            Config::set('mail.from.address', env('CLOUDRON_MAIL_FROM'));
+        if ($this->cloudronEnv('CLOUDRON_MAIL_FROM')) {
+            Config::set('mail.from.address', $this->cloudronEnv('CLOUDRON_MAIL_FROM'));
         }
 
-        if (env('CLOUDRON_MAIL_FROM_DISPLAY_NAME')) {
-            Config::set('mail.from.name', env('CLOUDRON_MAIL_FROM_DISPLAY_NAME'));
+        if ($this->cloudronEnv('CLOUDRON_MAIL_FROM_DISPLAY_NAME')) {
+            Config::set('mail.from.name', $this->cloudronEnv('CLOUDRON_MAIL_FROM_DISPLAY_NAME'));
         }
     }
 
@@ -93,33 +111,33 @@ class CloudronEnvironmentServiceProvider extends ServiceProvider
         // provisioned for this app. Prefer it over a hand-maintained
         // APP_URL so redirects, signed links, and asset URLs stay correct
         // if the app is ever moved between beta and production domains.
-        if (env('CLOUDRON_APP_ORIGIN')) {
-            Config::set('app.url', env('CLOUDRON_APP_ORIGIN'));
+        if ($this->cloudronEnv('CLOUDRON_APP_ORIGIN')) {
+            Config::set('app.url', $this->cloudronEnv('CLOUDRON_APP_ORIGIN'));
         }
     }
 
     private function mapOidc(): void
     {
-        if (! env('CLOUDRON_OIDC_DISCOVERY_URL')) {
+        if (! $this->cloudronEnv('CLOUDRON_OIDC_DISCOVERY_URL')) {
             return;
         }
 
-        Config::set('services.cloudron_oidc.discovery_url', env('CLOUDRON_OIDC_DISCOVERY_URL'));
-        Config::set('services.cloudron_oidc.issuer', env('CLOUDRON_OIDC_ISSUER'));
-        Config::set('services.cloudron_oidc.client_id', env('CLOUDRON_OIDC_CLIENT_ID'));
-        Config::set('services.cloudron_oidc.client_secret', env('CLOUDRON_OIDC_CLIENT_SECRET'));
+        Config::set('services.cloudron_oidc.discovery_url', $this->cloudronEnv('CLOUDRON_OIDC_DISCOVERY_URL'));
+        Config::set('services.cloudron_oidc.issuer', $this->cloudronEnv('CLOUDRON_OIDC_ISSUER'));
+        Config::set('services.cloudron_oidc.client_id', $this->cloudronEnv('CLOUDRON_OIDC_CLIENT_ID'));
+        Config::set('services.cloudron_oidc.client_secret', $this->cloudronEnv('CLOUDRON_OIDC_CLIENT_SECRET'));
     }
 
     private function mapLdap(): void
     {
-        if (! env('CLOUDRON_LDAP_URL')) {
+        if (! $this->cloudronEnv('CLOUDRON_LDAP_URL')) {
             return;
         }
 
-        Config::set('ldap.connections.default.hosts', [env('CLOUDRON_LDAP_URL')]);
-        Config::set('ldap.connections.default.username', env('CLOUDRON_LDAP_BIND_DN'));
-        Config::set('ldap.connections.default.password', env('CLOUDRON_LDAP_BIND_PASSWORD'));
-        Config::set('ldap.connections.default.base_dn', env('CLOUDRON_LDAP_USERS_BASE_DN'));
-        Config::set('services.cloudron_oidc.ldap_groups_base_dn', env('CLOUDRON_LDAP_GROUPS_BASE_DN'));
+        Config::set('ldap.connections.default.hosts', [$this->cloudronEnv('CLOUDRON_LDAP_URL')]);
+        Config::set('ldap.connections.default.username', $this->cloudronEnv('CLOUDRON_LDAP_BIND_DN'));
+        Config::set('ldap.connections.default.password', $this->cloudronEnv('CLOUDRON_LDAP_BIND_PASSWORD'));
+        Config::set('ldap.connections.default.base_dn', $this->cloudronEnv('CLOUDRON_LDAP_USERS_BASE_DN'));
+        Config::set('services.cloudron_oidc.ldap_groups_base_dn', $this->cloudronEnv('CLOUDRON_LDAP_GROUPS_BASE_DN'));
     }
 }
