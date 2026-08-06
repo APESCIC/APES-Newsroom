@@ -2,7 +2,7 @@
 
 Source: [Issue #1](https://github.com/APESCIC/APES-Newsroom/issues/1) and its sub-issues (#2–#11, #18).
 
-**Code-complete v1 status (2026-08-06):** Engineering acceptance for #5–#9 and #18 is implemented on `feat/v1-code-complete` (Editor.js publishing UX, discovery/archives/redirects, Ghost content CLI import, governance surfaces, admin Ghost members CSV importer). Still open / gated: #2 design approval, #3 watched beta deploy, #4 live OIDC/LDAP proof, #10 legal/a11y sign-off, #11 production cutover.
+**Code-complete v1 status (2026-08-06):** Engineering acceptance for #5–#9 and #18 is on `main`. Live ops: #2 design approved, #3 beta deploy+rollback done, #4 live OIDC/LDAP proved on beta, #10 governance sign-off recorded. Still open / gated: #11 production cutover (requires separate explicit authorization — not granted by closing #2–#10).
 
 ## What we're building
 
@@ -105,9 +105,6 @@ Who is doing the #2 design work — is that Bambie/a designer producing wirefram
 
 ## Suggested next step
 
-**Code-complete v1 is implemented** on `feat/v1-code-complete`. Next operational steps (not authorized by this plan alone):
+**Beta is ready.** Remaining gated step:
 
-1. Stakeholder approval for #2 design drafts (or explicit waiver)
-2. Watched beta deploy + rollback drill (#3) and live OIDC/LDAP proof (#4)
-3. Legal/compliance + accessibility sign-off on #10 artifacts
-4. Authorized final content import (#9) then admin-panel mailing CSV import (#18) then cutover (#11)
+1. Explicit production authorization from Bambie, then guarded cutover on #11 (final content + mailing imports, hostname move, rollback window). Ghost stays recoverable until a further separate retirement approval.
