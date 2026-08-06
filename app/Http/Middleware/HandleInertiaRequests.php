@@ -38,6 +38,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user()?->only(['id', 'name', 'email', 'role']),
             ],
+            'devTools' => app()->environment('local'),
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),
             ],

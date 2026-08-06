@@ -2,6 +2,7 @@ import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
+import RoleSwitcher from './Components/Dev/RoleSwitcher';
 
 const appName = document.title || 'APES Newsroom';
 
@@ -18,6 +19,15 @@ createInertiaApp({
         return page;
     },
     setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />);
+        createRoot(el).render(
+            <App {...props}>
+                {({ Component, props: pageProps, key }) => (
+                    <>
+                        <Component key={key} {...pageProps} />
+                        <RoleSwitcher />
+                    </>
+                )}
+            </App>,
+        );
     },
 });

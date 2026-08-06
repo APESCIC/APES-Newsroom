@@ -9,13 +9,40 @@ Two modes: **default** (zero extra services) and **production-like**
 composer install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate
+php artisan migrate --seed
 npm install
 composer dev    # or: php artisan serve + npm run dev
 ```
 
 Uses SQLite with database-backed sessions, cache, and queue. No Docker
-required.
+required. Seeding creates password demo users for local role preview
+(see below).
+
+## Role preview (local only)
+
+When `APP_ENV=local`, a floating **Local role preview** bar appears on
+every page. Use it (or the one-click buttons on `/login`) to switch
+sessions without Cloudron OIDC:
+
+| Control | User | Default landing |
+|---------|------|-----------------|
+| Guest | logout | `/` |
+| Public | `public@apes.local` | `/` |
+| Staff | `staff@apes.local` | `/staff/posts` |
+| Admin | `admin@apes.local` | `/admin/moderation` |
+| Super admin | `superadmin@apes.local` | `/admin/moderation` |
+
+Demo password for all seeded users: `password`.
+
+Endpoints (`POST /_dev/login/{role}`, `POST /_dev/logout`) are registered
+only when `APP_ENV=local`, and the controller also returns 404 outside
+local. Do not enable this in staging or production.
+
+```bash
+php artisan migrate --seed
+composer dev
+# open http://localhost:8000 — use the floating switcher
+```
 
 ## Production-like setup
 
