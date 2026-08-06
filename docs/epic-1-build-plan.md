@@ -1,6 +1,6 @@
 # Epic #1 build plan: APES Newsroom (replacing Ghost)
 
-Source: [Issue #1](https://github.com/APESCIC/APES-Newsroom/issues/1) and its ten sub-issues (#2–#11). Repo is currently empty (README only), so this plan starts from zero.
+Source: [Issue #1](https://github.com/APESCIC/APES-Newsroom/issues/1) and its ten sub-issues (#2–#11). Phases 0–3 are implemented in code on the main delivery branch; #2–#6 still have residual acceptance work (Editor.js UI, discovery polish) tracked on those issues.
 
 ## What we're building
 
@@ -95,4 +95,4 @@ Who is doing the #2 design work — is that Bambie/a designer producing wirefram
 
 ## Suggested next step
 
-Start **#3 (Laravel foundation)** — it's the only issue with no upstream dependency and everything else needs it to exist before code can run. #2 can proceed in parallel on the design side if that's being handled separately.
+**Phase 3 (#7 mailing, #8 engagement) is implemented.** Next build focus is **#9 Ghost migration** once mailing/consent and content schemas are accepted as stable enough to import into. Continue polishing #5/#6 residuals (Editor.js UI, archives) in parallel. #10 governance artifacts and #11 cutover remain separately gated.

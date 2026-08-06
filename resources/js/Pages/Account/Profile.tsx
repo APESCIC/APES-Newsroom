@@ -61,6 +61,20 @@ export default function Profile({ user, status }: { user: ProfileUser; status?: 
                 </form>
 
                 <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6">
+                    <h2 className="text-lg font-medium">Public profile</h2>
+                    <Link href="/account/public-profile" className="text-sm underline">
+                        Edit public profile
+                    </Link>
+                </section>
+
+                <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6">
+                    <h2 className="text-lg font-medium">Mailing lists</h2>
+                    <Link href="/account/mailing" className="text-sm underline">
+                        Manage mailing preferences
+                    </Link>
+                </section>
+
+                <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6">
                     <h2 className="text-lg font-medium">Your data</h2>
                     <Link href="/account/export" className="text-sm underline">
                         Download account data (JSON)

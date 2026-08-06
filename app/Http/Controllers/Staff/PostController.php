@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Enums\Channel;
+use App\Enums\MailingList;
 use App\Enums\PostStatus;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
@@ -12,8 +13,10 @@ use App\Models\Post;
 use App\Models\PostRevision;
 use App\Services\EditorJs\BlockRenderer;
 use App\Services\EditorJs\BlockValidator;
+use App\Services\Mailing\CampaignService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -23,6 +26,7 @@ class PostController extends Controller
     public function __construct(
         private readonly BlockValidator $validator,
         private readonly BlockRenderer $renderer,
+        private readonly CampaignService $campaigns,
     ) {}
 
     public function index(Request $request): Response
@@ -51,6 +55,7 @@ class PostController extends Controller
         return Inertia::render('Staff/Posts/Edit', [
             'post' => null,
             'channels' => $this->channelOptions(),
+            'mailingLists' => $this->mailingListOptions(),
         ]);
     }
 
@@ -88,8 +93,11 @@ class PostController extends Controller
                 'meta_title' => $post->meta_title,
                 'meta_description' => $post->meta_description,
                 'scheduled_for' => $post->scheduled_for?->format('Y-m-d\TH:i'),
+                'email_on_publish' => $post->email_on_publish,
+                'mailing_lists' => $post->mailing_lists ?? [],
             ],
             'channels' => $this->channelOptions(),
+            'mailingLists' => $this->mailingListOptions(),
         ]);
     }
 
@@ -141,11 +149,15 @@ class PostController extends Controller
             return back();
         }
 
-        $post->update([
-            'status' => PostStatus::Published,
-            'published_at' => now(),
-            'scheduled_for' => null,
-        ]);
+        DB::transaction(function () use ($request, $post) {
+            $post->update([
+                'status' => PostStatus::Published,
+                'published_at' => now(),
+                'scheduled_for' => null,
+            ]);
+
+            $this->campaigns->createFromPublishedPost($post->fresh(), $request->user());
+        });
 
         return back();
     }
@@ -157,6 +169,14 @@ class PostController extends Controller
         return Inertia::render('Articles/Show', [
             'article' => $this->articlePayload($post),
             'preview' => true,
+            'comments' => [],
+            'reactions' => [
+                'helpful' => 0,
+                'support' => 0,
+                'thank_you' => 0,
+                'mine' => [],
+            ],
+            'canEngage' => false,
         ]);
     }
 
@@ -192,6 +212,17 @@ class PostController extends Controller
         return collect(Channel::cases())->map(fn (Channel $c) => [
             'value' => $c->value,
             'label' => $c->label(),
+        ])->all();
+    }
+
+    /**
+     * @return array<int, array{value: string, label: string}>
+     */
+    private function mailingListOptions(): array
+    {
+        return collect(MailingList::cases())->map(fn (MailingList $list) => [
+            'value' => $list->value,
+            'label' => $list->label(),
         ])->all();
     }
 

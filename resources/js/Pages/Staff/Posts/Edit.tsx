@@ -2,6 +2,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 type Channel = { value: string; label: string };
+type MailingListOption = { value: string; label: string };
 
 type PostData = {
     id: number;
@@ -14,6 +15,8 @@ type PostData = {
     meta_title: string | null;
     meta_description: string | null;
     scheduled_for: string | null;
+    email_on_publish: boolean;
+    mailing_lists: string[];
 };
 
 const emptyContent = {
@@ -30,9 +33,19 @@ type PostForm = {
     channel: string;
     meta_title: string;
     meta_description: string;
+    email_on_publish: boolean;
+    mailing_lists: string[];
 };
 
-export default function PostEdit({ post, channels }: { post: PostData | null; channels: Channel[] }) {
+export default function PostEdit({
+    post,
+    channels,
+    mailingLists,
+}: {
+    post: PostData | null;
+    channels: Channel[];
+    mailingLists: MailingListOption[];
+}) {
     const isNew = post === null;
 
     const { data, setData, post: submitPost, patch, processing, errors } = useForm<PostForm>({
@@ -43,6 +56,8 @@ export default function PostEdit({ post, channels }: { post: PostData | null; ch
         channel: post?.channel ?? channels[0]?.value ?? 'apes_cic',
         meta_title: post?.meta_title ?? '',
         meta_description: post?.meta_description ?? '',
+        email_on_publish: post?.email_on_publish ?? false,
+        mailing_lists: post?.mailing_lists ?? [],
     });
 
     const submit: FormEventHandler = (e) => {
@@ -61,6 +76,15 @@ export default function PostEdit({ post, channels }: { post: PostData | null; ch
         });
     };
 
+    const toggleList = (value: string) => {
+        setData(
+            'mailing_lists',
+            data.mailing_lists.includes(value)
+                ? data.mailing_lists.filter((l) => l !== value)
+                : [...data.mailing_lists, value],
+        );
+    };
+
     const bodyText = data.content.blocks[0]?.data?.text ?? '';
 
     return (
@@ -76,6 +100,10 @@ export default function PostEdit({ post, channels }: { post: PostData | null; ch
                         Status: {post.status}{' '}
                         <Link href={`/staff/posts/${post.id}/preview`} className="underline">
                             Preview
+                        </Link>
+                        {' · '}
+                        <Link href={`/staff/posts/${post.id}/campaign`} className="underline">
+                            Campaign preview
                         </Link>
                     </p>
                 )}
@@ -136,6 +164,33 @@ export default function PostEdit({ post, channels }: { post: PostData | null; ch
                         />
                         {errors.content && <p className="text-sm text-red-600">{errors.content}</p>}
                     </div>
+
+                    <fieldset className="flex flex-col gap-3 border-t pt-4">
+                        <legend className="font-medium">Email campaign</legend>
+                        <label className="flex gap-2 text-sm">
+                            <input
+                                type="checkbox"
+                                checked={data.email_on_publish}
+                                onChange={(e) => setData('email_on_publish', e.target.checked)}
+                            />
+                            Email this post on publish
+                        </label>
+                        {data.email_on_publish && (
+                            <div className="flex flex-col gap-2 pl-6">
+                                {mailingLists.map((list) => (
+                                    <label key={list.value} className="flex gap-2 text-sm">
+                                        <input
+                                            type="checkbox"
+                                            checked={data.mailing_lists.includes(list.value)}
+                                            onChange={() => toggleList(list.value)}
+                                        />
+                                        {list.label}
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+                    </fieldset>
+
                     <button type="submit" disabled={processing} className="w-fit rounded bg-apes-primary px-4 py-2 text-white">
                         {isNew ? 'Create draft' : 'Save'}
                     </button>

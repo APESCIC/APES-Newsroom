@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Staff;
 
 use App\Enums\Channel;
+use App\Enums\MailingList;
 use App\Enums\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -27,6 +28,9 @@ class StorePostRequest extends FormRequest
             'channel' => ['required', Rule::enum(Channel::class)],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:500'],
+            'email_on_publish' => ['sometimes', 'boolean'],
+            'mailing_lists' => ['nullable', 'array'],
+            'mailing_lists.*' => [Rule::enum(MailingList::class)],
         ];
     }
 }
