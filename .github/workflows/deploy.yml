@@ -97,6 +97,13 @@ jobs:
             "$RELEASE_DIR"/storage/logs \
             "$RELEASE_DIR"/bootstrap/cache
 
+          # Empty dirs are dropped by cloudron sync push; keep placeholders.
+          touch \
+            "$RELEASE_DIR"/storage/framework/sessions/.gitkeep \
+            "$RELEASE_DIR"/storage/framework/views/.gitkeep \
+            "$RELEASE_DIR"/storage/framework/cache/data/.gitkeep \
+            "$RELEASE_DIR"/bootstrap/cache/.gitkeep
+
       - name: Install Cloudron CLI
         run: npm install -g cloudron
 
