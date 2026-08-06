@@ -70,3 +70,11 @@
 - [ ] Manual keyboard pass
 - [ ] Screen reader smoke pass
 - [ ] Named accessibility approver recorded
+
+## Test evidence pointers (code-complete v1)
+
+- Skip link present on homepage (`resources/js/Pages/home.tsx`)
+- Branded error page `Errors/Show` for 404/410/429/500
+- Engagement controls expose `aria-pressed` on reactions
+- Feature tests cover public reading, engagement gates, and form validation
+- Formal WCAG audit + accessibility sign-off remain open on issue #10

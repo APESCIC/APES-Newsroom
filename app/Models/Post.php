@@ -16,10 +16,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
-    'author_id', 'title', 'slug', 'excerpt', 'content', 'status', 'channel',
+    'ghost_id', 'author_id', 'title', 'slug', 'excerpt', 'content', 'status', 'channel',
     'hero_image', 'hero_image_alt', 'hero_image_caption', 'hero_image_credit',
     'meta_title', 'meta_description', 'canonical_url', 'published_at',
-    'scheduled_for', 'email_on_publish', 'mailing_lists', 'review_notes',
+    'scheduled_for', 'email_on_publish', 'mailing_lists', 'review_notes', 'needs_import_review',
 ])]
 class Post extends Model
 {
@@ -36,6 +36,7 @@ class Post extends Model
             'scheduled_for' => 'datetime',
             'email_on_publish' => 'boolean',
             'mailing_lists' => 'array',
+            'needs_import_review' => 'boolean',
         ];
     }
 

@@ -23,10 +23,11 @@ type Article = {
     channel: string;
     channel_slug: string;
     author: string;
+    author_id?: number;
     published_at: string | null;
     meta_title: string;
     meta_description: string | null;
-    tags?: string[];
+    tags?: Array<string | { name: string; slug: string }>;
 };
 
 const reactionLabels: Record<string, string> = {
@@ -91,11 +92,42 @@ export default function ArticleShow({
                 <article>
                     <h1 className="mt-4 text-4xl font-semibold text-neutral-900">{article.title}</h1>
                     <p className="mt-2 text-sm text-neutral-600">
-                        By {article.author}
+                        By{' '}
+                        {article.author_id ? (
+                            <Link href={`/authors/${article.author_id}`} className="underline">
+                                {article.author}
+                            </Link>
+                        ) : (
+                            article.author
+                        )}
                         {article.published_at && (
-                            <> · {new Date(article.published_at).toLocaleDateString('en-GB')}</>
+                            <>
+                                {' '}
+                                ·{' '}
+                                <Link
+                                    href={`/archive/${new Date(article.published_at).getUTCFullYear()}`}
+                                    className="underline"
+                                >
+                                    {new Date(article.published_at).toLocaleDateString('en-GB')}
+                                </Link>
+                            </>
                         )}
                     </p>
+                    {article.tags && article.tags.length > 0 && (
+                        <ul className="mt-3 flex flex-wrap gap-2 text-sm">
+                            {article.tags.map((tag) => {
+                                const name = typeof tag === 'string' ? tag : tag.name;
+                                const slug = typeof tag === 'string' ? tag.toLowerCase().replace(/\s+/g, '-') : tag.slug;
+                                return (
+                                    <li key={slug}>
+                                        <Link href={`/tags/${slug}`} className="rounded border px-2 py-0.5 underline">
+                                            {name}
+                                        </Link>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
                     <div
                         className="prose prose-neutral mt-8 max-w-none"
                         dangerouslySetInnerHTML={{ __html: article.html }}
@@ -146,6 +178,25 @@ export default function ArticleShow({
                                 <li key={comment.id} className="border-b border-neutral-100 pb-4">
                                     <p className="text-sm font-medium">{comment.author.display_name}</p>
                                     <p className="mt-1 text-neutral-800">{comment.body}</p>
+                                    {canEngage && (
+                                        <button
+                                            type="button"
+                                            className="mt-2 text-xs text-neutral-600 underline"
+                                            onClick={() => {
+                                                const reason = window.prompt('Why are you reporting this comment?');
+                                                if (!reason) {
+                                                    return;
+                                                }
+                                                router.post('/reports', {
+                                                    type: 'comment',
+                                                    id: comment.id,
+                                                    reason,
+                                                });
+                                            }}
+                                        >
+                                            Report
+                                        </button>
+                                    )}
                                 </li>
                             ))}
                             {comments.length === 0 && <li className="text-sm text-neutral-600">No approved comments yet.</li>}

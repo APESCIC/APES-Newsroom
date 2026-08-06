@@ -46,4 +46,45 @@ class BlockValidatorTest extends TestCase
             ]],
         ]);
     }
+
+    public function test_table_and_embed_are_validated(): void
+    {
+        $result = (new BlockValidator)->validate([
+            'blocks' => [
+                [
+                    'type' => 'table',
+                    'data' => [
+                        'withHeadings' => true,
+                        'content' => [['A', 'B'], ['1', '2']],
+                    ],
+                ],
+                [
+                    'type' => 'embed',
+                    'data' => [
+                        'service' => 'youtube',
+                        'source' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                        'embed' => 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame('table', $result['blocks'][0]['type']);
+        $this->assertSame('embed', $result['blocks'][1]['type']);
+    }
+
+    public function test_unapproved_embed_is_rejected(): void
+    {
+        $this->expectException(ValidationException::class);
+
+        (new BlockValidator)->validate([
+            'blocks' => [[
+                'type' => 'embed',
+                'data' => [
+                    'service' => 'unknown',
+                    'source' => 'https://example.com/x',
+                ],
+            ]],
+        ]);
+    }
 }
