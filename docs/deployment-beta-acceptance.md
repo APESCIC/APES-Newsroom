@@ -17,8 +17,10 @@ Record evidence (screenshots, command output, timestamps) in issue #3 comments.
 - [ ] Trigger "Deploy to Cloudron (beta)" workflow manually from `main`
 - [ ] Cloudron backup created successfully before activation
 - [ ] Migrations run without error
+- [ ] Activate log shows MySQL assert (`www-data artisan targets MySQL`) — not silent sqlite
 - [ ] Health check passes within 60 seconds
 - [ ] Workflow reports success
+- [ ] Homepage `/` returns 200 (not only `/health` / `/login`)
 
 ## Post-deploy verification
 

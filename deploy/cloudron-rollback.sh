@@ -27,9 +27,10 @@ if [ ! -d "${PREVIOUS_RELEASE_DIR}" ]; then
 fi
 
 echo "==> Rolling back to ${PREVIOUS_RELEASE_DIR}"
-sudo -u www-data php "${PREVIOUS_RELEASE_DIR}/artisan" config:cache
-sudo -u www-data php "${PREVIOUS_RELEASE_DIR}/artisan" route:cache
-sudo -u www-data php "${PREVIOUS_RELEASE_DIR}/artisan" view:cache
+WWW_DATA_PHP=(bash "${PREVIOUS_RELEASE_DIR}/deploy/cloudron-www-data.sh" /usr/bin/php)
+"${WWW_DATA_PHP[@]}" "${PREVIOUS_RELEASE_DIR}/artisan" config:cache
+"${WWW_DATA_PHP[@]}" "${PREVIOUS_RELEASE_DIR}/artisan" route:cache
+"${WWW_DATA_PHP[@]}" "${PREVIOUS_RELEASE_DIR}/artisan" view:cache
 
 ln -sfn "${PREVIOUS_RELEASE_DIR}" "${CURRENT_LINK}.new"
 mv -Tf "${CURRENT_LINK}.new" "${CURRENT_LINK}"

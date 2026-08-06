@@ -71,21 +71,35 @@ chown www-data:www-data /run/php/sessions
 
 chown -R www-data:www-data "${RELEASE_DIR}"
 
+WWW_DATA_PHP=(bash "${RELEASE_DIR}/deploy/cloudron-www-data.sh" /usr/bin/php)
+
 if [ -f "${CURRENT_LINK}" ] || [ -L "${CURRENT_LINK}" ]; then
     readlink "${CURRENT_LINK}" > "${PREVIOUS_FILE}" || true
 fi
 
 echo "==> Generating APP_KEY if this is a first-ever deploy"
-sudo -u www-data php "${RELEASE_DIR}/artisan" key:generate --force --no-interaction \
+"${WWW_DATA_PHP[@]}" "${RELEASE_DIR}/artisan" key:generate --force --no-interaction \
     --ansi 2>&1 | grep -v 'Application key set' || true
 
+# Fail closed: if Cloudron MySQL is provisioned, www-data artisan must see
+# mysql — otherwise migrate would write to sqlite and leave MySQL empty.
+if [ -n "${CLOUDRON_MYSQL_HOST:-}" ]; then
+    echo "==> Asserting www-data artisan targets MySQL (not sqlite fallback)"
+    db_default="$("${WWW_DATA_PHP[@]}" "${RELEASE_DIR}/artisan" tinker --execute="echo config('database.default');")"
+    if [ "${db_default}" != "mysql" ]; then
+        echo "FATAL: CLOUDRON_MYSQL_HOST is set but artisan database.default is '${db_default:-empty}' (expected mysql)." >&2
+        echo "sudo likely stripped CLOUDRON_* — use deploy/cloudron-www-data.sh." >&2
+        exit 1
+    fi
+fi
+
 echo "==> Running database migrations"
-sudo -u www-data php "${RELEASE_DIR}/artisan" migrate --force --no-interaction
+"${WWW_DATA_PHP[@]}" "${RELEASE_DIR}/artisan" migrate --force --no-interaction
 
 echo "==> Caching config/routes/views for the new release"
-sudo -u www-data php "${RELEASE_DIR}/artisan" config:cache
-sudo -u www-data php "${RELEASE_DIR}/artisan" route:cache
-sudo -u www-data php "${RELEASE_DIR}/artisan" view:cache
+"${WWW_DATA_PHP[@]}" "${RELEASE_DIR}/artisan" config:cache
+"${WWW_DATA_PHP[@]}" "${RELEASE_DIR}/artisan" route:cache
+"${WWW_DATA_PHP[@]}" "${RELEASE_DIR}/artisan" view:cache
 
 echo "==> Activating release ${RELEASE_SHA} atomically"
 ln -sfn "${RELEASE_DIR}" "${CURRENT_LINK}.new"

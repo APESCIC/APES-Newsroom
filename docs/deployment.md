@@ -66,7 +66,11 @@ These happen once, outside of CI, before the first deploy can work.
 5. **Add the scheduler cron entry.** In the Cloudron dashboard, this
    app's `Cron` section, add:
    - Schedule: `* * * * *`
-   - Command: `sudo -u www-data /usr/bin/php /app/data/current/artisan schedule:run`
+   - Command: `bash /app/data/current/deploy/cloudron-www-data.sh /usr/bin/php /app/data/current/artisan schedule:run`
+
+   Do **not** use bare `sudo -u www-data php …` — that strips `CLOUDRON_*`
+   and artisan falls back to sqlite from the shared `.env` while the web
+   app still uses MySQL. See `deploy/cloudron-www-data.sh`.
 
    (Cloudron's per-app Cron feature, not a crontab file - see
    docs.cloudron.io/apps#cron.)
@@ -168,6 +172,28 @@ Expected: `"cache": true` in the health response.
 
 Ensure `/app/data/run.sh` exists (copy from `deploy/cloudron-run.sh`) so
 the queue worker starts on boot against the Redis-backed queue.
+
+## Artisan must preserve CLOUDRON_* (www-data)
+
+Cloudron injects `CLOUDRON_MYSQL_*` / `CLOUDRON_REDIS_*` / SMTP vars into
+the container environment. Apache/php-fpm sees them, so the web app uses
+MySQL. Bare `sudo -u www-data …` **strips** those variables, so artisan
+falls back to `DB_CONNECTION=sqlite` from the shared `.env` and can
+silently migrate the wrong database.
+
+Always run artisan as www-data via:
+
+```bash
+bash /app/data/current/deploy/cloudron-www-data.sh \
+  /usr/bin/php /app/data/current/artisan <command>
+```
+
+`cloudron-activate.sh`, `cloudron-rollback.sh`, and `cloudron-run.sh` use
+this helper. Scheduler cron must use it too (see one-time setup above).
+
+**Symptom of the bug:** `/health` and `/login` OK; `/` and discovery routes
+500 with `Table '….posts' doesn't exist` on MySQL while `migrate:status`
+under `sudo -u www-data` looks clean against sqlite.
 
 ## OIDC client (staff sign-in)
 
