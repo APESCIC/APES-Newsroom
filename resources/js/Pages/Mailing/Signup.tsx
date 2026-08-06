@@ -1,5 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import PublicLayout from '../../Components/Layout/PublicLayout';
 
 type ListOption = { value: string; label: string; purpose: string };
 
@@ -22,13 +23,13 @@ export default function Signup({ lists, status }: { lists: ListOption[]; status?
     };
 
     return (
-        <>
+        <PublicLayout>
             <Head title="Mailing lists" />
-            <main className="mx-auto max-w-lg px-6 py-12">
+            <main id="main-content" className="mx-auto max-w-lg px-6 py-12">
                 <h1 className="text-2xl font-semibold">APES Newsroom mailing lists</h1>
                 <p className="mt-2 text-sm text-neutral-600">
-                    Choose which APES lists you want. Nothing is pre-selected. We will email you a confirmation
-                    link for each list before sending any news.
+                    Choose which APES lists you want. Nothing is pre-selected. We will email you a confirmation link for
+                    each list before sending any news.
                 </p>
 
                 {status === 'check-email' && (
@@ -67,11 +68,15 @@ export default function Signup({ lists, status }: { lists: ListOption[]; status?
                         {errors.lists && <p className="text-sm text-red-600">{errors.lists}</p>}
                     </fieldset>
 
-                    <button type="submit" disabled={processing} className="w-fit rounded bg-apes-primary px-4 py-2 text-white">
+                    <button
+                        type="submit"
+                        disabled={processing}
+                        className="w-fit rounded bg-apes-primary px-4 py-2 text-white"
+                    >
                         Subscribe
                     </button>
                 </form>
             </main>
-        </>
+        </PublicLayout>
     );
 }

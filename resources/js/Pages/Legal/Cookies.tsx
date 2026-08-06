@@ -1,13 +1,11 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import PublicLayout from '../../Components/Layout/PublicLayout';
 
 export default function Cookies() {
     return (
-        <>
+        <PublicLayout>
             <Head title="Cookie notice" />
-            <main className="mx-auto max-w-3xl px-6 py-12 prose prose-neutral">
-                <Link href="/" className="text-sm text-apes-primary no-underline">
-                    ← APES Newsroom
-                </Link>
+            <main id="main-content" className="prose prose-neutral mx-auto max-w-3xl px-6 py-12">
                 <h1>Cookie notice</h1>
                 <p>
                     We use essential cookies and similar storage required to sign you in, protect forms (CSRF), and keep
@@ -18,6 +16,6 @@ export default function Cookies() {
                     will only load after an appropriate consent mechanism and updated notice.
                 </p>
             </main>
-        </>
+        </PublicLayout>
     );
 }

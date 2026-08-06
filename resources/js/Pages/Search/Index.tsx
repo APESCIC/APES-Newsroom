@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import PublicLayout from '../../Components/Layout/PublicLayout';
 
 type Result = { title: string; slug: string; excerpt: string | null; published_at: string | null };
 
@@ -12,9 +13,9 @@ export default function SearchIndex({ query, results }: { query: string; results
     };
 
     return (
-        <>
+        <PublicLayout>
             <Head title="Search" />
-            <main className="mx-auto max-w-3xl px-6 py-12">
+            <main id="main-content" className="mx-auto max-w-3xl px-6 py-12">
                 <h1 className="text-2xl font-semibold">Search</h1>
                 <form onSubmit={submit} className="mt-4 flex gap-2">
                     <label htmlFor="q" className="sr-only">
@@ -42,6 +43,6 @@ export default function SearchIndex({ query, results }: { query: string; results
                     ))}
                 </ul>
             </main>
-        </>
+        </PublicLayout>
     );
 }

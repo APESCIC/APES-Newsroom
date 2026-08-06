@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import PublicLayout from '../../Components/Layout/PublicLayout';
 
 type PostCard = {
     title: string;
@@ -14,13 +15,10 @@ type Paginated = {
 
 export default function TagArchive({ tag, posts }: { tag: { name: string; slug: string }; posts: Paginated }) {
     return (
-        <>
+        <PublicLayout>
             <Head title={`Tag: ${tag.name}`} />
-            <main className="mx-auto max-w-3xl px-6 py-12">
-                <Link href="/" className="text-sm text-neutral-600 underline">
-                    Home
-                </Link>
-                <h1 className="mt-4 text-3xl font-semibold">Tag: {tag.name}</h1>
+            <main id="main-content" className="mx-auto max-w-3xl px-6 py-12">
+                <h1 className="text-3xl font-semibold">Tag: {tag.name}</h1>
                 {posts.data.length === 0 ? (
                     <p className="mt-6 text-neutral-600">No published stories with this tag.</p>
                 ) : (
@@ -36,6 +34,6 @@ export default function TagArchive({ tag, posts }: { tag: { name: string; slug: 
                     </ul>
                 )}
             </main>
-        </>
+        </PublicLayout>
     );
 }

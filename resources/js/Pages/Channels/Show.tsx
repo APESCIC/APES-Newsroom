@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import PublicLayout from '../../Components/Layout/PublicLayout';
 
 type Post = {
     title: string;
@@ -16,13 +17,10 @@ export default function ChannelShow({
     posts: { data: Post[] };
 }) {
     return (
-        <>
+        <PublicLayout>
             <Head title={channel.label} />
-            <main className="mx-auto max-w-5xl px-6 py-12">
-                <Link href="/" className="text-sm text-neutral-600 hover:underline">
-                    ← Home
-                </Link>
-                <h1 className="mt-4 text-3xl font-semibold text-neutral-900">{channel.label}</h1>
+            <main id="main-content" className="mx-auto max-w-5xl px-6 py-12">
+                <h1 className="text-3xl font-semibold text-neutral-900">{channel.label}</h1>
                 <ul className="mt-8 grid gap-6">
                     {posts.data.map((post) => (
                         <li key={post.slug} className="border-b border-neutral-200 pb-6">
@@ -35,6 +33,6 @@ export default function ChannelShow({
                     ))}
                 </ul>
             </main>
-        </>
+        </PublicLayout>
     );
 }

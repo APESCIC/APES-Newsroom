@@ -1,13 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
+import PublicLayout from '../../Components/Layout/PublicLayout';
 
 export default function Rights() {
     return (
-        <>
+        <PublicLayout>
             <Head title="Your data rights" />
-            <main className="mx-auto max-w-3xl px-6 py-12 prose prose-neutral">
-                <Link href="/" className="text-sm text-apes-primary no-underline">
-                    ← APES Newsroom
-                </Link>
+            <main id="main-content" className="prose prose-neutral mx-auto max-w-3xl px-6 py-12">
                 <h1>Your data rights</h1>
                 <ul>
                     <li>
@@ -27,6 +25,6 @@ export default function Rights() {
                     </li>
                 </ul>
             </main>
-        </>
+        </PublicLayout>
     );
 }

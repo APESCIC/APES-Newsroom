@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import PublicLayout from '../../Components/Layout/PublicLayout';
 
 type PostCard = {
     title: string;
@@ -24,13 +25,10 @@ export default function DateArchive({
     const label = month ? `${year}-${String(month).padStart(2, '0')}` : String(year);
 
     return (
-        <>
+        <PublicLayout>
             <Head title={`Archive ${label}`} />
-            <main className="mx-auto max-w-3xl px-6 py-12">
-                <Link href="/" className="text-sm text-neutral-600 underline">
-                    Home
-                </Link>
-                <h1 className="mt-4 text-3xl font-semibold">Archive: {label}</h1>
+            <main id="main-content" className="mx-auto max-w-3xl px-6 py-12">
+                <h1 className="text-3xl font-semibold">Archive: {label}</h1>
                 {posts.data.length === 0 ? (
                     <p className="mt-6 text-neutral-600">No published stories in this period.</p>
                 ) : (
@@ -46,6 +44,6 @@ export default function DateArchive({
                     </ul>
                 )}
             </main>
-        </>
+        </PublicLayout>
     );
 }
