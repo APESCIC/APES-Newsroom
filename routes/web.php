@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ChannelController;
@@ -9,7 +10,6 @@ use App\Http\Controllers\RssController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Staff\PostController as StaffPostController;
-use App\Enums\Role;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');

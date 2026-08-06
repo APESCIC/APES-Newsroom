@@ -46,5 +46,4 @@ class EmailVerificationController extends Controller
 
         return redirect()->route('account.show')->with('status', 'email-verified');
     }
-
 }

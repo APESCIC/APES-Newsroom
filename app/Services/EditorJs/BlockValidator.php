@@ -52,7 +52,6 @@ class BlockValidator
     }
 
     /**
-     * @param  mixed  $block
      * @return array<string, mixed>
      */
     private function validateBlock(mixed $block, int $index): array

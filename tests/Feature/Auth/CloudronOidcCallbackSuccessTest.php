@@ -2,13 +2,11 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Enums\Role;
 use App\Models\User;
 use App\Services\Auth\CloudronOidcProvider;
-use App\Services\Auth\LdapGroupLookup;
 use App\Services\Auth\StaffOidcIdentity;
-use App\Services\Auth\StaffReconcileResult;
 use App\Services\Auth\StaffReconciler;
+use App\Services\Auth\StaffReconcileResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;

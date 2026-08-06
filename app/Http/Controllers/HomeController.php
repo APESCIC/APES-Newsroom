@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\Channel;
 use App\Models\Post;
-use App\Services\EditorJs\BlockRenderer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
