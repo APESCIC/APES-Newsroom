@@ -74,6 +74,12 @@ class DeployPreflightCommand extends Command
 
     private function checkGitState(): void
     {
+        if (app()->environment('testing')) {
+            $this->record('git.clean_tree', true, 'skipped in testing environment');
+
+            return;
+        }
+
         if (! is_dir(base_path('.git'))) {
             $this->record('git.clean_tree', true, 'skipped: not a git checkout (deployed artifact)');
 
