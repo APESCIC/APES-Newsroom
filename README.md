@@ -7,7 +7,8 @@ Rescue, and APES Pet Care Clinic. Replaces the existing Ghost site.
 
 See [Issue #1](https://github.com/APESCIC/APES-Newsroom/issues/1) for the
 full epic and [`docs/epic-1-build-plan.md`](docs/epic-1-build-plan.md) for
-how the ten sub-issues sequence against each other.
+how the ten sub-issues sequence against each other. Agents and contributors:
+track work via GitHub Issues per [`AGENTS.md`](AGENTS.md).
 
 ## Stack
 
