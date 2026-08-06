@@ -1,0 +1,49 @@
+# Test users and groups for local OpenLDAP (docker compose openldap service).
+# Group CNs must match keys in config/rbac.php.
+
+dn: ou=users,dc=apes,dc=local
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=apes,dc=local
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=newsroom-staff,ou=groups,dc=apes,dc=local
+objectClass: groupOfNames
+cn: newsroom-staff
+member: cn=staffer,ou=users,dc=apes,dc=local
+
+dn: cn=newsroom-admins,ou=groups,dc=apes,dc=local
+objectClass: groupOfNames
+cn: newsroom-admins
+member: cn=admin,ou=users,dc=apes,dc=local
+
+dn: cn=newsroom-super-admins,ou=groups,dc=apes,dc=local
+objectClass: groupOfNames
+cn: newsroom-super-admins
+member: cn=superadmin,ou=users,dc=apes,dc=local
+
+dn: cn=staffer,ou=users,dc=apes,dc=local
+objectClass: inetOrgPerson
+cn: Staffer Person
+sn: Person
+uid: staffer
+mail: staffer@apes.local
+userPassword: staffer
+
+dn: cn=admin,ou=users,dc=apes,dc=local
+objectClass: inetOrgPerson
+cn: Admin Person
+sn: Person
+uid: admin
+mail: admin@apes.local
+userPassword: admin
+
+dn: cn=superadmin,ou=users,dc=apes,dc=local
+objectClass: inetOrgPerson
+cn: Super Admin
+sn: Admin
+uid: superadmin
+mail: superadmin@apes.local
+userPassword: superadmin

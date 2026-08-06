@@ -42,7 +42,7 @@ return [
     |
     | Read directly from the CLOUDRON_LDAP_* environment variables Cloudron
     | injects for the LDAP addon (docs.cloudron.io/packaging/addons#ldap).
-    | Consumed by staff role reconciliation (issue #4) - not wired up yet.
+    | Consumed by staff role reconciliation via LdapGroupLookup.
     | Values are absent outside Cloudron; group mapping happens in code,
     | not here, so no group names are hard-coded to a config value.
     |
@@ -63,8 +63,9 @@ return [
     |
     | Read from the CLOUDRON_OIDC_* environment variables Cloudron injects
     | for the manually-registered OIDC client (docs.cloudron.io/packaging/
-    | addons#oidc). Consumed by staff authentication (issue #4) - not wired
-    | up yet.
+    | addons#oidc). On LAMP apps, create the client in the Cloudron
+    | dashboard and set these in /app/data/shared/.env — see
+    | docs/deployment.md.
     |
     */
 
@@ -73,6 +74,7 @@ return [
         'issuer' => env('CLOUDRON_OIDC_ISSUER'),
         'client_id' => env('CLOUDRON_OIDC_CLIENT_ID'),
         'client_secret' => env('CLOUDRON_OIDC_CLIENT_SECRET'),
+        'provider_name' => env('CLOUDRON_OIDC_PROVIDER_NAME', 'Cloudron'),
     ],
 
 ];

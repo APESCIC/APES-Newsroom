@@ -1,0 +1,138 @@
+# Local development
+
+Two modes: **default** (zero extra services) and **production-like**
+(Redis, OIDC, LDAP). Everyday feature work and CI use the default.
+
+## Default setup
+
+```
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm install
+composer dev    # or: php artisan serve + npm run dev
+```
+
+Uses SQLite with database-backed sessions, cache, and queue. No Docker
+required.
+
+## Production-like setup
+
+Use this to verify Redis drivers, staff OIDC login, and LDAP role mapping
+before deploying to beta.
+
+### 1. Start optional services
+
+```bash
+docker compose up -d redis          # Redis only (most common)
+docker compose up -d                # Redis + OpenLDAP
+docker compose down
+```
+
+OpenLDAP is seeded from `docker/openldap/bootstrap.ldif` with test users
+and groups matching `config/rbac.php`.
+
+### 2. Configure `.env`
+
+Copy the commented block at the bottom of `.env.example` into your local
+`.env` and uncomment the values you need.
+
+**Redis:**
+
+```env
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis
+SESSION_DRIVER=redis
+REDIS_CLIENT=predis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+```
+
+Use `predis` on Windows if the PHP `redis` extension is not installed.
+Cloudron uses `phpredis`.
+
+**OIDC (Cloudron client for localhost):**
+
+Create a **second** OpenID client in the Cloudron dashboard:
+
+- Redirect URI: `http://localhost:8000/auth/cloudron/callback`
+
+```env
+APP_URL=http://localhost:8000
+CLOUDRON_OIDC_DISCOVERY_URL=https://<cloudron-domain>/.well-known/openid-configuration
+CLOUDRON_OIDC_ISSUER=https://<cloudron-domain>
+CLOUDRON_OIDC_CLIENT_ID=<localhost-client-id>
+CLOUDRON_OIDC_CLIENT_SECRET=<localhost-client-secret>
+CLOUDRON_OIDC_PROVIDER_NAME=Cloudron
+```
+
+**LDAP — option A: Cloudron directory**
+
+Copy `CLOUDRON_LDAP_*` values from Cloudron `/app/data/credentials.txt`
+into `.env`. Requires network access to the Cloudron LDAP host.
+
+**LDAP — option B: Docker OpenLDAP**
+
+```env
+CLOUDRON_LDAP_URL=ldap://127.0.0.1:389
+CLOUDRON_LDAP_USERS_BASE_DN=ou=users,dc=apes,dc=local
+CLOUDRON_LDAP_GROUPS_BASE_DN=ou=groups,dc=apes,dc=local
+CLOUDRON_LDAP_BIND_DN=cn=admin,dc=apes,dc=local
+CLOUDRON_LDAP_BIND_PASSWORD=admin
+```
+
+Test users (password = username): `staffer@apes.local`, `admin@apes.local`,
+`superadmin@apes.local`.
+
+### 3. Run the app
+
+```bash
+# Terminal 1
+composer dev
+
+# Terminal 2 (required when QUEUE_CONNECTION=redis)
+php artisan queue:work
+```
+
+### 4. Verify
+
+```bash
+php artisan deploy:preflight
+curl http://localhost:8000/health
+```
+
+Expected health response when Redis is configured:
+
+```json
+{"status":"ok","checks":{"database":true,"cache":true}}
+```
+
+**Staff OIDC flow:**
+
+1. Visit `http://localhost:8000/login`
+2. Click the staff sign-in button
+3. Authenticate at Cloudron OIDC
+4. Callback reconciles LDAP groups and stores the session in Redis
+
+## Automated tests
+
+PHPUnit covers auth logic without live services:
+
+```bash
+composer test
+```
+
+`StaffOidcLoginTest` mocks LDAP lookup. `LdapGroupLookupTest` uses
+LdapRecord's directory emulator. `LoginPageTest` verifies the staff
+button appears only when OIDC is configured.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---------|--------------|-----|
+| `cache: false` on `/health` | Redis not running or wrong host | `docker compose up -d redis`; check `REDIS_HOST` |
+| OIDC redirect mismatch | Wrong redirect URI on client | Register exact callback URL in Cloudron dashboard |
+| Staff login denied (no group) | `memberof` values don't match `config/rbac.php` | Run ldapsearch (see `docs/deployment.md`) and update keys |
+| LDAP connection timeout | Cloudron LDAP not reachable locally | Use Docker OpenLDAP (option B) |
+| Queue jobs not processing | Worker not running | Start `php artisan queue:work` in a second terminal |

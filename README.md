@@ -28,9 +28,10 @@ php artisan serve
 ```
 
 No MySQL or Redis needed for local dev - `.env.example` defaults to
-sqlite, database-backed sessions/cache/queue. In Cloudron,
-`CloudronEnvironmentServiceProvider` (`app/Providers`) overrides these
-from the platform's `CLOUDRON_*` environment variables automatically; see
+sqlite, database-backed sessions/cache/queue. For production-like local
+testing with Redis and OIDC, see [`docs/local-dev.md`](docs/local-dev.md).
+In Cloudron, `CloudronEnvironmentServiceProvider` (`app/Providers`) overrides
+these from the platform's `CLOUDRON_*` environment variables automatically; see
 that file and `.env.example` for what's mapped.
 
 ## Testing
