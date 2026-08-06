@@ -38,12 +38,12 @@ class StaffReconciler
 
         $role = collect($matchedRoles)->sortByDesc(fn (Role $role) => $role->rank())->first();
 
+        // Match by OIDC sub or email (any auth_provider). A public/password
+        // account with the same verified email must be linked, not inserted —
+        // otherwise users.email unique constraint fails with a 500.
         $user = User::query()
             ->where('external_id', $identity->sub)
-            ->orWhere(function ($query) use ($identity): void {
-                $query->where('email', $identity->email)
-                    ->where('auth_provider', 'cloudron_oidc');
-            })
+            ->orWhere('email', $identity->email)
             ->first() ?? new User;
 
         $user->forceFill([
