@@ -4,7 +4,7 @@ Source: [Issue #1](https://github.com/APESCIC/APES-Newsroom/issues/1) and its su
 
 ## What we're building
 
-One Laravel 13 + Inertia/React app on the existing Cloudron LAMP app (`74a2a784-a161-4787-84ff-2b8efc957bc8`), with two surfaces: a public SEO newsroom for three APES channels (CIC, Shelter & Rescue, Pet Care Clinic), and authenticated workspaces for publishing, campaigns, moderation, and governance. Public accounts use password/magic-link login; staff use Cloudron OIDC + LDAP role mapping. Content is versioned Editor.js JSON with a server-enforced block allowlist. Mailing lists are per-channel, double opt-in, queued through Cloudron SMTP. Ghost content and mailing lists are imported from Admin export files (content JSON + media archive, then members CSV); Ghost isn't retired until a separately authorized cutover.
+One Laravel 13 + Inertia/React app on the existing Cloudron LAMP app (`74a2a784-a161-4787-84ff-2b8efc957bc8`), with two surfaces: a public SEO newsroom for three APES channels (CIC, Shelter & Rescue, Pet Care Clinic), and authenticated workspaces for publishing, campaigns, moderation, and governance. Public accounts use password/magic-link login; staff use Cloudron OIDC + LDAP role mapping. Content is versioned Editor.js JSON with a server-enforced block allowlist. Mailing lists are per-channel, double opt-in, queued through Cloudron SMTP. Ghost content is imported from Admin export files (content JSON + media archive); mailing lists are imported later via an admin-panel importer that uploads a Ghost members CSV; Ghost isn't retired until a separately authorized cutover.
 
 Shared contracts used across multiple issues: `Role` (public/staff/admin/super_admin), `PostStatus` (draft/in_review/scheduled/published/unpublished/deleted), `MailingList` (apes_cic/apes_shelter_rescue/apes_pet_care_clinic), `ModerationStatus` (private/pending/approved/rejected/suspended), `ReactionType` (helpful/support/thank_you).
 
@@ -57,8 +57,8 @@ Every sub-issue repeats some version of this, so it's worth stating once: comple
        sign-off gates here before mailing import / cutover
                        |
               +--------v-------------+
-              | #18 Ghost mailing CSV |
-              | import (needs #7)     |
+              | #18 Admin mailing CSV |
+              | importer (needs #7)   |
               +--------+--------------+
                        |
               +--------v---------+
@@ -92,10 +92,10 @@ Every sub-issue repeats some version of this, so it's worth stating once: comple
 - **#10 GDPR/PECR/security/accessibility governance.** Not a phase that starts after everything else — threat modeling, CSRF/authz/rate-limit controls, CI security checks, and accessibility checks should be built into #3–#9 as they're written. What's specific to #10 is the formal artifact: data inventory, retention schedule, privacy/cookie copy, rights workflows, recorded legal/compliance and accessibility approvals as an explicit launch gate before #18 and #11.
 
 **Phase 5b — Mailing import (pre-cutover)**
-- **#18 Import Ghost mailing lists from members CSV export.** Depends on #7 (target contact/consent/suppression models) and runs after #10 formal gates, immediately before #11. File-based import from Ghost members CSV: mailing contacts (not accounts), fail-closed three-list activation, suppressions, dry-run/resumable/idempotent, reconciliation report, no email from import runs.
+- **#18 Admin importer: Ghost members CSV → mailing lists.** Depends on #7 (target contact/consent/suppression models) and runs after #10 formal gates, immediately before #11. Admin-panel file importer (Inertia/React): authorized admins upload a Ghost members CSV, validate headers, dry-run, confirm import, and view a reconciliation report. Queued/idempotent server job; mailing contacts (not accounts); fail-closed three-list activation; suppressions; no email from dry-run or import runs.
 
 **Phase 6 — Cutover**
-- **#11 Validate, cut over apesnews.org.uk, retire Ghost safely.** Depends on everything above. Beta acceptance across every surface (including separate content and mailing import dry-runs), throughput benchmarking, backup/restore/rollback drills, then — only after separate production authorization — the guarded cutover with final content import then final mailing import from export files, and a defined rollback window. Ghost retirement is a further separate authorization after that window.
+- **#11 Validate, cut over apesnews.org.uk, retire Ghost safely.** Depends on everything above. Beta acceptance across every surface (including separate content import and **admin-panel** mailing CSV dry-runs), throughput benchmarking, backup/restore/rollback drills, then — only after separate production authorization — the guarded cutover with final content import then final admin-panel mailing import from the uploaded Ghost members CSV, and a defined rollback window. Ghost retirement is a further separate authorization after that window.
 
 ## Open questions worth resolving before/while work starts
 
@@ -103,4 +103,4 @@ Who is doing the #2 design work — is that Bambie/a designer producing wirefram
 
 ## Suggested next step
 
-**Phase 3 (#7 mailing, #8 engagement) is implemented.** Next build focus is **#9 content/media/redirect import scaffolding** once content schemas (#5/#6) are accepted as stable enough to import into. Continue polishing #5/#6 residuals (Editor.js UI, archives) in parallel. **#18 mailing CSV import comes last before cutover** (after #10). #10 governance artifacts and #11 cutover remain separately gated.
+**Phase 3 (#7 mailing, #8 engagement) is implemented.** Next build focus is **#9 content/media/redirect import scaffolding** once content schemas (#5/#6) are accepted as stable enough to import into. Continue polishing #5/#6 residuals (Editor.js UI, archives) in parallel. **#18 admin-panel mailing CSV importer comes last before cutover** (after #10). #10 governance artifacts and #11 cutover remain separately gated.
