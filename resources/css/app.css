@@ -13,7 +13,31 @@
     --color-neutral-900: #1A1A1A;
     --color-neutral-600: #525252;
     --color-neutral-100: #F5F5F4;
+    --color-page-tint: #F7FBF9;
     --color-focus: #2563EB;
+    --radius-tile: 1rem;
+}
+
+.shadow-chunky-apes {
+    box-shadow: 4px 4px 0 var(--color-apes-primary);
+}
+.shadow-chunky-shelter {
+    box-shadow: 4px 4px 0 var(--color-shelter-accent);
+}
+.shadow-chunky-clinic {
+    box-shadow: 4px 4px 0 var(--color-clinic-accent);
+}
+.shadow-chunky-ink {
+    box-shadow: 4px 4px 0 var(--color-neutral-900);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shadow-chunky-apes,
+    .shadow-chunky-shelter,
+    .shadow-chunky-clinic,
+    .shadow-chunky-ink {
+        transition: none;
+    }
 }
 
 .prose {

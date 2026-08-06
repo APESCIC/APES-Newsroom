@@ -1,13 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
+import PublicLayout from '../../Components/Layout/PublicLayout';
 
 export default function Privacy() {
     return (
-        <>
+        <PublicLayout>
             <Head title="Privacy notice" />
-            <main className="mx-auto max-w-3xl px-6 py-12 prose prose-neutral">
-                <Link href="/" className="text-sm text-apes-primary no-underline">
-                    ← APES Newsroom
-                </Link>
+            <main id="main-content" className="prose prose-neutral mx-auto max-w-3xl px-6 py-12">
                 <h1>Privacy notice</h1>
                 <p>
                     APES Newsroom is operated by APES CIC. This draft notice explains how we process personal data for
@@ -29,6 +27,6 @@ export default function Privacy() {
                 <h2>Contact</h2>
                 <p>Privacy questions: use the contact channels published on the APES CIC website.</p>
             </main>
-        </>
+        </PublicLayout>
     );
 }

@@ -15,11 +15,24 @@ Mission-led editorial: authentic animal-care imagery, warm APES accents, high-co
 | `--color-clinic-accent` | `#457B9D` | Pet Care Clinic channel |
 | `--color-neutral-900` | `#1A1A1A` | Headings, body text |
 | `--color-neutral-600` | `#525252` | Secondary text |
-| `--color-neutral-100` | `#F5F5F4` | Page backgrounds |
+| `--color-neutral-100` | `#F5F5F4` | Quiet secondary surfaces |
+| `--color-page-tint` | `#F7FBF9` | Public page backgrounds (Friendly Guide) |
 | `--color-surface` | `#FFFFFF` | Cards, panels |
 | `--color-error` | `#B91C1C` | Errors, destructive actions |
 | `--color-success` | `#15803D` | Success states |
 | `--color-focus` | `#2563EB` | Focus rings |
+
+## Friendly Guide surfaces
+
+| Token / class | Value | Usage |
+|---------------|-------|-------|
+| `--radius-tile` | `1rem` | Trail tiles and desk panel corners |
+| `.shadow-chunky-apes` | `4px 4px 0` primary | APES CIC trail tiles |
+| `.shadow-chunky-shelter` | `4px 4px 0` shelter accent | Shelter trail tiles |
+| `.shadow-chunky-clinic` | `4px 4px 0` clinic accent | Clinic trail tiles |
+| `.shadow-chunky-ink` | `4px 4px 0` neutral-900 | Desk panel and menus |
+
+Chunky shadows are for trail tiles, desk panels, and Account menu only — not article body.
 
 ## Typography
 

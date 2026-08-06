@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Role;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -37,6 +38,10 @@ class HandleInertiaRequests extends Middleware
             'appName' => config('app.name'),
             'auth' => [
                 'user' => $request->user()?->only(['id', 'name', 'email', 'role']),
+                'can' => [
+                    'accessStaff' => $request->user()?->role->atLeast(Role::Staff) ?? false,
+                    'accessAdmin' => $request->user()?->role->atLeast(Role::Admin) ?? false,
+                ],
             ],
             'devTools' => app()->environment('local'),
             'flash' => [

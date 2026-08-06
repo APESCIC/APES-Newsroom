@@ -1,5 +1,6 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import PublicLayout from '../../Components/Layout/PublicLayout';
 
 type Comment = {
     id: number;
@@ -65,7 +66,7 @@ export default function ArticleShow({
     };
 
     return (
-        <>
+        <PublicLayout>
             <Head title={article.meta_title}>
                 <meta name="description" content={article.meta_description ?? ''} />
                 {preview && <meta name="robots" content="noindex,nofollow" />}
@@ -85,7 +86,7 @@ export default function ArticleShow({
             {preview && (
                 <div className="bg-amber-100 px-4 py-2 text-center text-sm text-amber-900">Preview — not indexed</div>
             )}
-            <main className="mx-auto max-w-3xl px-6 py-12">
+            <main id="main-content" className="mx-auto max-w-3xl px-6 py-12">
                 <Link href={`/${article.channel_slug}`} className="text-sm text-apes-primary">
                     {article.channel}
                 </Link>
@@ -238,6 +239,6 @@ export default function ArticleShow({
                     </section>
                 )}
             </main>
-        </>
+        </PublicLayout>
     );
 }

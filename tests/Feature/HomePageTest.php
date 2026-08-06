@@ -15,6 +15,14 @@ class HomePageTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertInertia(fn (Assert $page) => $page->component('home'));
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('home')
+            ->has('channels', 3)
+            ->has('channels.0', fn (Assert $c) => $c
+                ->has('slug')
+                ->has('label')
+                ->etc())
+            ->has('recent')
+            ->has('featured'));
     }
 }

@@ -1,14 +1,19 @@
 # APES Newsroom — Component Inventory (draft)
 
-> **Status:** First-pass draft for stakeholder review (#2).
+> **Status:** Updated for Friendly Guide UI (#27). Baseline from #2; public chrome now follows
+> [`docs/superpowers/specs/2026-08-06-friendly-guide-ui-design.md`](../superpowers/specs/2026-08-06-friendly-guide-ui-design.md).
 
 ## Layout
 
 | Component | Description | States |
 |-----------|-------------|--------|
-| `SiteHeader` | Logo, primary nav, search, account | default, mobile menu open |
-| `SiteFooter` | Links, charity info, privacy | default |
-| `SkipLink` | Skip to main content | focus visible |
+| `PublicLayout` | Skip link, brand header, Search, AccountMenu, page tint, footer | guest, signed-in |
+| `AccountMenu` | Login/Register or You disclosure with Profile / Admin / Staff / Sign out | guest, public, staff, admin |
+| `SiteFooter` | Privacy, cookies, rights, mailing | default |
+| `ChannelTrailTile` | Channel trail with icon, hint, accent border, chunky shadow | default, focus |
+| `DeskPanel` | “On the desk” featured + recent stack | empty, with featured |
+| `SiteHeader` | (legacy name) superseded by `PublicLayout` header | — |
+| `SkipLink` | Skip to main content (in `PublicLayout`) | focus visible |
 | `PageContainer` | Max-width wrapper with gutters | — |
 | `ChannelHero` | Channel landing hero with accent | default |
 
