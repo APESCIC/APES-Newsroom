@@ -138,11 +138,22 @@ class CloudronEnvironmentServiceProvider extends ServiceProvider
             return;
         }
 
-        Config::set('ldap.connections.default.hosts', [$this->cloudronEnv('CLOUDRON_LDAP_URL')]);
+        $ldapUrl = (string) $this->cloudronEnv('CLOUDRON_LDAP_URL');
+        $parsed = parse_url($ldapUrl);
+        $host = $this->cloudronEnv('CLOUDRON_LDAP_HOST')
+            ?: ($parsed['host'] ?? null);
+        $port = $this->cloudronEnv('CLOUDRON_LDAP_PORT')
+            ?: ($parsed['port'] ?? 389);
+
+        if ($host) {
+            Config::set('ldap.connections.default.hosts', [(string) $host]);
+        }
+
+        Config::set('ldap.connections.default.port', (int) $port);
         Config::set('ldap.connections.default.username', $this->cloudronEnv('CLOUDRON_LDAP_BIND_DN'));
         Config::set('ldap.connections.default.password', $this->cloudronEnv('CLOUDRON_LDAP_BIND_PASSWORD'));
         Config::set('ldap.connections.default.base_dn', $this->cloudronEnv('CLOUDRON_LDAP_USERS_BASE_DN'));
-        Config::set('services.cloudron_ldap.url', $this->cloudronEnv('CLOUDRON_LDAP_URL'));
+        Config::set('services.cloudron_ldap.url', $ldapUrl);
         Config::set('services.cloudron_ldap.users_base_dn', $this->cloudronEnv('CLOUDRON_LDAP_USERS_BASE_DN'));
         Config::set('services.cloudron_ldap.groups_base_dn', $this->cloudronEnv('CLOUDRON_LDAP_GROUPS_BASE_DN'));
         Config::set('services.cloudron_ldap.bind_dn', $this->cloudronEnv('CLOUDRON_LDAP_BIND_DN'));

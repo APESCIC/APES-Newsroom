@@ -130,4 +130,41 @@ class StaffOidcLoginTest extends TestCase
 
         $this->assertNull($result->user->password);
     }
+
+    public function test_cloudron_memberof_dn_matches_dotted_group_cn(): void
+    {
+        $result = $this->reconcilerWithGroups([
+            'cn=newsroom.superadmin,ou=groups,dc=cloudron',
+        ])->reconcile($this->identity());
+
+        $this->assertTrue($result->allowed);
+        $this->assertSame(Role::SuperAdmin, $result->user->role);
+    }
+
+    public function test_cloudron_admin_memberof_dn_grants_admin(): void
+    {
+        $result = $this->reconcilerWithGroups([
+            'cn=newsroom.admin,ou=groups,dc=cloudron',
+        ])->reconcile($this->identity());
+
+        $this->assertTrue($result->allowed);
+        $this->assertSame(Role::Admin, $result->user->role);
+    }
+
+    public function test_existing_cloudron_user_is_relinked_when_oidc_sub_changes(): void
+    {
+        $existing = User::factory()->staff()->create([
+            'email' => 'staffer@example.com',
+            'external_id' => 'old-sub',
+            'auth_provider' => 'cloudron_oidc',
+        ]);
+
+        $result = $this->reconcilerWithGroups([self::STAFF_GROUP])
+            ->reconcile(new StaffOidcIdentity(sub: 'new-sub', email: 'staffer@example.com', name: 'Staffer Person'));
+
+        $this->assertTrue($result->allowed);
+        $this->assertSame($existing->id, $result->user->id);
+        $this->assertSame('new-sub', $result->user->fresh()->external_id);
+        $this->assertSame(1, User::count());
+    }
 }

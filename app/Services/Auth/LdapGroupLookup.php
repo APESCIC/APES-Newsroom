@@ -52,6 +52,10 @@ class LdapGroupLookup
             return $memberof !== '' && $memberof !== null ? [(string) $memberof] : [];
         }
 
-        return array_values(array_map('strval', $memberof));
+        // LdapRecord/php-ldap may include a numeric `count` entry alongside DNs.
+        return array_values(array_filter(
+            array_map('strval', $memberof),
+            fn (string $value) => $value !== '' && ! ctype_digit($value),
+        ));
     }
 }

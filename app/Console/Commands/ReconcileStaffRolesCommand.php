@@ -43,8 +43,16 @@ class ReconcileStaffRolesCommand extends Command
             }
 
             $matchedRoles = collect($groups)
-                ->map(fn (string $group) => $map->get(mb_strtolower($group)))
+                ->flatMap(function (string $group) use ($map) {
+                    $keys = [mb_strtolower($group)];
+                    if (preg_match('/(^|,)cn=([^,]+)/i', $group, $matches) === 1) {
+                        $keys[] = mb_strtolower($matches[2]);
+                    }
+
+                    return collect($keys)->map(fn (string $key) => $map->get($key));
+                })
                 ->filter()
+                ->unique()
                 ->values();
 
             if ($matchedRoles->isEmpty()) {

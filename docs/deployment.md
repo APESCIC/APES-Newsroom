@@ -226,7 +226,10 @@ For local development, create a **second** client with redirect URI
 ## LDAP group mapping
 
 Staff roles are derived from each user's `memberof` attribute in Cloudron
-LDAP. Group names must match keys in `config/rbac.php`.
+LDAP. Live Cloudron groups are `newsroom.staff`, `newsroom.admin`, and
+`newsroom.superadmin` (mapped in `config/rbac.php`). `memberof` returns
+full DNs such as `cn=newsroom.staff,ou=groups,dc=cloudron`; the reconciler
+matches the CN RDN as well as bare CNs used in local OpenLDAP.
 
 **Discover group names** inside the Cloudron container:
 
@@ -242,8 +245,10 @@ cloudron exec --app 74a2a784-a161-4787-84ff-2b8efc957bc8 -- bash -c \
   'ldapsearch -x -H "$CLOUDRON_LDAP_URL" -D "$CLOUDRON_LDAP_BIND_DN" -w "$CLOUDRON_LDAP_BIND_PASSWORD" -b "$CLOUDRON_LDAP_USERS_BASE_DN" "(mail=<user-email>)" memberof'
 ```
 
-Update `config/rbac.php` so keys match the `memberof` values exactly
-(case-insensitive). Deploy the updated config to beta.
+OIDC credentials for LAMP apps are not auto-injected. Prefer
+`cloudron env set` for `CLOUDRON_OIDC_*` so `CloudronEnvironmentServiceProvider`
+(which reads `getenv`) sees them after `config:cache`. Also keep the same
+keys in `/app/data/shared/.env` if you maintain that file by hand.
 
 ## End-to-end verification (beta)
 
