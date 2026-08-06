@@ -37,9 +37,11 @@ that file and `.env.example` for what's mapped.
 ## Testing
 
 ```
+composer lint        # PHP style (Laravel Pint --test; same as CI)
+composer format      # auto-fix PHP style with Pint
 composer test        # or: php artisan test
 npm run typecheck
-npm run lint
+npm run lint         # ESLint on resources/js
 ```
 
 ## Health check
