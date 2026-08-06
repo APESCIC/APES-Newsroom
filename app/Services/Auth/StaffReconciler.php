@@ -21,7 +21,7 @@ class StaffReconciler
     public function reconcile(StaffOidcIdentity $identity): StaffReconcileResult
     {
         try {
-            $groups = $this->ldap->groupsForMember($identity->sub);
+            $groups = $this->ldap->groupsForEmail($identity->email);
         } catch (LdapUnreachableException) {
             return StaffReconcileResult::deny(
                 'Staff sign-in failed: directory is currently unreachable. Please try again shortly.'

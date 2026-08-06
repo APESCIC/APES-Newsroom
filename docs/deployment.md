@@ -144,3 +144,83 @@ Production (`apesnews.org.uk`) deployment is a separate, later workflow
 gated on issue #11's beta acceptance and explicit production
 authorization - it doesn't exist yet, on purpose. This pipeline only ever
 touches beta.
+
+## Redis addon
+
+Enable Redis in the Cloudron dashboard for this LAMP app, then restart.
+Cloudron injects `CLOUDRON_REDIS_*` at runtime; `CloudronEnvironmentServiceProvider`
+switches cache, queue, and sessions to Redis automatically.
+
+**Verify after restart:**
+
+```bash
+cloudron exec --app 74a2a784-a161-4787-84ff-2b8efc957bc8 -- printenv | grep CLOUDRON_REDIS
+curl https://beta.apesnews.org.uk/health
+```
+
+Expected: `"cache": true` in the health response.
+
+Ensure `/app/data/run.sh` exists (copy from `deploy/cloudron-run.sh`) so
+the queue worker starts on boot against the Redis-backed queue.
+
+## OIDC client (staff sign-in)
+
+LAMP apps do **not** auto-inject OIDC credentials. Create an OpenID
+client manually in the Cloudron dashboard:
+
+1. **Users & Groups → OpenID Clients → Add Client**
+2. **Redirect URI (beta):** `https://beta.apesnews.org.uk/auth/cloudron/callback`
+3. Scopes: `openid`, `email`, `profile`
+4. Note the client ID, client secret, and Cloudron domain
+
+Add to `/app/data/shared/.env` (never commit):
+
+```env
+CLOUDRON_OIDC_DISCOVERY_URL=https://<cloudron-domain>/.well-known/openid-configuration
+CLOUDRON_OIDC_ISSUER=https://<cloudron-domain>
+CLOUDRON_OIDC_CLIENT_ID=<client-id>
+CLOUDRON_OIDC_CLIENT_SECRET=<client-secret>
+CLOUDRON_OIDC_PROVIDER_NAME=Cloudron
+```
+
+Restart the app and run `php artisan config:cache` inside the container.
+The login page shows a staff sign-in button once `CLOUDRON_OIDC_DISCOVERY_URL`
+is set.
+
+For local development, create a **second** client with redirect URI
+`http://localhost:8000/auth/cloudron/callback` — see
+[`docs/local-dev.md`](local-dev.md).
+
+## LDAP group mapping
+
+Staff roles are derived from each user's `memberof` attribute in Cloudron
+LDAP. Group names must match keys in `config/rbac.php`.
+
+**Discover group names** inside the Cloudron container:
+
+```bash
+cloudron exec --app 74a2a784-a161-4787-84ff-2b8efc957bc8 -- bash -c \
+  'ldapsearch -x -H "$CLOUDRON_LDAP_URL" -D "$CLOUDRON_LDAP_BIND_DN" -w "$CLOUDRON_LDAP_BIND_PASSWORD" -b "$CLOUDRON_LDAP_GROUPS_BASE_DN" cn'
+```
+
+**Inspect a user's `memberof`:**
+
+```bash
+cloudron exec --app 74a2a784-a161-4787-84ff-2b8efc957bc8 -- bash -c \
+  'ldapsearch -x -H "$CLOUDRON_LDAP_URL" -D "$CLOUDRON_LDAP_BIND_DN" -w "$CLOUDRON_LDAP_BIND_PASSWORD" -b "$CLOUDRON_LDAP_USERS_BASE_DN" "(mail=<user-email>)" memberof'
+```
+
+Update `config/rbac.php` so keys match the `memberof` values exactly
+(case-insensitive). Deploy the updated config to beta.
+
+## End-to-end verification (beta)
+
+| Check | Expected |
+|-------|----------|
+| `GET /health` | `"cache": true`, `"database": true` |
+| `deploy:preflight --target=beta` | Redis reachable |
+| Visit `/login` | Staff sign-in button visible |
+| Staff sign-in | Redirect to Cloudron OIDC |
+| Login as group member | User created with correct role |
+| Login as non-member | Denied on login page |
+| Queue worker | Processing jobs via Redis |

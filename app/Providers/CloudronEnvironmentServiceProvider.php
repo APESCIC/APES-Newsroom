@@ -126,6 +126,10 @@ class CloudronEnvironmentServiceProvider extends ServiceProvider
         Config::set('services.cloudron_oidc.issuer', $this->cloudronEnv('CLOUDRON_OIDC_ISSUER'));
         Config::set('services.cloudron_oidc.client_id', $this->cloudronEnv('CLOUDRON_OIDC_CLIENT_ID'));
         Config::set('services.cloudron_oidc.client_secret', $this->cloudronEnv('CLOUDRON_OIDC_CLIENT_SECRET'));
+
+        if ($providerName = $this->cloudronEnv('CLOUDRON_OIDC_PROVIDER_NAME')) {
+            Config::set('services.cloudron_oidc.provider_name', $providerName);
+        }
     }
 
     private function mapLdap(): void
@@ -138,6 +142,10 @@ class CloudronEnvironmentServiceProvider extends ServiceProvider
         Config::set('ldap.connections.default.username', $this->cloudronEnv('CLOUDRON_LDAP_BIND_DN'));
         Config::set('ldap.connections.default.password', $this->cloudronEnv('CLOUDRON_LDAP_BIND_PASSWORD'));
         Config::set('ldap.connections.default.base_dn', $this->cloudronEnv('CLOUDRON_LDAP_USERS_BASE_DN'));
-        Config::set('services.cloudron_oidc.ldap_groups_base_dn', $this->cloudronEnv('CLOUDRON_LDAP_GROUPS_BASE_DN'));
+        Config::set('services.cloudron_ldap.url', $this->cloudronEnv('CLOUDRON_LDAP_URL'));
+        Config::set('services.cloudron_ldap.users_base_dn', $this->cloudronEnv('CLOUDRON_LDAP_USERS_BASE_DN'));
+        Config::set('services.cloudron_ldap.groups_base_dn', $this->cloudronEnv('CLOUDRON_LDAP_GROUPS_BASE_DN'));
+        Config::set('services.cloudron_ldap.bind_dn', $this->cloudronEnv('CLOUDRON_LDAP_BIND_DN'));
+        Config::set('services.cloudron_ldap.bind_password', $this->cloudronEnv('CLOUDRON_LDAP_BIND_PASSWORD'));
     }
 }

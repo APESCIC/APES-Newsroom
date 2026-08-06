@@ -16,11 +16,11 @@ class StaffOidcLoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const STAFF_GROUP = 'cn=newsroom-staff,ou=groups,dc=apes,dc=org,dc=uk';
+    private const STAFF_GROUP = 'newsroom-staff';
 
-    private const ADMIN_GROUP = 'cn=newsroom-admins,ou=groups,dc=apes,dc=org,dc=uk';
+    private const ADMIN_GROUP = 'newsroom-admins';
 
-    private const SUPER_ADMIN_GROUP = 'cn=newsroom-super-admins,ou=groups,dc=apes,dc=org,dc=uk';
+    private const SUPER_ADMIN_GROUP = 'newsroom-super-admins';
 
     private function identity(string $sub = 'oidc-sub-1'): StaffOidcIdentity
     {
@@ -30,7 +30,7 @@ class StaffOidcLoginTest extends TestCase
     private function reconcilerWithGroups(array $groups): StaffReconciler
     {
         $lookup = Mockery::mock(LdapGroupLookup::class);
-        $lookup->shouldReceive('groupsForMember')->andReturn($groups);
+        $lookup->shouldReceive('groupsForEmail')->andReturn($groups);
 
         return new StaffReconciler($lookup);
     }
@@ -38,7 +38,7 @@ class StaffOidcLoginTest extends TestCase
     private function reconcilerThatFails(): StaffReconciler
     {
         $lookup = Mockery::mock(LdapGroupLookup::class);
-        $lookup->shouldReceive('groupsForMember')->andThrow(new LdapUnreachableException('down'));
+        $lookup->shouldReceive('groupsForEmail')->andThrow(new LdapUnreachableException('down'));
 
         return new StaffReconciler($lookup);
     }

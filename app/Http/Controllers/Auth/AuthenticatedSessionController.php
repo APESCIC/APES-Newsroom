@@ -14,7 +14,14 @@ class AuthenticatedSessionController extends Controller
 {
     public function create(): Response
     {
-        return Inertia::render('Auth/Login');
+        $discoveryUrl = config('services.cloudron_oidc.discovery_url');
+
+        return Inertia::render('Auth/Login', [
+            'staffLoginUrl' => $discoveryUrl ? route('cloudron.redirect') : null,
+            'staffLoginLabel' => $discoveryUrl
+                ? 'Log in with '.config('services.cloudron_oidc.provider_name')
+                : null,
+        ]);
     }
 
     public function store(LoginRequest $request): RedirectResponse
