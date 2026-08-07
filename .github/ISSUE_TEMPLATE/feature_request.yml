@@ -1,0 +1,68 @@
+name: Feature request
+description: Propose a user-valued APES Newsroom improvement
+title: "[Feature]: "
+type: Feature
+labels:
+  - enhancement
+assignees:
+  - bmurphy-apescic
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Underlying need
+      description: What user or operational problem needs solving, and for whom?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe the result without assuming a particular implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed approach
+      description: If you have an approach in mind, outline it here.
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other options or workarounds have been considered?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: State what should be included and explicitly excluded.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable conditions that would make this complete.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and relationships
+      description: Link related issues, milestones, external decisions, or blocking work.
+    validations:
+      required: false
+  - type: textarea
+    id: implications
+    attributes:
+      label: Security, privacy, and accessibility implications
+      description: Describe relevant risks, data handling, authorization, and inclusive-design needs.
+    validations:
+      required: true
