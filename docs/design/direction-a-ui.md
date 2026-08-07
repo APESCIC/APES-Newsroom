@@ -51,8 +51,6 @@ specified at a synthetic 800 weight use 700.
   focus to the first visible desktop destination.
 - Sticky public headers reserve scroll margin for skip-link targets so the
   destination remains visible.
-- Workspace skip-link targets use the measured sticky task-header height, so
-  wrapped actions cannot obscure the focused destination at narrow reflow widths.
 - The page does not impose a global minimum width, preserving reflow below 320
   CSS pixels at high zoom or in narrow split-screen layouts.
 
@@ -63,8 +61,8 @@ specified at a synthetic 800 weight use 700.
   underlying workspace becomes inert and cannot scroll, closing restores the
   trigger focus, and crossing into the desktop breakpoint closes the modal
   state and moves focus to the active desktop destination.
-- Workspace skip targets reserve 8rem below the stacked mobile task header and
-  return to the standard 5rem offset once the header becomes a row.
+- Workspace skip-link targets use the measured sticky task-header height, so
+  wrapped actions cannot obscure the focused destination at narrow reflow widths.
 - Four queue summaries map directly to pending profiles, pending comments,
   open reports and suspended profiles.
 - Available actions remain Approve, Reject, Suspend, Resolve, Dismiss and Lift
