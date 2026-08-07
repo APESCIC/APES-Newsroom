@@ -131,6 +131,13 @@ describe('Direction A public homepage', () => {
         expect(footerLogo).toHaveAttribute('src', '/brand/apes-logo-footer-64.png');
 
         const menuButton = screen.getByRole('button', { name: 'Open main menu' });
+        const desktopHomeLink = within(primaryNavigation).getByRole('link', { name: 'Home' });
+        desktopHomeLink.focus();
+        act(() => dispatchDesktopChange(false));
+        expect(menuButton).toHaveFocus();
+        act(() => dispatchDesktopChange(true));
+        expect(desktopHomeLink).toHaveFocus();
+
         const desktopAccountButton = within(primaryNavigation.parentElement!).getByRole('button', { name: 'Account' });
         await user.click(desktopAccountButton);
         expect(desktopAccountButton).toHaveAttribute('aria-expanded', 'true');

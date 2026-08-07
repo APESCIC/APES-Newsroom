@@ -8,7 +8,7 @@
 
 | Component | Description | States |
 | --- | --- | --- |
-| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer; the short-height mobile disclosure scrolls, nested Escape closes one layer at a time, and crossing the desktop breakpoint closes it and focuses the first desktop destination | guest, signed-in, mobile disclosure, nested disclosure, short viewport, breakpoint change |
+| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer; the short-height mobile disclosure scrolls, nested Escape closes one layer at a time, and breakpoint changes transfer focus between visible mobile and desktop navigation | guest, signed-in, mobile disclosure, nested disclosure, short viewport, breakpoint change |
 | `AccountMenu` | Login/Register or Account disclosure with Profile, Admin, Staff, Sign out; Escape closes only this disclosure and restores its trigger, while breakpoint changes close a presentation that becomes hidden and transfer its focus to visible navigation | guest, public, staff, admin, nested mobile disclosure, breakpoint change |
 | `SiteFooter` | Dedicated 64px brand mark and privacy, cookies, rights, mailing links with minimum 44×44px touch targets | default |
 | `DeskPanel` | Featured-story media panel, channel, headline, excerpt, byline/London publication date and story action | empty, populated |

@@ -27,16 +27,21 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         if (typeof window.matchMedia !== 'function') return;
 
         const desktopQuery = window.matchMedia('(min-width: 64rem)');
-        const closeAtDesktop = (event: MediaQueryListEvent) => {
-            if (event.matches && menuOpen) {
-                setMenuOpen(false);
-                focusFirstDesktopDestination();
+        const handleBreakpointChange = (event: MediaQueryListEvent) => {
+            if (event.matches) {
+                const mobileTriggerHadFocus = menuTriggerRef.current === document.activeElement;
+                if (menuOpen) setMenuOpen(false);
+                if (menuOpen || mobileTriggerHadFocus) focusFirstDesktopDestination();
+                return;
             }
+
+            const desktopNavigationHadFocus = desktopNavigationRef.current?.contains(document.activeElement) ?? false;
+            if (desktopNavigationHadFocus) focusMobileMenuTrigger();
         };
 
-        desktopQuery.addEventListener('change', closeAtDesktop);
-        return () => desktopQuery.removeEventListener('change', closeAtDesktop);
-    }, [focusFirstDesktopDestination, menuOpen]);
+        desktopQuery.addEventListener('change', handleBreakpointChange);
+        return () => desktopQuery.removeEventListener('change', handleBreakpointChange);
+    }, [focusFirstDesktopDestination, focusMobileMenuTrigger, menuOpen]);
 
     useEffect(() => {
         if (!menuOpen) return;

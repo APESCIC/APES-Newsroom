@@ -47,8 +47,9 @@ specified at a synthetic 800 weight use 700.
   disclosure first and restores its trigger. Account disclosures reset when
   their desktop or mobile presentation becomes hidden, moving focus to the
   corresponding visible navigation trigger or destination when required.
-  Crossing into the desktop breakpoint closes the main disclosure and moves
-  focus to the first visible desktop destination.
+  Hiding focused desktop navigation moves focus to the mobile menu trigger;
+  crossing into the desktop breakpoint closes the main disclosure and moves
+  focused mobile navigation to the first visible desktop destination.
 - Sticky public headers reserve scroll margin for skip-link targets so the
   destination remains visible.
 - The page does not impose a global minimum width, preserving reflow below 320
