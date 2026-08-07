@@ -44,9 +44,10 @@ specified at a synthetic 800 weight use 700.
 - Public navigation and account actions remain source- and role-aware; no new
   archive route is introduced. The mobile disclosure scrolls within the
   available viewport at short heights. Escape closes the innermost open
-  disclosure first and restores its trigger. Crossing into the desktop
-  breakpoint closes the main disclosure and moves focus to the first visible
-  desktop destination.
+  disclosure first and restores its trigger. Account disclosures reset when
+  their desktop or mobile presentation becomes hidden. Crossing into the
+  desktop breakpoint closes the main disclosure and moves focus to the first
+  visible desktop destination.
 - Sticky public headers reserve scroll margin for skip-link targets so the
   destination remains visible.
 - The page does not impose a global minimum width, preserving reflow below 320

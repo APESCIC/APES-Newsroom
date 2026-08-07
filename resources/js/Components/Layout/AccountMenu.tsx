@@ -2,12 +2,34 @@ import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { SharedPageProps } from '../../types/page';
 
-export default function AccountMenu({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
+type AccountMenuBreakpoint = 'all' | 'desktop' | 'mobile';
+
+export default function AccountMenu({
+    tone = 'light',
+    breakpoint = 'all',
+}: {
+    tone?: 'light' | 'dark';
+    breakpoint?: AccountMenuBreakpoint;
+}) {
     const { auth } = usePage<SharedPageProps>().props;
     const [open, setOpen] = useState(false);
     const menuId = useId();
     const rootRef = useRef<HTMLDivElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (breakpoint === 'all' || typeof window.matchMedia !== 'function') return;
+
+        const desktopQuery = window.matchMedia('(min-width: 64rem)');
+        const closeWhenHidden = ({ matches }: Pick<MediaQueryListEvent, 'matches'>) => {
+            const visible = breakpoint === 'desktop' ? matches : !matches;
+            if (!visible) setOpen(false);
+        };
+
+        closeWhenHidden(desktopQuery);
+        desktopQuery.addEventListener('change', closeWhenHidden);
+        return () => desktopQuery.removeEventListener('change', closeWhenHidden);
+    }, [breakpoint]);
 
     useEffect(() => {
         if (!open) {

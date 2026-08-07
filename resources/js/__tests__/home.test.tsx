@@ -7,20 +7,32 @@ import { setMockPage } from '../test/inertia';
 import appCss from '../../css/app.css?raw';
 
 describe('Direction A public homepage', () => {
-    let desktopChangeListener: ((event: MediaQueryListEvent) => void) | undefined;
+    let desktopMatches: boolean;
+    let desktopChangeListeners: Set<(event: MediaQueryListEvent) => void>;
+
+    const dispatchDesktopChange = (matches: boolean) => {
+        desktopMatches = matches;
+        const event = { matches } as MediaQueryListEvent;
+        for (const listener of desktopChangeListeners) listener(event);
+    };
 
     beforeEach(() => {
-        desktopChangeListener = undefined;
+        desktopMatches = true;
+        desktopChangeListeners = new Set();
         Object.defineProperty(window, 'matchMedia', {
             configurable: true,
             value: vi.fn().mockImplementation((query: string) => ({
-                matches: false,
+                get matches() {
+                    return desktopMatches;
+                },
                 media: query,
                 onchange: null,
                 addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
-                    desktopChangeListener = listener;
+                    desktopChangeListeners.add(listener);
                 },
-                removeEventListener: vi.fn(),
+                removeEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
+                    desktopChangeListeners.delete(listener);
+                },
                 addListener: vi.fn(),
                 removeListener: vi.fn(),
                 dispatchEvent: vi.fn(),
@@ -117,10 +129,12 @@ describe('Direction A public homepage', () => {
 
         const footerLogo = screen.getByRole('link', { name: 'APES Newsroom home' }).querySelector('img');
         expect(footerLogo).toHaveAttribute('src', '/brand/apes-logo-footer-64.png');
-        const footerNavigation = screen.getByRole('navigation', { name: 'Legal and subscriptions' });
-        for (const link of within(footerNavigation).getAllByRole('link')) {
-            expect(link).toHaveClass('inline-flex', 'min-h-11', 'items-center');
-        }
+
+        const desktopAccountButton = within(primaryNavigation.parentElement!).getByRole('button', { name: 'Account' });
+        await user.click(desktopAccountButton);
+        expect(desktopAccountButton).toHaveAttribute('aria-expanded', 'true');
+        act(() => dispatchDesktopChange(false));
+        expect(desktopAccountButton).toHaveAttribute('aria-expanded', 'false');
 
         const menuButton = screen.getByRole('button', { name: 'Open main menu' });
         await user.click(menuButton);
@@ -153,10 +167,14 @@ describe('Direction A public homepage', () => {
         await user.click(menuButton);
         const reopenedMobileNavigation = screen.getAllByRole('navigation', { name: 'Primary navigation' })[1];
         within(reopenedMobileNavigation).getByRole('link', { name: 'APES' }).focus();
-        act(() => desktopChangeListener?.({ matches: true } as MediaQueryListEvent));
+        act(() => dispatchDesktopChange(true));
         expect(menuButton).toHaveAttribute('aria-expanded', 'false');
         expect(within(primaryNavigation).getByRole('link', { name: 'Home' })).toHaveFocus();
 
         expect(appCss).not.toContain('min-width: 20rem');
+        const footerNavigation = screen.getByRole('navigation', { name: 'Legal and subscriptions' });
+        for (const link of within(footerNavigation).getAllByRole('link')) {
+            expect(link).toHaveClass('inline-flex', 'min-h-11', 'min-w-11', 'items-center', 'justify-center');
+        }
     });
 });

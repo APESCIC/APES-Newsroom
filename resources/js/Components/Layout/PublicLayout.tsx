@@ -83,7 +83,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                                 </li>
                             </ul>
                         </nav>
-                        <AccountMenu tone="dark" />
+                        <AccountMenu tone="dark" breakpoint="desktop" />
                     </div>
 
                     <button
@@ -130,7 +130,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                             </ul>
                         </nav>
                         <div className="mx-auto mt-3 max-w-public border-t border-white/15 pt-4">
-                            <AccountMenu tone="dark" />
+                            <AccountMenu tone="dark" breakpoint="mobile" />
                         </div>
                     </div>
                 )}
