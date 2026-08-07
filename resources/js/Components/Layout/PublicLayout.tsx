@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import ApesLogo from '../Brand/ApesLogo';
 import LineIcon from '../Icons/LineIcon';
 import AccountMenu from './AccountMenu';
@@ -17,6 +17,11 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     const menuId = useId();
     const menuTriggerRef = useRef<HTMLButtonElement>(null);
     const desktopNavigationRef = useRef<HTMLDivElement>(null);
+    const focusMobileMenuTrigger = useCallback(() => menuTriggerRef.current?.focus(), []);
+    const focusFirstDesktopDestination = useCallback(
+        () => desktopNavigationRef.current?.querySelector<HTMLElement>('a[href]')?.focus(),
+        [],
+    );
 
     useEffect(() => {
         if (typeof window.matchMedia !== 'function') return;
@@ -25,13 +30,13 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         const closeAtDesktop = (event: MediaQueryListEvent) => {
             if (event.matches && menuOpen) {
                 setMenuOpen(false);
-                desktopNavigationRef.current?.querySelector<HTMLElement>('a[href]')?.focus();
+                focusFirstDesktopDestination();
             }
         };
 
         desktopQuery.addEventListener('change', closeAtDesktop);
         return () => desktopQuery.removeEventListener('change', closeAtDesktop);
-    }, [menuOpen]);
+    }, [focusFirstDesktopDestination, menuOpen]);
 
     useEffect(() => {
         if (!menuOpen) return;
@@ -83,7 +88,11 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                                 </li>
                             </ul>
                         </nav>
-                        <AccountMenu tone="dark" breakpoint="desktop" />
+                        <AccountMenu
+                            tone="dark"
+                            breakpoint="desktop"
+                            onHiddenWhileFocused={focusMobileMenuTrigger}
+                        />
                     </div>
 
                     <button
@@ -130,7 +139,11 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                             </ul>
                         </nav>
                         <div className="mx-auto mt-3 max-w-public border-t border-white/15 pt-4">
-                            <AccountMenu tone="dark" breakpoint="mobile" />
+                            <AccountMenu
+                                tone="dark"
+                                breakpoint="mobile"
+                                onHiddenWhileFocused={focusFirstDesktopDestination}
+                            />
                         </div>
                     </div>
                 )}

@@ -130,13 +130,14 @@ describe('Direction A public homepage', () => {
         const footerLogo = screen.getByRole('link', { name: 'APES Newsroom home' }).querySelector('img');
         expect(footerLogo).toHaveAttribute('src', '/brand/apes-logo-footer-64.png');
 
+        const menuButton = screen.getByRole('button', { name: 'Open main menu' });
         const desktopAccountButton = within(primaryNavigation.parentElement!).getByRole('button', { name: 'Account' });
         await user.click(desktopAccountButton);
         expect(desktopAccountButton).toHaveAttribute('aria-expanded', 'true');
         act(() => dispatchDesktopChange(false));
         expect(desktopAccountButton).toHaveAttribute('aria-expanded', 'false');
+        expect(menuButton).toHaveFocus();
 
-        const menuButton = screen.getByRole('button', { name: 'Open main menu' });
         await user.click(menuButton);
         expect(menuButton).toHaveAttribute('aria-expanded', 'true');
         const mobileMenu = document.getElementById(menuButton.getAttribute('aria-controls') ?? '');

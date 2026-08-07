@@ -6,9 +6,23 @@ import { setMockPage } from '../test/inertia';
 
 describe('Direction A staff posts workspace', () => {
     let desktopChangeListener: ((event: MediaQueryListEvent) => void) | undefined;
+    let resizeObserverCallback: ResizeObserverCallback | undefined;
 
     beforeEach(() => {
         desktopChangeListener = undefined;
+        resizeObserverCallback = undefined;
+        vi.stubGlobal(
+            'ResizeObserver',
+            class {
+                constructor(callback: ResizeObserverCallback) {
+                    resizeObserverCallback = callback;
+                }
+
+                observe = vi.fn();
+                disconnect = vi.fn();
+                unobserve = vi.fn();
+            },
+        );
         Object.defineProperty(window, 'matchMedia', {
             configurable: true,
             value: vi.fn().mockImplementation((query: string) => ({
@@ -76,6 +90,11 @@ describe('Direction A staff posts workspace', () => {
             'href',
             '/staff/posts/9/edit',
         );
+
+        const taskHeader = screen.getByTestId('workspace-task-header');
+        vi.spyOn(taskHeader, 'getBoundingClientRect').mockReturnValue({ height: 176 } as DOMRect);
+        act(() => resizeObserverCallback?.([], {} as ResizeObserver));
+        expect(screen.getByTestId('workspace-shell')).toHaveStyle({ '--workspace-task-header-height': '176px' });
 
         const navigationButton = screen.getByRole('button', { name: 'Open workspace navigation' });
         await user.click(navigationButton);

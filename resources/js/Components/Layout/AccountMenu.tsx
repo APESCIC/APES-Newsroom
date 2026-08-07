@@ -7,9 +7,11 @@ type AccountMenuBreakpoint = 'all' | 'desktop' | 'mobile';
 export default function AccountMenu({
     tone = 'light',
     breakpoint = 'all',
+    onHiddenWhileFocused,
 }: {
     tone?: 'light' | 'dark';
     breakpoint?: AccountMenuBreakpoint;
+    onHiddenWhileFocused?: () => void;
 }) {
     const { auth } = usePage<SharedPageProps>().props;
     const [open, setOpen] = useState(false);
@@ -23,13 +25,17 @@ export default function AccountMenu({
         const desktopQuery = window.matchMedia('(min-width: 64rem)');
         const closeWhenHidden = ({ matches }: Pick<MediaQueryListEvent, 'matches'>) => {
             const visible = breakpoint === 'desktop' ? matches : !matches;
-            if (!visible) setOpen(false);
+            if (!visible) {
+                const presentationHadFocus = rootRef.current?.contains(document.activeElement) ?? false;
+                setOpen(false);
+                if (presentationHadFocus) onHiddenWhileFocused?.();
+            }
         };
 
         closeWhenHidden(desktopQuery);
         desktopQuery.addEventListener('change', closeWhenHidden);
         return () => desktopQuery.removeEventListener('change', closeWhenHidden);
-    }, [breakpoint]);
+    }, [breakpoint, onHiddenWhileFocused]);
 
     useEffect(() => {
         if (!open) {

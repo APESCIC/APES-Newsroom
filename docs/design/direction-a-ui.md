@@ -45,11 +45,14 @@ specified at a synthetic 800 weight use 700.
   archive route is introduced. The mobile disclosure scrolls within the
   available viewport at short heights. Escape closes the innermost open
   disclosure first and restores its trigger. Account disclosures reset when
-  their desktop or mobile presentation becomes hidden. Crossing into the
-  desktop breakpoint closes the main disclosure and moves focus to the first
-  visible desktop destination.
+  their desktop or mobile presentation becomes hidden, moving focus to the
+  corresponding visible navigation trigger or destination when required.
+  Crossing into the desktop breakpoint closes the main disclosure and moves
+  focus to the first visible desktop destination.
 - Sticky public headers reserve scroll margin for skip-link targets so the
   destination remains visible.
+- Workspace skip-link targets use the measured sticky task-header height, so
+  wrapped actions cannot obscure the focused destination at narrow reflow widths.
 - The page does not impose a global minimum width, preserving reflow below 320
   CSS pixels at high zoom or in narrow split-screen layouts.
 

@@ -68,13 +68,7 @@
     }
 
     .workspace-shell #main-content {
-        scroll-margin-top: 8rem;
-    }
-
-    @media (min-width: 40rem) {
-        .workspace-shell #main-content {
-            scroll-margin-top: 5rem;
-        }
+        scroll-margin-top: calc(var(--workspace-task-header-height, 8rem) + 1rem);
     }
 
     button,

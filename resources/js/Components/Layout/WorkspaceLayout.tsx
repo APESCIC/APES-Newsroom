@@ -125,10 +125,36 @@ export default function WorkspaceLayout({
 }) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const navigationId = useId();
+    const workspaceShellRef = useRef<HTMLDivElement>(null);
+    const taskHeaderRef = useRef<HTMLElement>(null);
     const navigationTriggerRef = useRef<HTMLButtonElement>(null);
     const navigationDialogRef = useRef<HTMLElement>(null);
     const desktopSidebarRef = useRef<HTMLElement>(null);
     const closedAtDesktopRef = useRef(false);
+
+    useEffect(() => {
+        const workspaceShell = workspaceShellRef.current;
+        const taskHeader = taskHeaderRef.current;
+        if (!workspaceShell || !taskHeader) return;
+
+        const updateTaskHeaderHeight = () => {
+            workspaceShell.style.setProperty(
+                '--workspace-task-header-height',
+                `${Math.ceil(taskHeader.getBoundingClientRect().height)}px`,
+            );
+        };
+
+        updateTaskHeaderHeight();
+
+        if (typeof ResizeObserver === 'undefined') {
+            window.addEventListener('resize', updateTaskHeaderHeight);
+            return () => window.removeEventListener('resize', updateTaskHeaderHeight);
+        }
+
+        const resizeObserver = new ResizeObserver(updateTaskHeaderHeight);
+        resizeObserver.observe(taskHeader);
+        return () => resizeObserver.disconnect();
+    }, []);
 
     useEffect(() => {
         if (typeof window.matchMedia !== 'function') return;
@@ -205,7 +231,11 @@ export default function WorkspaceLayout({
     }, [mobileOpen]);
 
     return (
-        <div className="workspace-shell min-h-screen bg-page-tint text-body">
+        <div
+            ref={workspaceShellRef}
+            data-testid="workspace-shell"
+            className="workspace-shell min-h-screen bg-page-tint text-body"
+        >
             <div
                 data-testid="workspace-background"
                 inert={mobileOpen ? true : undefined}
@@ -235,7 +265,11 @@ export default function WorkspaceLayout({
                     </button>
                 </header>
                 <div className="lg:pl-64">
-                    <header className="sticky top-0 z-30 flex min-h-16 flex-col items-start justify-between gap-3 border-b border-border bg-white px-5 py-3 sm:flex-row sm:items-center sm:px-6">
+                    <header
+                        ref={taskHeaderRef}
+                        data-testid="workspace-task-header"
+                        className="sticky top-0 z-30 flex min-h-16 flex-col items-start justify-between gap-3 border-b border-border bg-white px-5 py-3 sm:flex-row sm:items-center sm:px-6"
+                    >
                         <div>
                             <h1 className="text-lg font-bold text-body">{title}</h1>
                             {subtitle && <p className="text-xs text-muted">{subtitle}</p>}
