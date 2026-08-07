@@ -1,0 +1,76 @@
+name: Bug report
+description: Report a reproducible APES Newsroom defect
+title: "[Bug]: "
+type: Bug
+labels:
+  - bug
+assignees:
+  - bmurphy-apescic
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve APES Newsroom. Do not include credentials,
+        personal data, private security details, or unredacted production logs.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is broken?
+      placeholder: Give a concise description of the defect.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who is affected and how severe is the effect?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Affected version or environment
+      description: Include the release, commit, browser/device, or beta/production environment as applicable.
+      placeholder: e.g. beta at commit abc123, Firefox 128 on Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest reliable sequence that demonstrates the problem.
+      placeholder: |
+        1. Go to ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should have happened?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: What happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting logs or screenshots
+      description: Add redacted evidence that helps reproduce or diagnose the issue.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Data-safety confirmation
+      options:
+        - label: I removed secrets, credentials, personal data, and private security details from this report.
+          required: true
