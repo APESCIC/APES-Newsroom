@@ -8,15 +8,15 @@
 
 | Component | Description | States |
 | --- | --- | --- |
-| `PublicLayout` | Skip link, dark brand header, primary channels, Search, Account, page canvas, footer | guest, signed-in, mobile disclosure |
+| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer | guest, signed-in, mobile disclosure |
 | `AccountMenu` | Login/Register or Account disclosure with Profile, Admin, Staff, Sign out | guest, public, staff, admin |
 | `SiteFooter` | Compact brand mark and privacy, cookies, rights, mailing links | default |
 | `DeskPanel` | Featured-story media panel, channel, headline, excerpt, byline/date and story action | empty, populated |
 | `ChannelTrailTile` | Labelled line icon, channel name, description and channel link | default, focus |
 | `RecentStoryCard` | Source-backed channel treatment, title, nullable excerpt and semantic publication time | default, missing metadata |
-| `WorkspaceLayout` | Dark role-labelled rail, account controls, light task canvas and mobile disclosure | staff, admin |
+| `WorkspaceLayout` | Dark role-labelled rail, account controls, light task canvas and scrollable modal mobile drawer with contained focus and inert background | staff, admin, short viewport |
 | `LineIcon` | First-party current-colour line icons without emoji dependencies | decorative |
-| `ApesLogo` | Unfiltered horizontal, square, or compact supplied APES artwork; square placement uses 384/768 WebP sources with PNG fallback | per placement, responsive |
+| `ApesLogo` | Unfiltered horizontal, masthead, square, or compact APES artwork; the masthead uses a deterministic tight crop and square placement uses 384/768 WebP sources with PNG fallback | per placement, responsive |
 
 ## Staff posts
 

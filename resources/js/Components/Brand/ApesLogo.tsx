@@ -1,7 +1,8 @@
-type LogoVariant = 'horizontal' | 'square' | 'compact';
+type LogoVariant = 'horizontal' | 'masthead' | 'square' | 'compact';
 
 const logoFiles: Record<LogoVariant, { src: string; width: number; height: number }> = {
     horizontal: { src: '/brand/apes-logo-horizontal.png', width: 440, height: 250 },
+    masthead: { src: '/brand/apes-logo-masthead.png', width: 195, height: 145 },
     square: { src: '/brand/apes-logo-square.png', width: 1024, height: 1024 },
     compact: { src: '/brand/apes-logo-compact.png', width: 512, height: 512 },
 };

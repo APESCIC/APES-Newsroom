@@ -64,6 +64,10 @@
         outline-offset: 3px;
     }
 
+    #main-content {
+        scroll-margin-top: 5rem;
+    }
+
     button,
     a {
         -webkit-tap-highlight-color: transparent;

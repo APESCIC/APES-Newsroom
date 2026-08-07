@@ -46,7 +46,7 @@ describe('Direction A public homepage', () => {
 
         expect(screen.getByRole('img', { name: 'APES Newsroom' })).toHaveAttribute(
             'src',
-            '/brand/apes-logo-horizontal.png',
+            '/brand/apes-logo-masthead.png',
         );
         const primaryNavigation = screen.getByRole('navigation', { name: 'Primary navigation' });
         expect(within(primaryNavigation).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');

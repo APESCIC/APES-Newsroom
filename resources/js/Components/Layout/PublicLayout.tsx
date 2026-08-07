@@ -35,7 +35,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
             <header className="sticky top-0 z-40 bg-brand-ink text-white">
                 <div className="mx-auto flex h-16 max-w-public items-center justify-between gap-6 px-5 sm:px-6">
                     <Link href="/" className="inline-flex shrink-0 rounded-control py-1">
-                        <ApesLogo variant="horizontal" className="h-10 w-auto object-contain" />
+                        <ApesLogo variant="masthead" className="h-12 w-auto object-contain" />
                     </Link>
 
                     <div className="hidden items-center gap-5 lg:flex">

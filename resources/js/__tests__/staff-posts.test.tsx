@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import PostsIndex from '../Pages/Staff/Posts/Index';
@@ -62,9 +62,28 @@ describe('Direction A staff posts workspace', () => {
         const navigationButton = screen.getByRole('button', { name: 'Open workspace navigation' });
         await user.click(navigationButton);
         expect(navigationButton).toHaveAttribute('aria-expanded', 'true');
-        expect(screen.getAllByRole('navigation', { name: 'Staff workspace' })).toHaveLength(2);
+
+        const background = screen.getByTestId('workspace-background');
+        const dialog = screen.getByRole('dialog', { name: 'Workspace navigation' });
+        const closeButton = within(dialog).getByRole('button', { name: 'Close workspace navigation' });
+        expect(screen.getAllByRole('navigation', { name: 'Staff workspace' })).toHaveLength(1);
+        expect(within(dialog).getByRole('navigation', { name: 'Staff workspace' })).toBeInTheDocument();
+        expect(dialog).toHaveAttribute('aria-modal', 'true');
+        expect(background).toHaveAttribute('inert');
+        expect(background).toHaveAttribute('aria-hidden', 'true');
+        expect(within(dialog).getByTestId('workspace-sidebar')).toHaveClass('overflow-y-auto');
+        expect(closeButton).toHaveFocus();
+
+        await user.tab({ shift: true });
+        expect(dialog).toContainElement(document.activeElement as HTMLElement);
+        await user.tab();
+        expect(closeButton).toHaveFocus();
+
         await user.keyboard('{Escape}');
         expect(navigationButton).toHaveAttribute('aria-expanded', 'false');
+        expect(background).not.toHaveAttribute('inert');
+        expect(background).not.toHaveAttribute('aria-hidden');
+        expect(navigationButton).toHaveFocus();
     });
 
     it('keeps admin and review navigation out of the staff-only workspace', () => {

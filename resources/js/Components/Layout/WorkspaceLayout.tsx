@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { useEffect, useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import type { SharedPageProps } from '../../types/page';
 import ApesLogo from '../Brand/ApesLogo';
 import LineIcon, { type IconName } from '../Icons/LineIcon';
@@ -58,7 +58,10 @@ function Sidebar({ area, active, close }: { area: WorkspaceArea; active: 'modera
     const roleLabel = auth.user?.role.replace('_', ' ') ?? 'workspace';
 
     return (
-        <div className="flex h-full flex-col bg-brand-ink px-5 py-6 text-white">
+        <div
+            className="flex h-full flex-col overflow-y-auto overscroll-contain bg-brand-ink px-5 py-6 text-white"
+            data-testid="workspace-sidebar"
+        >
             <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <Link href="/" className="inline-flex rounded-control">
@@ -67,7 +70,13 @@ function Sidebar({ area, active, close }: { area: WorkspaceArea; active: 'modera
                     <span className="rounded bg-white/10 px-2 py-1 text-[0.625rem] font-bold tracking-widest text-white/75 uppercase">{area}</span>
                 </div>
                 {close && (
-                    <button type="button" className="icon-button text-white" aria-label="Close workspace navigation" onClick={close}>
+                    <button
+                        type="button"
+                        className="icon-button text-white"
+                        aria-label="Close workspace navigation"
+                        data-workspace-close
+                        onClick={close}
+                    >
                         <LineIcon name="x" className="h-5 w-5" />
                     </button>
                 )}
@@ -116,63 +125,117 @@ export default function WorkspaceLayout({
 }) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const navigationId = useId();
+    const navigationTriggerRef = useRef<HTMLButtonElement>(null);
+    const navigationDialogRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
         if (!mobileOpen) return;
 
-        const closeOnEscape = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') setMobileOpen(false);
+        const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        const navigationTrigger = navigationTriggerRef.current;
+        const dialog = navigationDialogRef.current;
+        const focusableSelector =
+            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+        const focusableElements = () =>
+            dialog
+                ? Array.from(dialog.querySelectorAll<HTMLElement>(focusableSelector)).filter(
+                      (element) => !element.hasAttribute('hidden') && element.getAttribute('aria-hidden') !== 'true',
+                  )
+                : [];
+
+        (dialog?.querySelector<HTMLElement>('[data-workspace-close]') ?? focusableElements()[0])?.focus();
+
+        const handleDialogKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setMobileOpen(false);
+                return;
+            }
+
+            if (event.key !== 'Tab') return;
+
+            const elements = focusableElements();
+            if (elements.length === 0) {
+                event.preventDefault();
+                return;
+            }
+
+            const first = elements[0];
+            const last = elements[elements.length - 1];
+            const activeElement = document.activeElement;
+
+            if (event.shiftKey && (activeElement === first || !dialog?.contains(activeElement))) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
         };
 
-        document.addEventListener('keydown', closeOnEscape);
-        return () => document.removeEventListener('keydown', closeOnEscape);
+        document.addEventListener('keydown', handleDialogKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleDialogKeyDown);
+            if (previouslyFocused?.isConnected) previouslyFocused.focus();
+            else navigationTrigger?.focus();
+        };
     }, [mobileOpen]);
 
     return (
         <div className="min-h-screen bg-page-tint text-body">
-            <a href="#main-content" className="skip-link">
-                Skip to main content
-            </a>
-            <aside className="fixed inset-y-0 left-0 hidden w-64 lg:block">
-                <Sidebar area={area} active={active} />
-            </aside>
-            <header className="flex min-h-16 items-center justify-between border-b border-border bg-white px-5 lg:hidden">
-                <Link href="/" className="inline-flex items-center gap-3 font-semibold text-brand-ink">
-                    <ApesLogo variant="compact" alt="" className="h-11 w-11 object-contain" />
-                    APES Newsroom
-                </Link>
-                <button
-                    type="button"
-                    className="icon-button border border-border text-brand-ink"
-                    aria-label="Open workspace navigation"
-                    aria-expanded={mobileOpen}
-                    aria-controls={navigationId}
-                    onClick={() => setMobileOpen(true)}
-                >
-                    <LineIcon name="menu" className="h-5 w-5" />
-                </button>
-            </header>
+            <div
+                data-testid="workspace-background"
+                inert={mobileOpen ? true : undefined}
+                aria-hidden={mobileOpen ? true : undefined}
+            >
+                <a href="#main-content" className="skip-link">
+                    Skip to main content
+                </a>
+                <aside className="fixed inset-y-0 left-0 hidden w-64 lg:block">
+                    <Sidebar area={area} active={active} />
+                </aside>
+                <header className="flex min-h-16 items-center justify-between border-b border-border bg-white px-5 lg:hidden">
+                    <Link href="/" className="inline-flex items-center gap-3 font-semibold text-brand-ink">
+                        <ApesLogo variant="compact" alt="" className="h-11 w-11 object-contain" />
+                        APES Newsroom
+                    </Link>
+                    <button
+                        ref={navigationTriggerRef}
+                        type="button"
+                        className="icon-button border border-border text-brand-ink"
+                        aria-label="Open workspace navigation"
+                        aria-expanded={mobileOpen}
+                        aria-controls={navigationId}
+                        onClick={() => setMobileOpen(true)}
+                    >
+                        <LineIcon name="menu" className="h-5 w-5" />
+                    </button>
+                </header>
+                <div className="lg:pl-64">
+                    <header className="sticky top-0 z-30 flex min-h-16 flex-col items-start justify-between gap-3 border-b border-border bg-white px-5 py-3 sm:flex-row sm:items-center sm:px-6">
+                        <div>
+                            <h1 className="text-lg font-bold text-body">{title}</h1>
+                            {subtitle && <p className="text-xs text-muted">{subtitle}</p>}
+                        </div>
+                        {actions}
+                    </header>
+                    {children}
+                </div>
+            </div>
             {mobileOpen && (
                 <div className="fixed inset-0 z-50 bg-brand-ink/45 lg:hidden" onClick={() => setMobileOpen(false)}>
                     <aside
+                        ref={navigationDialogRef}
                         id={navigationId}
                         className="h-full w-[min(20rem,88vw)]"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Workspace navigation"
                         onClick={(event) => event.stopPropagation()}
                     >
                         <Sidebar area={area} active={active} close={() => setMobileOpen(false)} />
                     </aside>
                 </div>
             )}
-            <div className="lg:pl-64">
-                <header className="sticky top-0 z-30 flex min-h-16 flex-col items-start justify-between gap-3 border-b border-border bg-white px-5 py-3 sm:flex-row sm:items-center sm:px-6">
-                    <div>
-                        <h1 className="text-lg font-bold text-body">{title}</h1>
-                        {subtitle && <p className="text-xs text-muted">{subtitle}</p>}
-                    </div>
-                    {actions}
-                </header>
-                {children}
-            </div>
         </div>
     );
 }

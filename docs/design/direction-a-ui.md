@@ -19,9 +19,12 @@ contained mission panel. Authenticated workspaces retain the same brand ink,
 teal and typography but prioritise dense, calm task completion.
 
 The supplied horizontal, square and compact APES logo files are the only brand
-marks. Their artwork and aspect ratios remain unchanged without filters or
-recolouring. The square PNG remains the canonical fallback and is served with
-deterministic 384px and 768px WebP derivatives for responsive delivery.
+sources. Their artwork remains unchanged without filters or recolouring. The
+public header uses a deterministic tight crop of the horizontal source so the
+mark stays legible at masthead size, while a dedicated 32px PNG avoids shipping
+the full compact logo as browser chrome. The square PNG remains the canonical
+fallback and is served with deterministic 384px and 768px WebP derivatives for
+responsive delivery.
 
 Instrument Sans Variable 5.3.0 is self-hosted from the application bundle so
 the restrictive content security policy does not depend on a remote font host.
@@ -39,10 +42,14 @@ specified at a synthetic 800 weight use 700.
   nullable excerpt and semantic publication date when supplied.
 - Public navigation and account actions remain source- and role-aware; no new
   archive route is introduced.
+- Sticky public headers reserve scroll margin for skip-link targets so the
+  destination remains visible.
 
 ### Admin moderation
 
 - A dark workspace rail frames a light moderation canvas.
+- The mobile rail is a scrollable modal drawer: focus stays inside it, the
+  underlying workspace becomes inert, and closing restores the trigger focus.
 - Four queue summaries map directly to pending profiles, pending comments,
   open reports and suspended profiles.
 - Available actions remain Approve, Reject, Suspend, Resolve, Dismiss and Lift
