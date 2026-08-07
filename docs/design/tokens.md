@@ -1,77 +1,68 @@
-# APES Newsroom — Design Tokens (draft)
+# APES Newsroom — Direction A design tokens
 
-> **Status:** First-pass draft for stakeholder review (#2).
+> **Status:** Approved with the complete Direction A mock-up set under issue
+> #31 and implemented for homepage, admin moderation, and staff posts under #32.
 
 ## Brand direction
 
-Mission-led editorial: authentic animal-care imagery, warm APES accents, high-contrast long-form reading, calm accessible interfaces. Three channels share a unified system with distinct accent colours.
+Story-led conservation editorial: credible, calm and mission-led on public
+pages, with focused operational workspaces for staff and administrators. Use
+the supplied APES artwork as-is. Do not redraw, recolour, grayscale or filter
+the marks.
 
 ## Colour
 
 | Token | Value | Usage |
-|-------|-------|-------|
-| `--color-apes-primary` | `#2D6A4F` | Primary actions, APES CIC accent |
+| --- | --- | --- |
+| `--color-brand-ink` | `#061A1A` | Public masthead and workspace rail |
+| `--color-brand-teal` | `#00BFC7` | Decorative brand rules and highlights |
+| `--color-teal-deep` | `#006E73` | Accessible links, buttons and active states |
+| `--color-brand-mist` | `#E5F6F4` | Selected and informative surfaces |
+| `--color-page-tint` | `#F4F8F7` | Application background |
+| `--color-surface` | `#FFFFFF` | Cards and primary work surfaces |
+| `--color-body` | `#17211F` | Primary text |
+| `--color-muted` | `#5A6764` | Secondary text |
+| `--color-border` | `#CAD8D4` | Separators and normal control borders |
+| `--color-focus` | `#005FCC` | Visible focus rings |
+| `--color-success` | `#176B45` | Approval and published states |
+| `--color-warning` | `#9A5B13` | In-review and needs-attention states |
+| `--color-danger` | `#A93030` | Rejection and destructive actions |
+| `--color-apes-primary` | `#2D6A4F` | APES CIC channel |
 | `--color-shelter-accent` | `#BC6C25` | Shelter & Rescue channel |
 | `--color-clinic-accent` | `#457B9D` | Pet Care Clinic channel |
-| `--color-neutral-900` | `#1A1A1A` | Headings, body text |
-| `--color-neutral-600` | `#525252` | Secondary text |
-| `--color-neutral-100` | `#F5F5F4` | Quiet secondary surfaces |
-| `--color-page-tint` | `#F7FBF9` | Public page backgrounds (Friendly Guide) |
-| `--color-surface` | `#FFFFFF` | Cards, panels |
-| `--color-error` | `#B91C1C` | Errors, destructive actions |
-| `--color-success` | `#15803D` | Success states |
-| `--color-focus` | `#2563EB` | Focus rings |
 
-## Friendly Guide surfaces
-
-| Token / class | Value | Usage |
-|---------------|-------|-------|
-| `--radius-tile` | `1rem` | Trail tiles and desk panel corners |
-| `.shadow-chunky-apes` | `4px 4px 0` primary | APES CIC trail tiles |
-| `.shadow-chunky-shelter` | `4px 4px 0` shelter accent | Shelter trail tiles |
-| `.shadow-chunky-clinic` | `4px 4px 0` clinic accent | Clinic trail tiles |
-| `.shadow-chunky-ink` | `4px 4px 0` neutral-900 | Desk panel and menus |
-
-Chunky shadows are for trail tiles, desk panels, and Account menu only — not article body.
+Bright brand teal is decorative on light backgrounds; use deep teal for text
+and controls. Never rely on channel or state colour without a text or icon
+label.
 
 ## Typography
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--font-sans` | Instrument Sans, system-ui | UI and body |
-| `--font-serif` | Georgia, serif | Article long-form (optional) |
-| `--text-xs` | 0.75rem / 1rem | Captions, metadata |
-| `--text-sm` | 0.875rem / 1.25rem | Secondary UI |
-| `--text-base` | 1rem / 1.5rem | Body |
-| `--text-lg` | 1.125rem / 1.75rem | Lead paragraphs |
-| `--text-xl` | 1.25rem / 1.75rem | Section headings |
-| `--text-2xl` | 1.5rem / 2rem | Page titles |
-| `--text-3xl` | 1.875rem / 2.25rem | Article titles (mobile) |
-| `--text-4xl` | 2.25rem / 2.5rem | Article titles (desktop) |
+Instrument Sans with system sans-serif fallback is the only type family.
+Display titles use 700–800 weight and compact line height. Body and UI text use
+400–600 weight, with 16px primary reading text and 14px minimum compact
+metadata. Article measure is 65–72 characters.
 
-## Spacing
+## Spacing, radius and elevation
 
-4px base grid: `--space-1` (4px) through `--space-16` (64px). Article content max-width: `42rem` (prose). Page gutters: `1.5rem` mobile, `2rem` tablet+.
+- 4px base grid; primary gaps are 16, 24, 32 and 48px.
+- Public maximum width: 1200px; workspace maximum width: 1440px; article
+  measure: 720px.
+- Controls use 10px radius, normal cards 14px and feature surfaces 18px.
+- Normal cards use a one-pixel border and no shadow. Elevated feature cards
+  and menus may use `0 12px 32px rgba(6, 26, 26, 0.10)`.
+- Friendly Guide emoji and chunky offset shadows are retired in Direction A.
 
-## Focus
+## Focus, targets and motion
 
-- Visible 2px `--color-focus` outline with 2px offset
-- Never remove focus indicators
-- Focus must not be obscured by sticky headers
+- Visible 2px `--color-focus` outline with at least 2px offset.
+- Minimum interactive target: 44×44px.
+- Motion is limited to subtle opacity or translate transitions.
+- Disable non-essential motion for `prefers-reduced-motion`.
+- Maintain WCAG 2.2 AA contrast and reflow at 200% zoom.
 
-## Touch targets
+## Page-shell mapping
 
-Minimum 44×44px for interactive elements (WCAG 2.2 target size).
-
-## Motion
-
-Respect `prefers-reduced-motion`: disable non-essential transitions when set.
-
-## Channel differentiation
-
-Each channel page uses its accent colour for:
-- Hero band background tint
-- Category pill borders
-- Section heading underlines
-
-Shared chrome (header, footer, article body) remains consistent across channels.
+- Public: dark brand masthead, light editorial content and a restrained legal
+  footer.
+- Staff/admin: dark workspace rail and light working canvas. Workspace links
+  remain role-aware; the visual refresh does not broaden authorization.

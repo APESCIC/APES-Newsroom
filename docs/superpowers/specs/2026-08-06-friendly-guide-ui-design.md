@@ -1,5 +1,9 @@
 # Friendly Guide UI — Design Spec
 
+> **Historical:** This #27 specification is retained for provenance but was
+> superseded by the stakeholder-approved [Direction A system](../../design/direction-a-ui.md)
+> under #31 and #32.
+
 > **Status:** Approved for implementation planning (stakeholder choice 2026-08-06)  
 > **Issue:** [#27](https://github.com/APESCIC/APES-Newsroom/issues/27)  
 > **Relates to:** #1, closed design baseline #2  

@@ -94,6 +94,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Component tests
+        run: npm run test:frontend
+
       - name: Security audit (npm)
         run: npm audit --omit=dev --audit-level=high
 

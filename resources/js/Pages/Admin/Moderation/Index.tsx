@@ -1,4 +1,7 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import { useState, type KeyboardEvent } from 'react';
+import LineIcon from '../../../Components/Icons/LineIcon';
+import WorkspaceLayout from '../../../Components/Layout/WorkspaceLayout';
 
 type PendingProfile = {
     id: number;
@@ -33,6 +36,16 @@ type Suspended = {
     notes: string | null;
 };
 
+type Queue = 'profiles' | 'comments' | 'reports' | 'suspended';
+
+function formatDate(value: string | null) {
+    return value ? new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium' }).format(new Date(value)) : 'Date unavailable';
+}
+
+function EmptyQueue({ children }: { children: string }) {
+    return <p className="rounded-card border border-border bg-white p-8 text-center text-muted">{children}</p>;
+}
+
 export default function ModerationIndex({
     profiles,
     comments,
@@ -44,6 +57,8 @@ export default function ModerationIndex({
     reports?: Report[];
     suspended?: Suspended[];
 }) {
+    const [activeQueue, setActiveQueue] = useState<Queue>('profiles');
+
     const moderateProfile = (id: number, status: string) => {
         router.post(`/admin/moderation/profiles/${id}`, { status });
     };
@@ -52,139 +67,211 @@ export default function ModerationIndex({
         router.post(`/admin/moderation/comments/${id}`, { status });
     };
 
+    const queues: Array<{ id: Queue; tabLabel: string; summaryLabel: string; count: number }> = [
+        { id: 'profiles', tabLabel: 'Profiles', summaryLabel: 'Profiles awaiting review', count: profiles.length },
+        { id: 'comments', tabLabel: 'Comments', summaryLabel: 'Comments awaiting review', count: comments.length },
+        { id: 'reports', tabLabel: 'Reports', summaryLabel: 'Open reports', count: reports.length },
+        { id: 'suspended', tabLabel: 'Suspended', summaryLabel: 'Suspended profiles', count: suspended.length },
+    ];
+
+    const handleTabKey = (event: KeyboardEvent<HTMLButtonElement>, queue: Queue) => {
+        const currentIndex = queues.findIndex((item) => item.id === queue);
+        let nextIndex: number | null = null;
+
+        if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % queues.length;
+        if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + queues.length) % queues.length;
+        if (event.key === 'Home') nextIndex = 0;
+        if (event.key === 'End') nextIndex = queues.length - 1;
+
+        if (nextIndex === null) return;
+
+        event.preventDefault();
+        const nextQueue = queues[nextIndex].id;
+        setActiveQueue(nextQueue);
+        document.getElementById(`tab-${nextQueue}`)?.focus();
+    };
+
     return (
-        <>
+        <WorkspaceLayout area="Admin" active="moderation" title="Moderation queue">
             <Head title="Moderation" />
-            <main className="mx-auto max-w-3xl px-6 py-12">
-                <h1 className="text-2xl font-semibold">Moderation queue</h1>
-
-                <section className="mt-8">
-                    <h2 className="text-lg font-medium">Profiles ({profiles.length})</h2>
-                    <ul className="mt-4 flex flex-col gap-4">
-                        {profiles.map((profile) => (
-                            <li key={profile.id} className="rounded border p-4">
-                                <p className="font-medium">{profile.display_name ?? 'Untitled'}</p>
-                                <p className="text-sm text-neutral-600">Account: {profile.user_name}</p>
-                                {profile.bio && <p className="mt-2 text-sm">{profile.bio}</p>}
-                                <div className="mt-3 flex flex-wrap gap-2">
-                                    <button
-                                        type="button"
-                                        className="rounded bg-green-700 px-3 py-1 text-sm text-white"
-                                        onClick={() => moderateProfile(profile.id, 'approved')}
-                                    >
-                                        Approve
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="rounded bg-red-700 px-3 py-1 text-sm text-white"
-                                        onClick={() => moderateProfile(profile.id, 'rejected')}
-                                    >
-                                        Reject
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="rounded border px-3 py-1 text-sm"
-                                        onClick={() => moderateProfile(profile.id, 'suspended')}
-                                    >
-                                        Suspend
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                        {profiles.length === 0 && <li className="text-sm text-neutral-600">No pending profiles.</li>}
-                    </ul>
+            <main id="main-content" className="mx-auto max-w-workspace px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
+                <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Moderation summary">
+                    {queues.map((queue) => (
+                        <button
+                            key={queue.id}
+                            type="button"
+                            className={`min-h-32 rounded-card border bg-white p-5 text-left transition-colors ${
+                                activeQueue === queue.id ? 'border-teal-deep ring-2 ring-teal-deep/15' : 'border-border hover:border-teal-deep'
+                            }`}
+                            onClick={() => setActiveQueue(queue.id)}
+                            aria-label={`${queue.summaryLabel}: ${queue.count}`}
+                        >
+                            <span className="block text-3xl font-bold text-brand-ink">{queue.count}</span>
+                            <span className="mt-3 block text-sm font-semibold text-muted">{queue.summaryLabel}</span>
+                        </button>
+                    ))}
                 </section>
 
-                <section className="mt-10">
-                    <h2 className="text-lg font-medium">Comments ({comments.length})</h2>
-                    <ul className="mt-4 flex flex-col gap-4">
-                        {comments.map((comment) => (
-                            <li key={comment.id} className="rounded border p-4">
-                                <p className="text-sm text-neutral-600">
-                                    {comment.user_name} on {comment.post_title}
-                                </p>
-                                <p className="mt-2">{comment.body}</p>
-                                <div className="mt-3 flex gap-2">
-                                    <button
-                                        type="button"
-                                        className="rounded bg-green-700 px-3 py-1 text-sm text-white"
-                                        onClick={() => moderateComment(comment.id, 'approved')}
-                                    >
-                                        Approve
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="rounded bg-red-700 px-3 py-1 text-sm text-white"
-                                        onClick={() => moderateComment(comment.id, 'rejected')}
-                                    >
-                                        Reject
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                        {comments.length === 0 && <li className="text-sm text-neutral-600">No pending comments.</li>}
-                    </ul>
-                </section>
-
-                <section className="mt-10">
-                    <h2 className="text-lg font-medium">Open reports ({reports.length})</h2>
-                    <ul className="mt-4 flex flex-col gap-4">
-                        {reports.map((report) => (
-                            <li key={report.id} className="rounded border p-4">
-                                <p className="text-sm text-neutral-600">
-                                    {report.reportable_type} #{report.reportable_id} — {report.reporter}
-                                </p>
-                                <p className="mt-2">{report.reason}</p>
-                                <div className="mt-3 flex gap-2">
-                                    <button
-                                        type="button"
-                                        className="rounded border px-3 py-1 text-sm"
-                                        onClick={() =>
-                                            router.post(`/admin/moderation/reports/${report.id}`, {
-                                                status: 'resolved',
-                                            })
-                                        }
-                                    >
-                                        Resolve
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="rounded border px-3 py-1 text-sm"
-                                        onClick={() =>
-                                            router.post(`/admin/moderation/reports/${report.id}`, {
-                                                status: 'dismissed',
-                                            })
-                                        }
-                                    >
-                                        Dismiss
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                        {reports.length === 0 && <li className="text-sm text-neutral-600">No open reports.</li>}
-                    </ul>
-                </section>
-
-                <section className="mt-10">
-                    <h2 className="text-lg font-medium">Suspended ({suspended.length})</h2>
-                    <ul className="mt-4 flex flex-col gap-4">
-                        {suspended.map((profile) => (
-                            <li key={profile.id} className="rounded border p-4">
-                                <p className="font-medium">{profile.display_name ?? profile.user_name}</p>
-                                {profile.notes && <p className="mt-1 text-sm text-neutral-600">{profile.notes}</p>}
+                <section className="mt-8 overflow-hidden rounded-feature border border-border bg-white" aria-label="Moderation queue records">
+                    <div className="border-b border-border px-2 sm:px-4">
+                        <div role="tablist" aria-label="Moderation queues" className="flex gap-1 overflow-x-auto">
+                            {queues.map((queue) => (
                                 <button
+                                    key={queue.id}
+                                    id={`tab-${queue.id}`}
                                     type="button"
-                                    className="mt-3 rounded border px-3 py-1 text-sm"
-                                    onClick={() => moderateProfile(profile.id, 'private')}
+                                    role="tab"
+                                    aria-selected={activeQueue === queue.id}
+                                    aria-controls={`panel-${queue.id}`}
+                                    className={`min-h-11 shrink-0 border-b-2 px-4 py-3 text-sm font-semibold ${
+                                        activeQueue === queue.id
+                                            ? 'border-teal-deep text-teal-deep'
+                                            : 'border-transparent text-muted hover:text-body'
+                                    }`}
+                                    onClick={() => setActiveQueue(queue.id)}
+                                    onKeyDown={(event) => handleTabKey(event, queue.id)}
                                 >
-                                    Lift suspension
+                                    {queue.tabLabel} ({queue.count})
                                 </button>
-                            </li>
-                        ))}
-                        {suspended.length === 0 && <li className="text-sm text-neutral-600">No suspended profiles.</li>}
-                    </ul>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div
+                        id={`panel-${activeQueue}`}
+                        role="tabpanel"
+                        aria-labelledby={`tab-${activeQueue}`}
+                        className="p-5 sm:p-6"
+                    >
+                        {activeQueue === 'profiles' && (
+                            profiles.length > 0 ? (
+                                <>
+                                    <div className="hidden overflow-x-auto md:block">
+                                        <table className="w-full text-left text-sm" aria-label="Pending profiles">
+                                            <thead className="bg-page-tint/70 text-xs tracking-wide text-muted uppercase">
+                                                <tr>
+                                                    <th scope="col" className="px-5 py-4">User / account</th>
+                                                    <th scope="col" className="px-5 py-4">Bio / status</th>
+                                                    <th scope="col" className="px-5 py-4">Updated</th>
+                                                    <th scope="col" className="px-5 py-4 text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-border">
+                                                {profiles.map((profile) => {
+                                                    const name = profile.display_name ?? 'Untitled profile';
+                                                    return (
+                                                        <tr key={profile.id} className="hover:bg-page-tint/50">
+                                                            <td className="px-5 py-5">
+                                                                <p className="font-bold text-body">{name}</p>
+                                                                <p className="mt-1 text-xs text-muted">{profile.user_name}</p>
+                                                            </td>
+                                                            <td className="max-w-sm px-5 py-5 text-body">{profile.bio ?? 'No bio supplied.'}</td>
+                                                            <td className="px-5 py-5 text-xs text-muted">{formatDate(profile.updated_at)}</td>
+                                                            <td className="px-5 py-5">
+                                                                <div className="flex justify-end gap-2">
+                                                                    <button type="button" className="button-success" aria-label={`Approve profile for ${name}`} onClick={() => moderateProfile(profile.id, 'approved')}>Approve</button>
+                                                                    <button type="button" className="button-danger" aria-label={`Reject profile for ${name}`} onClick={() => moderateProfile(profile.id, 'rejected')}>Reject</button>
+                                                                    <button type="button" className="button-secondary" aria-label={`Suspend profile for ${name}`} onClick={() => moderateProfile(profile.id, 'suspended')}>Suspend</button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <ul className="space-y-4 md:hidden">
+                                        {profiles.map((profile) => {
+                                            const name = profile.display_name ?? 'Untitled profile';
+                                            return (
+                                                <li key={profile.id} className="rounded-card border border-border bg-white p-5">
+                                                    <div className="flex items-start gap-4">
+                                                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-mist text-teal-deep">
+                                                            <LineIcon name="user" className="h-5 w-5" />
+                                                        </span>
+                                                        <div>
+                                                            <h3 className="font-bold text-brand-ink">{name}</h3>
+                                                            <p className="mt-1 text-sm text-muted">Account: {profile.user_name}</p>
+                                                        </div>
+                                                    </div>
+                                                    {profile.bio && <p className="mt-5 text-sm leading-6 text-body">{profile.bio}</p>}
+                                                    <div className="mt-5 flex flex-wrap gap-2">
+                                                        <button type="button" className="button-success" aria-label={`Approve profile for ${name} on small screens`} onClick={() => moderateProfile(profile.id, 'approved')}>Approve</button>
+                                                        <button type="button" className="button-danger" aria-label={`Reject profile for ${name} on small screens`} onClick={() => moderateProfile(profile.id, 'rejected')}>Reject</button>
+                                                        <button type="button" className="button-secondary" aria-label={`Suspend profile for ${name} on small screens`} onClick={() => moderateProfile(profile.id, 'suspended')}>Suspend</button>
+                                                    </div>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </>
+                            ) : <EmptyQueue>No profiles are waiting for review.</EmptyQueue>
+                        )}
+
+                        {activeQueue === 'comments' && (
+                            comments.length > 0 ? (
+                                <ul className="space-y-4">
+                                    {comments.map((comment) => (
+                                        <li key={comment.id} className="rounded-card border border-border bg-white p-6">
+                                            <p className="text-sm text-muted">
+                                                <strong className="text-body">{comment.user_name}</strong> on{' '}
+                                                <Link href={`/articles/${comment.post_slug}`} className="font-semibold text-teal-deep hover:underline">{comment.post_title}</Link>
+                                            </p>
+                                            <p className="mt-2 text-xs text-muted">Submitted {formatDate(comment.created_at)}</p>
+                                            <p className="mt-5 rounded-control bg-page-tint p-4 leading-7 text-body">{comment.body}</p>
+                                            <div className="mt-5 flex flex-wrap gap-2">
+                                                <button type="button" className="button-success" aria-label={`Approve comment by ${comment.user_name}`} onClick={() => moderateComment(comment.id, 'approved')}>Approve</button>
+                                                <button type="button" className="button-danger" aria-label={`Reject comment by ${comment.user_name}`} onClick={() => moderateComment(comment.id, 'rejected')}>Reject</button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : <EmptyQueue>No comments are waiting for review.</EmptyQueue>
+                        )}
+
+                        {activeQueue === 'reports' && (
+                            reports.length > 0 ? (
+                                <ul className="space-y-4">
+                                    {reports.map((report) => (
+                                        <li key={report.id} className="rounded-card border border-border bg-white p-6">
+                                            <div className="flex flex-wrap items-start justify-between gap-3">
+                                                <div>
+                                                    <h3 className="font-bold text-brand-ink">{report.reportable_type} #{report.reportable_id}</h3>
+                                                    <p className="mt-1 text-sm text-muted">Reported by {report.reporter ?? 'Unknown account'} · {formatDate(report.created_at)}</p>
+                                                </div>
+                                                <span className="badge-warning">Needs attention</span>
+                                            </div>
+                                            <p className="mt-5 rounded-control bg-page-tint p-4 leading-7 text-body">{report.reason}</p>
+                                            <div className="mt-5 flex flex-wrap gap-2">
+                                                <button type="button" className="button-primary" aria-label={`Resolve report ${report.id}`} onClick={() => router.post(`/admin/moderation/reports/${report.id}`, { status: 'resolved' })}>Resolve</button>
+                                                <button type="button" className="button-secondary" aria-label={`Dismiss report ${report.id}`} onClick={() => router.post(`/admin/moderation/reports/${report.id}`, { status: 'dismissed' })}>Dismiss</button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : <EmptyQueue>No reports are open.</EmptyQueue>
+                        )}
+
+                        {activeQueue === 'suspended' && (
+                            suspended.length > 0 ? (
+                                <ul className="grid gap-4 xl:grid-cols-2">
+                                    {suspended.map((profile) => {
+                                        const name = profile.display_name ?? profile.user_name;
+                                        return (
+                                            <li key={profile.id} className="rounded-card border border-border bg-white p-6">
+                                                <h3 className="font-bold text-brand-ink">{name}</h3>
+                                                <p className="mt-1 text-sm text-muted">Account: {profile.user_name}</p>
+                                                {profile.notes && <p className="mt-4 rounded-control bg-page-tint p-4 text-sm leading-6">{profile.notes}</p>}
+                                                <button type="button" className="button-secondary mt-5" aria-label={`Lift suspension for ${name}`} onClick={() => moderateProfile(profile.id, 'private')}>Lift suspension</button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            ) : <EmptyQueue>No profiles are suspended.</EmptyQueue>
+                        )}
+                    </div>
                 </section>
             </main>
-        </>
+        </WorkspaceLayout>
     );
 }

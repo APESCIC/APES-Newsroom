@@ -1,5 +1,7 @@
 # APES Newsroom
 
+[![CI](https://github.com/APESCIC/APES-Newsroom/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/APESCIC/APES-Newsroom/actions/workflows/ci.yml)
+
 Public newsroom and authenticated publishing/campaign/moderation
 workspaces for the [Association for the Protection of Exotic Species
 (APES CIC)](https://apes.org.uk), covering APES CIC, APES Shelter &
@@ -9,6 +11,14 @@ See [Issue #1](https://github.com/APESCIC/APES-Newsroom/issues/1) for the
 full epic and [`docs/epic-1-build-plan.md`](docs/epic-1-build-plan.md) for
 how the ten sub-issues sequence against each other. Agents and contributors:
 track work via GitHub Issues per [`AGENTS.md`](AGENTS.md).
+
+## Repository status
+
+Last verified: **2026-08-07T00:20:14+01:00**. APES Newsroom is in active
+pre-release development. The Direction A public homepage, staff posts desk,
+and admin moderation workspace are being implemented under
+[issue #32](https://github.com/APESCIC/APES-Newsroom/issues/32); deployment and
+the production cutover remain separately authorized work.
 
 ## Stack
 
@@ -43,6 +53,7 @@ composer format      # auto-fix PHP style with Pint
 composer test        # or: php artisan test
 npm run typecheck
 npm run lint         # ESLint on resources/js
+npm run test:frontend
 ```
 
 ## Health check
@@ -57,3 +68,14 @@ Guarded, manually-triggered deploy to beta via GitHub Actions - see
 [`docs/deployment.md`](docs/deployment.md) for the full runbook,
 one-time setup, and rollback procedure. Production deployment and the
 Ghost cutover are separately authorized later work (issue #11).
+
+## Project links and support
+
+- [Documentation](docs/epic-1-build-plan.md), [local development](docs/local-dev.md), and [deployment runbook](docs/deployment.md)
+- [Direction A design record](docs/design/direction-a-ui.md) and [design tokens](docs/design/tokens.md)
+- [Report a bug](https://github.com/APESCIC/APES-Newsroom/issues/new?template=bug_report.yml) or [request a feature](https://github.com/APESCIC/APES-Newsroom/issues/new?template=feature_request.yml)
+- [All issues](https://github.com/APESCIC/APES-Newsroom/issues), [Discussions](https://github.com/APESCIC/APES-Newsroom/discussions), and [Releases](https://github.com/APESCIC/APES-Newsroom/releases)
+
+The repository is maintained by [APES CIC](https://github.com/APESCIC). A
+private security-reporting route is not yet documented; do not disclose
+potential vulnerabilities in a public issue.

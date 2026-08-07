@@ -1,5 +1,9 @@
 # Friendly Guide UI Implementation Plan
 
+> **Historical:** This #27 plan is retained for provenance but was superseded
+> by the stakeholder-approved [Direction A system](../../design/direction-a-ui.md)
+> under #31 and #32. Do not use its emoji or chunky-shadow guidance for new UI.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ship the approved Friendly Guide public chrome, split-desk homepage, and role-gated Account-menu Admin/Staff links (#27).

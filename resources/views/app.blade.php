@@ -7,6 +7,11 @@
 
         <title inertia>{{ config('app.name', 'APES Newsroom') }}</title>
 
+        <link rel="icon" type="image/png" href="/brand/apes-logo-compact.png">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx'])
         @inertiaHead

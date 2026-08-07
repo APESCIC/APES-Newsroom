@@ -1,37 +1,64 @@
+import type { IconName } from './Components/Icons/LineIcon';
+
 export type ChannelAccent = 'apes' | 'shelter' | 'clinic';
 
 export type ChannelMeta = {
-    icon: string;
-    hint: string;
+    label: string;
+    description: string;
     accent: ChannelAccent;
-    shadowClass: string;
+    icon: IconName;
+    textClass: string;
     borderClass: string;
     badgeClass: string;
+    mediaClass: string;
 };
 
 export const channelMetaBySlug: Record<string, ChannelMeta> = {
     'apes-cic': {
-        icon: '🌳',
-        hint: 'Mission stories',
+        label: 'APES CIC',
+        description: 'Mission stories from the field of global conservation.',
         accent: 'apes',
-        shadowClass: 'shadow-chunky-apes',
+        icon: 'tree',
+        textClass: 'text-apes-primary',
         borderClass: 'border-apes-primary',
-        badgeClass: 'bg-[#e8f2ec] text-apes-primary',
+        badgeClass: 'bg-apes-mist text-apes-primary',
+        mediaClass: 'bg-apes-mist text-apes-primary',
     },
     'apes-shelter-rescue': {
-        icon: '🏠',
-        hint: 'Shelter & rescue updates',
+        label: 'Shelter & Rescue',
+        description: 'Updates on rescued animals and adoption successes.',
         accent: 'shelter',
-        shadowClass: 'shadow-chunky-shelter',
+        icon: 'shelter',
+        textClass: 'text-shelter-accent',
         borderClass: 'border-shelter-accent',
-        badgeClass: 'bg-[#f5e6d8] text-shelter-accent',
+        badgeClass: 'bg-shelter-mist text-shelter-accent',
+        mediaClass: 'bg-shelter-mist text-shelter-accent',
     },
     'apes-pet-care-clinic': {
-        icon: '💉',
-        hint: 'Clinic notes',
+        label: 'Pet Care Clinic',
+        description: 'Expert clinic notes and community health advice.',
         accent: 'clinic',
-        shadowClass: 'shadow-chunky-clinic',
+        icon: 'clinic',
+        textClass: 'text-clinic-accent',
         borderClass: 'border-clinic-accent',
-        badgeClass: 'bg-[#e3f0f7] text-clinic-accent',
+        badgeClass: 'bg-clinic-mist text-clinic-accent',
+        mediaClass: 'bg-clinic-mist text-clinic-accent',
     },
 };
+
+const slugAliases: Record<string, string> = {
+    apes: 'apes-cic',
+    apes_cic: 'apes-cic',
+    'shelter-rescue': 'apes-shelter-rescue',
+    apes_shelter_rescue: 'apes-shelter-rescue',
+    'pet-care-clinic': 'apes-pet-care-clinic',
+    apes_pet_care_clinic: 'apes-pet-care-clinic',
+};
+
+export function channelMeta(value: string): ChannelMeta | undefined {
+    return channelMetaBySlug[slugAliases[value] ?? value];
+}
+
+export function canonicalChannelSlug(value: string): string {
+    return slugAliases[value] ?? value;
+}
