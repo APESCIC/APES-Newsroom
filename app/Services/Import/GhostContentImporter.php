@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
 class GhostContentImporter
@@ -280,7 +281,7 @@ class GhostContentImporter
                     'blocks' => $converted['blocks'],
                     'version' => '2.29.0',
                 ]);
-            } catch (\Illuminate\Validation\ValidationException $e) {
+            } catch (ValidationException $e) {
                 $report['warnings'][] = 'Post '.$slug.' failed block validation: '.$e->getMessage();
                 $report['needs_review'][] = $slug;
                 $converted['needs_review'] = true;
