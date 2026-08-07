@@ -18,7 +18,7 @@
 
 | Surface | Checks |
 |---------|--------|
-| Homepage | Keyboard nav through featured cards; alt text on hero images |
+| Homepage | Keyboard nav through featured cards; visible channel names provide link names; responsive artwork has alt text; recent publication dates use `time` |
 | Channel pages | Channel accent does not reduce text contrast below AA |
 | Article | Semantic article markup; image alt/caption/credit; readable line length |
 | Search | Labelled input; results announced; empty state |
@@ -53,7 +53,7 @@
 
 | Surface | Checks |
 |---------|--------|
-| Queues | Table/list keyboard navigable; action buttons labelled |
+| Queues | Persistent tab/panel relationships, roving tab focus, pressed queue summaries, keyboard-navigable tables/lists, and labelled actions |
 | Rejection reasons | Visible to moderators only; not leaked publicly |
 
 ## Testing plan

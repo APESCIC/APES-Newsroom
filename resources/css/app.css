@@ -1,42 +1,183 @@
+@import '@fontsource-variable/instrument-sans/wght.css';
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
 
+    --color-brand-ink: #061A1A;
+    --color-brand-teal: #00BFC7;
+    --color-teal-deep: #006E73;
+    --color-brand-mist: #E5F6F4;
+    --color-page-tint: #F4F8F7;
+    --color-surface: #FFFFFF;
+    --color-body: #17211F;
+    --color-muted: #5A6764;
+    --color-border: #CAD8D4;
+    --color-focus: #2563EB;
+    --color-success: #176B45;
+    --color-warning: #9A5B13;
+    --color-danger: #A93030;
     --color-apes-primary: #2D6A4F;
     --color-shelter-accent: #BC6C25;
     --color-clinic-accent: #457B9D;
-    --color-neutral-900: #1A1A1A;
-    --color-neutral-600: #525252;
-    --color-neutral-100: #F5F5F4;
-    --color-page-tint: #F7FBF9;
-    --color-focus: #2563EB;
-    --radius-tile: 1rem;
+    --color-shelter-text: #8A4B12;
+    --color-clinic-text: #2F617D;
+    --color-apes-mist: #E5F6F4;
+    --color-shelter-mist: #F4EBE3;
+    --color-clinic-mist: #E3EDF4;
+    --color-warning-mist: #FFF0D8;
+    --color-success-mist: #E4F3EB;
+
+    /* Compatibility aliases for existing, out-of-scope pages. */
+    --color-neutral-900: #17211F;
+    --color-neutral-600: #5A6764;
+    --color-neutral-100: #F4F8F7;
+
+    --radius-control: 0.625rem;
+    --radius-card: 0.875rem;
+    --radius-feature: 1.125rem;
+    --radius-tile: 0.875rem;
+
+    --container-public: 75rem;
+    --container-workspace: 90rem;
+    --shadow-elevated: 0 12px 32px rgba(6, 26, 26, 0.1);
 }
 
-.shadow-chunky-apes {
-    box-shadow: 4px 4px 0 var(--color-apes-primary);
+@layer base {
+    html {
+        background: var(--color-page-tint);
+        color: var(--color-body);
+        font-family: var(--font-sans);
+    }
+
+    body {
+        margin: 0;
+        background: var(--color-page-tint);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 3px;
+    }
+
+    #main-content {
+        scroll-margin-top: 5rem;
+    }
+
+    .workspace-shell #main-content {
+        scroll-margin-top: calc(var(--workspace-task-header-height, 8rem) + 1rem);
+    }
+
+    button,
+    a {
+        -webkit-tap-highlight-color: transparent;
+    }
 }
-.shadow-chunky-shelter {
-    box-shadow: 4px 4px 0 var(--color-shelter-accent);
-}
-.shadow-chunky-clinic {
-    box-shadow: 4px 4px 0 var(--color-clinic-accent);
-}
-.shadow-chunky-ink {
-    box-shadow: 4px 4px 0 var(--color-neutral-900);
+
+@layer components {
+    .skip-link {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 100;
+        translate: 0 -200%;
+        border-radius: var(--radius-control);
+        background: white;
+        padding: 0.75rem 1rem;
+        color: var(--color-brand-ink);
+        font-weight: 700;
+    }
+
+    .skip-link:focus {
+        translate: 0;
+    }
+
+    .eyebrow {
+        color: var(--color-teal-deep);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .icon-button {
+        display: inline-flex;
+        min-height: 2.75rem;
+        min-width: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-control);
+    }
+
+    .button-primary,
+    .button-secondary,
+    .button-success,
+    .button-danger {
+        display: inline-flex;
+        min-height: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border: 1px solid transparent;
+        border-radius: var(--radius-control);
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+    }
+
+    .button-primary {
+        background: var(--color-teal-deep);
+        color: white;
+    }
+
+    .button-primary:hover {
+        background: var(--color-brand-ink);
+    }
+
+    .button-secondary {
+        border-color: var(--color-border);
+        background: white;
+        color: var(--color-brand-ink);
+    }
+
+    .button-secondary:hover {
+        border-color: var(--color-teal-deep);
+        color: var(--color-teal-deep);
+    }
+
+    .button-success {
+        background: var(--color-success);
+        color: white;
+    }
+
+    .button-danger {
+        border-color: var(--color-danger);
+        background: white;
+        color: var(--color-danger);
+    }
+
+    .badge-warning {
+        display: inline-flex;
+        border-radius: 999px;
+        background: var(--color-warning-mist);
+        padding: 0.25rem 0.75rem;
+        color: var(--color-warning);
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .shadow-chunky-apes,
-    .shadow-chunky-shelter,
-    .shadow-chunky-clinic,
-    .shadow-chunky-ink {
-        transition: none;
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }
 

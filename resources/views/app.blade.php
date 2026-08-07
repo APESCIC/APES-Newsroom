@@ -7,6 +7,8 @@
 
         <title inertia>{{ config('app.name', 'APES Newsroom') }}</title>
 
+        <link rel="icon" type="image/png" sizes="32x32" href="/brand/apes-favicon-32.png">
+
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx'])
         @inertiaHead

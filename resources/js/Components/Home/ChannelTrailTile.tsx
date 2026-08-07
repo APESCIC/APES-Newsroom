@@ -1,8 +1,9 @@
 import { Link } from '@inertiajs/react';
-import { channelMetaBySlug } from '../../channelMeta';
+import { canonicalChannelSlug, channelMeta } from '../../channelMeta';
+import LineIcon from '../Icons/LineIcon';
 
-export default function ChannelTrailTile({ slug, label }: { slug: string; label: string }) {
-    const meta = channelMetaBySlug[slug];
+export default function ChannelTrailTile({ slug }: { slug: string }) {
+    const meta = channelMeta(slug);
 
     if (!meta) {
         return null;
@@ -10,14 +11,14 @@ export default function ChannelTrailTile({ slug, label }: { slug: string; label:
 
     return (
         <Link
-            href={`/${slug}`}
-            className={`flex min-h-11 flex-1 flex-col justify-center rounded-2xl border-2 bg-white p-3 ${meta.borderClass} ${meta.shadowClass} focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-focus`}
+            href={`/${canonicalChannelSlug(slug)}`}
+            className="group flex min-h-44 flex-col rounded-card border border-border bg-white p-6 transition-transform hover:-translate-y-1 hover:shadow-elevated"
         >
-            <span className="text-2xl" aria-hidden="true">
-                {meta.icon}
+            <span className={`flex h-12 w-12 items-center justify-center rounded-control ${meta.mediaClass}`}>
+                <LineIcon name={meta.icon} className="h-7 w-7" />
             </span>
-            <span className="mt-1 text-sm font-extrabold">{label}</span>
-            <span className="text-xs text-neutral-600">{meta.hint}</span>
+            <span className="mt-4 text-lg font-bold text-body">{meta.label}</span>
+            <span className="mt-2 text-sm leading-6 text-muted">{meta.description}</span>
         </Link>
     );
 }

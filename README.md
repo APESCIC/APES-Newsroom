@@ -14,10 +14,13 @@ track work via GitHub Issues per [`AGENTS.md`](AGENTS.md).
 
 ## Repository status
 
-Last verified: **2026-08-07T11:37:42+01:00**. APES Newsroom is in active
-pre-release development. Issue #33 restores the PHP formatting baseline, while
-the Direction A interface remains under review in PR #34. Production deployment
-and the Ghost cutover remain separately authorized work.
+Last verified: **2026-08-07T17:24:38+01:00**. APES Newsroom is in active
+pre-release development. The PHP formatting baseline was restored through
+[issue #33](https://github.com/APESCIC/APES-Newsroom/issues/33); the Direction A
+homepage, staff desk, and admin workspace are tracked by
+[issue #32](https://github.com/APESCIC/APES-Newsroom/issues/32) and delivered for
+review in [PR #34](https://github.com/APESCIC/APES-Newsroom/pull/34).
+Production deployment and the Ghost cutover remain separately authorized work.
 
 ## Stack
 
@@ -52,6 +55,7 @@ composer format      # auto-fix PHP style with Pint
 composer test        # or: php artisan test
 npm run typecheck
 npm run lint         # ESLint on resources/js
+npm run test:frontend
 ```
 
 ## Health check
@@ -70,6 +74,7 @@ Ghost cutover are separately authorized later work (issue #11).
 ## Project links and support
 
 - [Documentation](docs/epic-1-build-plan.md), [local development](docs/local-dev.md), and [deployment runbook](docs/deployment.md)
+- [Direction A design record](docs/design/direction-a-ui.md) and [design tokens](docs/design/tokens.md)
 - [Report a bug](https://github.com/APESCIC/APES-Newsroom/issues/new?template=bug_report.yml) or [request a feature](https://github.com/APESCIC/APES-Newsroom/issues/new?template=feature_request.yml)
 - [All issues](https://github.com/APESCIC/APES-Newsroom/issues), [Discussions](https://github.com/APESCIC/APES-Newsroom/discussions), and [Releases](https://github.com/APESCIC/APES-Newsroom/releases)
 
