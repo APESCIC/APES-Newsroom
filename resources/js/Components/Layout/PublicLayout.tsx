@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { useEffect, useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import ApesLogo from '../Brand/ApesLogo';
 import LineIcon from '../Icons/LineIcon';
 import AccountMenu from './AccountMenu';
@@ -15,12 +15,16 @@ const primaryLinks = [
 export default function PublicLayout({ children }: { children: ReactNode }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const menuId = useId();
+    const menuTriggerRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         if (!menuOpen) return;
 
         const closeOnEscape = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') setMenuOpen(false);
+            if (event.key === 'Escape') {
+                setMenuOpen(false);
+                menuTriggerRef.current?.focus();
+            }
         };
 
         document.addEventListener('keydown', closeOnEscape);
@@ -67,6 +71,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                     </div>
 
                     <button
+                        ref={menuTriggerRef}
                         type="button"
                         className="icon-button border border-white/25 text-white lg:hidden"
                         aria-label={menuOpen ? 'Close main menu' : 'Open main menu'}

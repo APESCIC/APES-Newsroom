@@ -127,6 +127,23 @@ export default function WorkspaceLayout({
     const navigationId = useId();
     const navigationTriggerRef = useRef<HTMLButtonElement>(null);
     const navigationDialogRef = useRef<HTMLElement>(null);
+    const desktopSidebarRef = useRef<HTMLElement>(null);
+    const closedAtDesktopRef = useRef(false);
+
+    useEffect(() => {
+        if (typeof window.matchMedia !== 'function') return;
+
+        const desktopQuery = window.matchMedia('(min-width: 64rem)');
+        const closeAtDesktop = (event: MediaQueryListEvent) => {
+            if (event.matches && mobileOpen) {
+                closedAtDesktopRef.current = true;
+                setMobileOpen(false);
+            }
+        };
+
+        desktopQuery.addEventListener('change', closeAtDesktop);
+        return () => desktopQuery.removeEventListener('change', closeAtDesktop);
+    }, [mobileOpen]);
 
     useEffect(() => {
         if (!mobileOpen) return;
@@ -134,6 +151,7 @@ export default function WorkspaceLayout({
         const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         const navigationTrigger = navigationTriggerRef.current;
         const dialog = navigationDialogRef.current;
+        const desktopSidebar = desktopSidebarRef.current;
         const focusableSelector =
             'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
         const focusableElements = () =>
@@ -175,13 +193,16 @@ export default function WorkspaceLayout({
         document.addEventListener('keydown', handleDialogKeyDown);
         return () => {
             document.removeEventListener('keydown', handleDialogKeyDown);
-            if (previouslyFocused?.isConnected) previouslyFocused.focus();
+            if (closedAtDesktopRef.current) {
+                closedAtDesktopRef.current = false;
+                desktopSidebar?.querySelector<HTMLElement>('[aria-current="page"]')?.focus();
+            } else if (previouslyFocused?.isConnected) previouslyFocused.focus();
             else navigationTrigger?.focus();
         };
     }, [mobileOpen]);
 
     return (
-        <div className="min-h-screen bg-page-tint text-body">
+        <div className="workspace-shell min-h-screen bg-page-tint text-body">
             <div
                 data-testid="workspace-background"
                 inert={mobileOpen ? true : undefined}
@@ -190,7 +211,7 @@ export default function WorkspaceLayout({
                 <a href="#main-content" className="skip-link">
                     Skip to main content
                 </a>
-                <aside className="fixed inset-y-0 left-0 hidden w-64 lg:block">
+                <aside ref={desktopSidebarRef} className="fixed inset-y-0 left-0 hidden w-64 lg:block">
                     <Sidebar area={area} active={active} />
                 </aside>
                 <header className="flex min-h-16 items-center justify-between border-b border-border bg-white px-5 lg:hidden">

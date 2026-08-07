@@ -1,11 +1,29 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import PostsIndex from '../Pages/Staff/Posts/Index';
 import { setMockPage } from '../test/inertia';
 
 describe('Direction A staff posts workspace', () => {
+    let desktopChangeListener: ((event: MediaQueryListEvent) => void) | undefined;
+
     beforeEach(() => {
+        desktopChangeListener = undefined;
+        Object.defineProperty(window, 'matchMedia', {
+            configurable: true,
+            value: vi.fn().mockImplementation((query: string) => ({
+                matches: false,
+                media: query,
+                onchange: null,
+                addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
+                    desktopChangeListener = listener;
+                },
+                removeEventListener: vi.fn(),
+                addListener: vi.fn(),
+                removeListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+            })),
+        });
         setMockPage({
             appName: 'APES Newsroom',
             auth: {
@@ -79,6 +97,13 @@ describe('Direction A staff posts workspace', () => {
         await user.tab();
         expect(closeButton).toHaveFocus();
 
+        act(() => desktopChangeListener?.({ matches: true } as MediaQueryListEvent));
+        expect(screen.queryByRole('dialog', { name: 'Workspace navigation' })).not.toBeInTheDocument();
+        expect(background).not.toHaveAttribute('inert');
+        expect(background).not.toHaveAttribute('aria-hidden');
+        expect(screen.getByRole('link', { name: 'Posts' })).toHaveFocus();
+
+        await user.click(navigationButton);
         await user.keyboard('{Escape}');
         expect(navigationButton).toHaveAttribute('aria-expanded', 'false');
         expect(background).not.toHaveAttribute('inert');

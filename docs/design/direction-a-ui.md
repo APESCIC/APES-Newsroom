@@ -21,10 +21,10 @@ teal and typography but prioritise dense, calm task completion.
 The supplied horizontal, square and compact APES logo files are the only brand
 sources. Their artwork remains unchanged without filters or recolouring. The
 public header uses a deterministic tight crop of the horizontal source so the
-mark stays legible at masthead size, while a dedicated 32px PNG avoids shipping
-the full compact logo as browser chrome. The square PNG remains the canonical
-fallback and is served with deterministic 384px and 768px WebP derivatives for
-responsive delivery.
+mark stays legible at masthead size, while dedicated 64px footer and 32px
+favicon PNGs avoid shipping the full compact logo into smaller placements. The
+square PNG remains the canonical fallback and is served with deterministic
+384px and 768px WebP derivatives for responsive delivery.
 
 Instrument Sans Variable 5.3.0 is self-hosted from the application bundle so
 the restrictive content security policy does not depend on a remote font host.
@@ -39,9 +39,11 @@ specified at a synthetic 800 weight use 700.
 - Three labelled channel entry cards preserve APES CIC, Shelter & Rescue and
   Pet Care Clinic identities.
 - Recent stories follow in a responsive editorial grid and expose their
-  nullable excerpt and semantic publication date when supplied.
+  nullable excerpt and semantic publication date when supplied. Display dates
+  are pinned to the `Europe/London` publication timezone.
 - Public navigation and account actions remain source- and role-aware; no new
-  archive route is introduced.
+  archive route is introduced. Escape closes the mobile disclosure and returns
+  focus to its trigger.
 - Sticky public headers reserve scroll margin for skip-link targets so the
   destination remains visible.
 
@@ -49,7 +51,11 @@ specified at a synthetic 800 weight use 700.
 
 - A dark workspace rail frames a light moderation canvas.
 - The mobile rail is a scrollable modal drawer: focus stays inside it, the
-  underlying workspace becomes inert, and closing restores the trigger focus.
+  underlying workspace becomes inert, closing restores the trigger focus, and
+  crossing into the desktop breakpoint closes the modal state and moves focus
+  to the active desktop destination.
+- Workspace skip targets reserve 8rem below the stacked mobile task header and
+  return to the standard 5rem offset once the header becomes a row.
 - Four queue summaries map directly to pending profiles, pending comments,
   open reports and suspended profiles.
 - Available actions remain Approve, Reject, Suspend, Resolve, Dismiss and Lift

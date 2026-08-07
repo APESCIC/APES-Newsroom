@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { formatStoryDate } from '../Components/Home/DeskPanel';
 import Home from '../Pages/home';
 import { setMockPage } from '../test/inertia';
 
@@ -14,6 +15,13 @@ describe('Direction A public homepage', () => {
 
     it('presents the approved brand-led news hierarchy and navigation', async () => {
         const user = userEvent.setup();
+        try {
+            vi.stubEnv('TZ', 'America/Los_Angeles');
+            expect(formatStoryDate('2026-08-07T00:30:00Z')).toBe('7 August 2026');
+        } finally {
+            vi.unstubAllEnvs();
+        }
+
         render(
             <Home
                 featured={{
@@ -85,11 +93,17 @@ describe('Direction A public homepage', () => {
         );
         expect(responsiveSource).toHaveAttribute('sizes', '(min-width: 768px) 384px, calc(100vw - 6.5rem)');
 
+        const footerLogo = screen.getByRole('link', { name: 'APES Newsroom home' }).querySelector('img');
+        expect(footerLogo).toHaveAttribute('src', '/brand/apes-logo-footer-64.png');
+
         const menuButton = screen.getByRole('button', { name: 'Open main menu' });
         await user.click(menuButton);
         expect(menuButton).toHaveAttribute('aria-expanded', 'true');
         expect(screen.getAllByRole('navigation', { name: 'Primary navigation' })).toHaveLength(2);
+        const mobileNavigation = screen.getAllByRole('navigation', { name: 'Primary navigation' })[1];
+        within(mobileNavigation).getByRole('link', { name: 'APES' }).focus();
         await user.keyboard('{Escape}');
         expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+        expect(menuButton).toHaveFocus();
     });
 });

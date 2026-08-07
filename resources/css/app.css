@@ -68,6 +68,16 @@
         scroll-margin-top: 5rem;
     }
 
+    .workspace-shell #main-content {
+        scroll-margin-top: 8rem;
+    }
+
+    @media (min-width: 40rem) {
+        .workspace-shell #main-content {
+            scroll-margin-top: 5rem;
+        }
+    }
+
     button,
     a {
         -webkit-tap-highlight-color: transparent;

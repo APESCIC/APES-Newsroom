@@ -8,15 +8,15 @@
 
 | Component | Description | States |
 | --- | --- | --- |
-| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer | guest, signed-in, mobile disclosure |
+| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer; Escape closes the mobile disclosure and restores its trigger focus | guest, signed-in, mobile disclosure |
 | `AccountMenu` | Login/Register or Account disclosure with Profile, Admin, Staff, Sign out | guest, public, staff, admin |
-| `SiteFooter` | Compact brand mark and privacy, cookies, rights, mailing links | default |
-| `DeskPanel` | Featured-story media panel, channel, headline, excerpt, byline/date and story action | empty, populated |
+| `SiteFooter` | Dedicated 64px brand mark and privacy, cookies, rights, mailing links | default |
+| `DeskPanel` | Featured-story media panel, channel, headline, excerpt, byline/London publication date and story action | empty, populated |
 | `ChannelTrailTile` | Labelled line icon, channel name, description and channel link | default, focus |
-| `RecentStoryCard` | Source-backed channel treatment, title, nullable excerpt and semantic publication time | default, missing metadata |
-| `WorkspaceLayout` | Dark role-labelled rail, account controls, light task canvas and scrollable modal mobile drawer with contained focus and inert background | staff, admin, short viewport |
+| `RecentStoryCard` | Source-backed channel treatment, title, nullable excerpt and semantic Europe/London publication time | default, missing metadata |
+| `WorkspaceLayout` | Dark role-labelled rail, account controls, light task canvas and scrollable modal mobile drawer with contained focus, inert background and automatic close to the active desktop destination at the desktop breakpoint | staff, admin, short viewport, breakpoint change |
 | `LineIcon` | First-party current-colour line icons without emoji dependencies | decorative |
-| `ApesLogo` | Unfiltered horizontal, masthead, square, or compact APES artwork; the masthead uses a deterministic tight crop and square placement uses 384/768 WebP sources with PNG fallback | per placement, responsive |
+| `ApesLogo` | Unfiltered horizontal, masthead, footer, square, or compact APES artwork; the masthead uses a deterministic tight crop, the footer uses a 64px derivative, and square placement uses 384/768 WebP sources with PNG fallback | per placement, responsive |
 
 ## Staff posts
 
