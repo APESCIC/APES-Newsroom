@@ -10,10 +10,10 @@ export default function SiteFooter() {
                 </Link>
                 <nav aria-label="Legal and subscriptions">
                     <ul className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted">
-                        <li><Link href="/legal/privacy" className="hover:text-body">Privacy</Link></li>
-                        <li><Link href="/legal/cookies" className="hover:text-body">Cookies</Link></li>
-                        <li><Link href="/legal/rights" className="hover:text-body">Your rights</Link></li>
-                        <li><Link href="/mailing/signup" className="hover:text-body">Mailing lists</Link></li>
+                        <li><Link href="/legal/privacy" className="inline-flex min-h-11 items-center hover:text-body">Privacy</Link></li>
+                        <li><Link href="/legal/cookies" className="inline-flex min-h-11 items-center hover:text-body">Cookies</Link></li>
+                        <li><Link href="/legal/rights" className="inline-flex min-h-11 items-center hover:text-body">Your rights</Link></li>
+                        <li><Link href="/mailing/signup" className="inline-flex min-h-11 items-center hover:text-body">Mailing lists</Link></li>
                     </ul>
                 </nav>
             </div>

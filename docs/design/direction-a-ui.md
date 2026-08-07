@@ -43,9 +43,10 @@ specified at a synthetic 800 weight use 700.
   are pinned to the `Europe/London` publication timezone.
 - Public navigation and account actions remain source- and role-aware; no new
   archive route is introduced. The mobile disclosure scrolls within the
-  available viewport at short heights. Escape closes it and returns focus to
-  its trigger. Crossing into the desktop breakpoint closes the disclosure and
-  moves focus to the first visible desktop destination.
+  available viewport at short heights. Escape closes the innermost open
+  disclosure first and restores its trigger. Crossing into the desktop
+  breakpoint closes the main disclosure and moves focus to the first visible
+  desktop destination.
 - Sticky public headers reserve scroll margin for skip-link targets so the
   destination remains visible.
 - The page does not impose a global minimum width, preserving reflow below 320
@@ -55,9 +56,9 @@ specified at a synthetic 800 weight use 700.
 
 - A dark workspace rail frames a light moderation canvas.
 - The mobile rail is a scrollable modal drawer: focus stays inside it, the
-  underlying workspace becomes inert, closing restores the trigger focus, and
-  crossing into the desktop breakpoint closes the modal state and moves focus
-  to the active desktop destination.
+  underlying workspace becomes inert and cannot scroll, closing restores the
+  trigger focus, and crossing into the desktop breakpoint closes the modal
+  state and moves focus to the active desktop destination.
 - Workspace skip targets reserve 8rem below the stacked mobile task header and
   return to the standard 5rem offset once the header becomes a row.
 - Four queue summaries map directly to pending profiles, pending comments,

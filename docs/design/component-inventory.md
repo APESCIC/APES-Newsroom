@@ -8,13 +8,13 @@
 
 | Component | Description | States |
 | --- | --- | --- |
-| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer; the short-height mobile disclosure scrolls, Escape restores its trigger, and crossing the desktop breakpoint closes it and focuses the first desktop destination | guest, signed-in, mobile disclosure, short viewport, breakpoint change |
-| `AccountMenu` | Login/Register or Account disclosure with Profile, Admin, Staff, Sign out | guest, public, staff, admin |
-| `SiteFooter` | Dedicated 64px brand mark and privacy, cookies, rights, mailing links | default |
+| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer; the short-height mobile disclosure scrolls, nested Escape closes one layer at a time, and crossing the desktop breakpoint closes it and focuses the first desktop destination | guest, signed-in, mobile disclosure, nested disclosure, short viewport, breakpoint change |
+| `AccountMenu` | Login/Register or Account disclosure with Profile, Admin, Staff, Sign out; Escape closes only this disclosure and restores its trigger | guest, public, staff, admin, nested mobile disclosure |
+| `SiteFooter` | Dedicated 64px brand mark and privacy, cookies, rights, mailing links with 44px touch targets | default |
 | `DeskPanel` | Featured-story media panel, channel, headline, excerpt, byline/London publication date and story action | empty, populated |
 | `ChannelTrailTile` | Labelled line icon, channel name, description and channel link | default, focus |
 | `RecentStoryCard` | Source-backed channel treatment, title, nullable excerpt and semantic Europe/London publication time | default, missing metadata |
-| `WorkspaceLayout` | Dark role-labelled rail, account controls, light task canvas and scrollable modal mobile drawer with contained focus, inert background and automatic close to the active desktop destination at the desktop breakpoint | staff, admin, short viewport, breakpoint change |
+| `WorkspaceLayout` | Dark role-labelled rail, account controls, light task canvas and scrollable modal mobile drawer with contained focus, inert and scroll-locked background, and automatic close to the active desktop destination at the desktop breakpoint | staff, admin, short viewport, breakpoint change |
 | `LineIcon` | First-party current-colour line icons without emoji dependencies | decorative |
 | `ApesLogo` | Unfiltered horizontal, masthead, footer, square, or compact APES artwork; the masthead uses a deterministic tight crop, the footer uses a 64px derivative, and square placement uses 384/768 WebP sources with PNG fallback | per placement, responsive |
 

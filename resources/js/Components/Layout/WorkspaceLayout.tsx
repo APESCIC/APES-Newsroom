@@ -152,6 +152,7 @@ export default function WorkspaceLayout({
         const navigationTrigger = navigationTriggerRef.current;
         const dialog = navigationDialogRef.current;
         const desktopSidebar = desktopSidebarRef.current;
+        const previousBodyOverflow = document.body.style.overflow;
         const focusableSelector =
             'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
         const focusableElements = () =>
@@ -161,6 +162,7 @@ export default function WorkspaceLayout({
                   )
                 : [];
 
+        document.body.style.overflow = 'hidden';
         (dialog?.querySelector<HTMLElement>('[data-workspace-close]') ?? focusableElements()[0])?.focus();
 
         const handleDialogKeyDown = (event: KeyboardEvent) => {
@@ -193,6 +195,7 @@ export default function WorkspaceLayout({
         document.addEventListener('keydown', handleDialogKeyDown);
         return () => {
             document.removeEventListener('keydown', handleDialogKeyDown);
+            document.body.style.overflow = previousBodyOverflow;
             if (closedAtDesktopRef.current) {
                 closedAtDesktopRef.current = false;
                 desktopSidebar?.querySelector<HTMLElement>('[aria-current="page"]')?.focus();

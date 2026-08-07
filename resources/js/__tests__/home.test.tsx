@@ -28,7 +28,10 @@ describe('Direction A public homepage', () => {
         });
         setMockPage({
             appName: 'APES Newsroom',
-            auth: { user: null, can: { accessStaff: false, accessAdmin: false } },
+            auth: {
+                user: { id: 1, name: 'Alex Editor', email: 'alex@example.test', role: 'admin' },
+                can: { accessStaff: true, accessAdmin: true },
+            },
         });
     });
 
@@ -114,6 +117,10 @@ describe('Direction A public homepage', () => {
 
         const footerLogo = screen.getByRole('link', { name: 'APES Newsroom home' }).querySelector('img');
         expect(footerLogo).toHaveAttribute('src', '/brand/apes-logo-footer-64.png');
+        const footerNavigation = screen.getByRole('navigation', { name: 'Legal and subscriptions' });
+        for (const link of within(footerNavigation).getAllByRole('link')) {
+            expect(link).toHaveClass('inline-flex', 'min-h-11', 'items-center');
+        }
 
         const menuButton = screen.getByRole('button', { name: 'Open main menu' });
         await user.click(menuButton);
@@ -123,6 +130,22 @@ describe('Direction A public homepage', () => {
         expect(screen.getAllByRole('navigation', { name: 'Primary navigation' })).toHaveLength(2);
         const mobileNavigation = screen.getAllByRole('navigation', { name: 'Primary navigation' })[1];
         within(mobileNavigation).getByRole('link', { name: 'APES' }).focus();
+        await user.keyboard('{Escape}');
+        expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+        expect(menuButton).toHaveFocus();
+
+        await user.click(menuButton);
+        const accountButton = within(document.getElementById(menuButton.getAttribute('aria-controls') ?? '')!).getByRole(
+            'button',
+            { name: 'Account' },
+        );
+        await user.click(accountButton);
+        expect(accountButton).toHaveAttribute('aria-expanded', 'true');
+        await user.keyboard('{Escape}');
+        expect(accountButton).toHaveAttribute('aria-expanded', 'false');
+        expect(accountButton).toHaveFocus();
+        expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+
         await user.keyboard('{Escape}');
         expect(menuButton).toHaveAttribute('aria-expanded', 'false');
         expect(menuButton).toHaveFocus();

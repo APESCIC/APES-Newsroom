@@ -89,6 +89,7 @@ describe('Direction A staff posts workspace', () => {
         expect(dialog).toHaveAttribute('aria-modal', 'true');
         expect(background).toHaveAttribute('inert');
         expect(background).toHaveAttribute('aria-hidden', 'true');
+        expect(document.body.style.overflow).toBe('hidden');
         expect(within(dialog).getByTestId('workspace-sidebar')).toHaveClass('overflow-y-auto');
         expect(closeButton).toHaveFocus();
 
@@ -101,6 +102,7 @@ describe('Direction A staff posts workspace', () => {
         expect(screen.queryByRole('dialog', { name: 'Workspace navigation' })).not.toBeInTheDocument();
         expect(background).not.toHaveAttribute('inert');
         expect(background).not.toHaveAttribute('aria-hidden');
+        expect(document.body.style.overflow).toBe('');
         expect(screen.getByRole('link', { name: 'Posts' })).toHaveFocus();
 
         await user.click(navigationButton);
@@ -108,6 +110,7 @@ describe('Direction A staff posts workspace', () => {
         expect(navigationButton).toHaveAttribute('aria-expanded', 'false');
         expect(background).not.toHaveAttribute('inert');
         expect(background).not.toHaveAttribute('aria-hidden');
+        expect(document.body.style.overflow).toBe('');
         expect(navigationButton).toHaveFocus();
     });
 

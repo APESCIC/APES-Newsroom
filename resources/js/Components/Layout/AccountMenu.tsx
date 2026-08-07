@@ -7,6 +7,7 @@ export default function AccountMenu({ tone = 'light' }: { tone?: 'light' | 'dark
     const [open, setOpen] = useState(false);
     const menuId = useId();
     const rootRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         if (!open) {
@@ -15,7 +16,10 @@ export default function AccountMenu({ tone = 'light' }: { tone?: 'light' | 'dark
 
         const onKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopImmediatePropagation();
                 setOpen(false);
+                triggerRef.current?.focus();
             }
         };
         const onClick = (e: MouseEvent) => {
@@ -24,11 +28,11 @@ export default function AccountMenu({ tone = 'light' }: { tone?: 'light' | 'dark
             }
         };
 
-        document.addEventListener('keydown', onKey);
+        document.addEventListener('keydown', onKey, true);
         document.addEventListener('mousedown', onClick);
 
         return () => {
-            document.removeEventListener('keydown', onKey);
+            document.removeEventListener('keydown', onKey, true);
             document.removeEventListener('mousedown', onClick);
         };
     }, [open]);
@@ -59,6 +63,7 @@ export default function AccountMenu({ tone = 'light' }: { tone?: 'light' | 'dark
     return (
         <div className="relative" ref={rootRef}>
             <button
+                ref={triggerRef}
                 type="button"
                 className={`min-h-11 rounded-control border px-3 py-2 text-sm font-semibold ${
                     tone === 'dark'
