@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { formatStoryDate } from '../Components/Home/DeskPanel';
 import Home from '../Pages/home';
 import { setMockPage } from '../test/inertia';
+import appCss from '../../css/app.css?raw';
 
 describe('Direction A public homepage', () => {
     let desktopChangeListener: ((event: MediaQueryListEvent) => void) | undefined;
@@ -101,7 +102,7 @@ describe('Direction A public homepage', () => {
         );
         expect(screen.queryByText('Browse archive')).not.toBeInTheDocument();
 
-        const squareLogo = screen.getByRole('img', { name: 'Association of Protecting Exotic Species CIC' });
+        const squareLogo = screen.getByRole('img', { name: 'Association for the Protection of Exotic Species' });
         expect(squareLogo).toHaveAttribute('src', '/brand/apes-logo-square.png');
         expect(squareLogo.parentElement?.tagName).toBe('PICTURE');
         const responsiveSource = squareLogo.parentElement?.querySelector('source[type="image/webp"]');
@@ -117,6 +118,8 @@ describe('Direction A public homepage', () => {
         const menuButton = screen.getByRole('button', { name: 'Open main menu' });
         await user.click(menuButton);
         expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+        const mobileMenu = document.getElementById(menuButton.getAttribute('aria-controls') ?? '');
+        expect(mobileMenu).toHaveClass('max-h-[calc(100dvh-4rem)]', 'overflow-y-auto');
         expect(screen.getAllByRole('navigation', { name: 'Primary navigation' })).toHaveLength(2);
         const mobileNavigation = screen.getAllByRole('navigation', { name: 'Primary navigation' })[1];
         within(mobileNavigation).getByRole('link', { name: 'APES' }).focus();
@@ -130,5 +133,7 @@ describe('Direction A public homepage', () => {
         act(() => desktopChangeListener?.({ matches: true } as MediaQueryListEvent));
         expect(menuButton).toHaveAttribute('aria-expanded', 'false');
         expect(within(primaryNavigation).getByRole('link', { name: 'Home' })).toHaveFocus();
+
+        expect(appCss).not.toContain('min-width: 20rem');
     });
 });

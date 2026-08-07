@@ -28,7 +28,7 @@ export default function Home({
                     <aside className="mx-auto w-full max-w-sm rounded-feature border border-border bg-page-tint p-8 md:col-span-5">
                         <ApesLogo
                             variant="square"
-                            alt="Association of Protecting Exotic Species CIC"
+                            alt="Association for the Protection of Exotic Species"
                             className="h-auto w-full object-contain"
                         />
                         <div className="mt-8 border-t border-border pt-6 text-center">

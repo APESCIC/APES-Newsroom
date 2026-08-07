@@ -42,11 +42,14 @@ specified at a synthetic 800 weight use 700.
   nullable excerpt and semantic publication date when supplied. Display dates
   are pinned to the `Europe/London` publication timezone.
 - Public navigation and account actions remain source- and role-aware; no new
-  archive route is introduced. Escape closes the mobile disclosure and returns
-  focus to its trigger. Crossing into the desktop breakpoint closes the
-  disclosure and moves focus to the first visible desktop destination.
+  archive route is introduced. The mobile disclosure scrolls within the
+  available viewport at short heights. Escape closes it and returns focus to
+  its trigger. Crossing into the desktop breakpoint closes the disclosure and
+  moves focus to the first visible desktop destination.
 - Sticky public headers reserve scroll margin for skip-link targets so the
   destination remains visible.
+- The page does not impose a global minimum width, preserving reflow below 320
+  CSS pixels at high zoom or in narrow split-screen layouts.
 
 ### Admin moderation
 

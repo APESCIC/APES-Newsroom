@@ -100,7 +100,10 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                 </div>
 
                 {menuOpen && (
-                    <div id={menuId} className="border-t border-white/15 px-5 py-4 lg:hidden">
+                    <div
+                        id={menuId}
+                        className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-white/15 px-5 py-4 lg:hidden"
+                    >
                         <nav aria-label="Primary navigation">
                             <ul className="mx-auto flex max-w-public flex-col gap-1">
                                 {primaryLinks.map((link) => (
