@@ -16,6 +16,22 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const menuId = useId();
     const menuTriggerRef = useRef<HTMLButtonElement>(null);
+    const desktopNavigationRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (typeof window.matchMedia !== 'function') return;
+
+        const desktopQuery = window.matchMedia('(min-width: 64rem)');
+        const closeAtDesktop = (event: MediaQueryListEvent) => {
+            if (event.matches && menuOpen) {
+                setMenuOpen(false);
+                desktopNavigationRef.current?.querySelector<HTMLElement>('a[href]')?.focus();
+            }
+        };
+
+        desktopQuery.addEventListener('change', closeAtDesktop);
+        return () => desktopQuery.removeEventListener('change', closeAtDesktop);
+    }, [menuOpen]);
 
     useEffect(() => {
         if (!menuOpen) return;
@@ -42,7 +58,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                         <ApesLogo variant="masthead" className="h-12 w-auto object-contain" />
                     </Link>
 
-                    <div className="hidden items-center gap-5 lg:flex">
+                    <div ref={desktopNavigationRef} className="hidden items-center gap-5 lg:flex">
                         <nav aria-label="Primary navigation">
                             <ul className="flex items-center gap-1">
                                 {primaryLinks.map((link) => (

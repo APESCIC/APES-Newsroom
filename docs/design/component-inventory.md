@@ -8,7 +8,7 @@
 
 | Component | Description | States |
 | --- | --- | --- |
-| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer; Escape closes the mobile disclosure and restores its trigger focus | guest, signed-in, mobile disclosure |
+| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer; Escape restores the mobile trigger, while crossing the desktop breakpoint closes the disclosure and focuses the first desktop destination | guest, signed-in, mobile disclosure, breakpoint change |
 | `AccountMenu` | Login/Register or Account disclosure with Profile, Admin, Staff, Sign out | guest, public, staff, admin |
 | `SiteFooter` | Dedicated 64px brand mark and privacy, cookies, rights, mailing links | default |
 | `DeskPanel` | Featured-story media panel, channel, headline, excerpt, byline/London publication date and story action | empty, populated |

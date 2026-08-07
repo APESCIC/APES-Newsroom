@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { formatStoryDate } from '../Components/Home/DeskPanel';
@@ -6,7 +6,25 @@ import Home from '../Pages/home';
 import { setMockPage } from '../test/inertia';
 
 describe('Direction A public homepage', () => {
+    let desktopChangeListener: ((event: MediaQueryListEvent) => void) | undefined;
+
     beforeEach(() => {
+        desktopChangeListener = undefined;
+        Object.defineProperty(window, 'matchMedia', {
+            configurable: true,
+            value: vi.fn().mockImplementation((query: string) => ({
+                matches: false,
+                media: query,
+                onchange: null,
+                addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
+                    desktopChangeListener = listener;
+                },
+                removeEventListener: vi.fn(),
+                addListener: vi.fn(),
+                removeListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+            })),
+        });
         setMockPage({
             appName: 'APES Newsroom',
             auth: { user: null, can: { accessStaff: false, accessAdmin: false } },
@@ -105,5 +123,12 @@ describe('Direction A public homepage', () => {
         await user.keyboard('{Escape}');
         expect(menuButton).toHaveAttribute('aria-expanded', 'false');
         expect(menuButton).toHaveFocus();
+
+        await user.click(menuButton);
+        const reopenedMobileNavigation = screen.getAllByRole('navigation', { name: 'Primary navigation' })[1];
+        within(reopenedMobileNavigation).getByRole('link', { name: 'APES' }).focus();
+        act(() => desktopChangeListener?.({ matches: true } as MediaQueryListEvent));
+        expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+        expect(within(primaryNavigation).getByRole('link', { name: 'Home' })).toHaveFocus();
     });
 });
