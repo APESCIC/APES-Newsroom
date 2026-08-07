@@ -55,6 +55,11 @@ describe('Direction A public homepage', () => {
             '/apes-shelter-rescue',
         );
         expect(screen.getByRole('heading', { name: 'Wildlife corridor project reaches a new milestone' })).toBeInTheDocument();
+        expect(
+            screen.getByRole('link', {
+                name: 'Read the story: Wildlife corridor project reaches a new milestone',
+            }),
+        ).toHaveTextContent('Read the story');
         expect(screen.getByRole('heading', { name: 'Our mission' })).toBeInTheDocument();
         expect(screen.getByRole('region', { name: 'APES newsroom channels' })).toBeInTheDocument();
         const apesChannel = screen.getByRole('link', { name: /^APES CIC/ });

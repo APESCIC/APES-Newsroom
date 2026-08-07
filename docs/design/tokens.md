@@ -23,7 +23,7 @@ the marks.
 | `--color-body` | `#17211F` | Primary text |
 | `--color-muted` | `#5A6764` | Secondary text |
 | `--color-border` | `#CAD8D4` | Separators and normal control borders |
-| `--color-focus` | `#005FCC` | Visible focus rings |
+| `--color-focus` | `#2563EB` | Visible focus rings; 3.47:1 on brand ink and 5.17:1 on white |
 | `--color-success` | `#176B45` | Approval and published states |
 | `--color-warning` | `#9A5B13` | In-review and needs-attention states |
 | `--color-danger` | `#A93030` | Rejection and destructive actions |

@@ -56,7 +56,7 @@ export default function DeskPanel({ featured }: { featured?: PostCard }) {
                 <Link
                     href={`/articles/${featured.slug}`}
                     className="button-primary px-8"
-                    aria-label={`Read ${featured.title}`}
+                    aria-label={`Read the story: ${featured.title}`}
                 >
                     Read the story
                 </Link>
