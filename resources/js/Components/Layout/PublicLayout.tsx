@@ -16,6 +16,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const menuId = useId();
     const menuTriggerRef = useRef<HTMLButtonElement>(null);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
     const desktopNavigationRef = useRef<HTMLDivElement>(null);
     const focusMobileMenuTrigger = useCallback(() => menuTriggerRef.current?.focus(), []);
     const focusFirstDesktopDestination = useCallback(
@@ -29,9 +30,12 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         const desktopQuery = window.matchMedia('(min-width: 64rem)');
         const handleBreakpointChange = (event: MediaQueryListEvent) => {
             if (event.matches) {
-                const mobileTriggerHadFocus = menuTriggerRef.current === document.activeElement;
+                const activeElement = document.activeElement;
+                const mobileNavigationHadFocus =
+                    menuTriggerRef.current === activeElement ||
+                    (mobileMenuRef.current?.contains(activeElement) ?? false);
                 if (menuOpen) setMenuOpen(false);
-                if (menuOpen || mobileTriggerHadFocus) focusFirstDesktopDestination();
+                if (mobileNavigationHadFocus) focusFirstDesktopDestination();
                 return;
             }
 
@@ -115,6 +119,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
 
                 {menuOpen && (
                     <div
+                        ref={mobileMenuRef}
                         id={menuId}
                         className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-white/15 px-5 py-4 lg:hidden"
                     >

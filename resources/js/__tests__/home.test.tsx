@@ -179,6 +179,14 @@ describe('Direction A public homepage', () => {
         expect(menuButton).toHaveAttribute('aria-expanded', 'false');
         expect(within(primaryNavigation).getByRole('link', { name: 'Home' })).toHaveFocus();
 
+        act(() => dispatchDesktopChange(false));
+        await user.click(menuButton);
+        const mastheadHomeLink = screen.getAllByRole('link', { name: 'APES Newsroom' })[0];
+        mastheadHomeLink.focus();
+        act(() => dispatchDesktopChange(true));
+        expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+        expect(mastheadHomeLink).toHaveFocus();
+
         expect(appCss).not.toContain('min-width: 20rem');
         const footerNavigation = screen.getByRole('navigation', { name: 'Legal and subscriptions' });
         for (const link of within(footerNavigation).getAllByRole('link')) {
