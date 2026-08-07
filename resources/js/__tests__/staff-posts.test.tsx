@@ -66,4 +66,21 @@ describe('Direction A staff posts workspace', () => {
         await user.keyboard('{Escape}');
         expect(navigationButton).toHaveAttribute('aria-expanded', 'false');
     });
+
+    it('keeps admin and review navigation out of the staff-only workspace', () => {
+        setMockPage({
+            appName: 'APES Newsroom',
+            auth: {
+                user: { id: 2, name: 'Sam Staff', email: 'sam@example.test', role: 'staff' },
+                can: { accessStaff: true, accessAdmin: false },
+            },
+        });
+
+        render(<PostsIndex posts={[]} filterStatus={null} canReview={false} />);
+
+        expect(screen.getByRole('navigation', { name: 'Staff workspace' })).toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'Admin panel' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'Review queue' })).not.toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'New draft' })).toHaveAttribute('href', '/staff/posts/new');
+    });
 });

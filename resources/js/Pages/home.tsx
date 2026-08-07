@@ -45,7 +45,7 @@ export default function Home({
                     <div className="mx-auto max-w-public px-5 sm:px-6">
                         <div className="grid gap-6 md:grid-cols-3">
                             {channels.map((channel) => (
-                                <ChannelTrailTile key={channel.slug} slug={channel.slug} label={channel.label} />
+                                <ChannelTrailTile key={channel.slug} slug={channel.slug} />
                             ))}
                         </div>
                     </div>
@@ -53,7 +53,7 @@ export default function Home({
 
                 <section className="border-t border-border bg-white py-12" aria-labelledby="recent-heading">
                     <div className="mx-auto max-w-public px-5 sm:px-6">
-                    <h2 id="recent-heading" className="text-2xl font-extrabold text-body">Recent stories</h2>
+                    <h2 id="recent-heading" className="text-2xl font-bold text-body">Recent stories</h2>
                     {recent.length > 0 ? (
                         <div className="mt-8 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                             {recent.map((post) => <RecentStoryCard key={post.slug} post={post} />)}

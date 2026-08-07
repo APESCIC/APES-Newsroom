@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 import { canonicalChannelSlug, channelMeta } from '../../channelMeta';
 import LineIcon from '../Icons/LineIcon';
 
-export default function ChannelTrailTile({ slug, label }: { slug: string; label: string }) {
+export default function ChannelTrailTile({ slug }: { slug: string }) {
     const meta = channelMeta(slug);
 
     if (!meta) {
@@ -12,7 +12,6 @@ export default function ChannelTrailTile({ slug, label }: { slug: string; label:
     return (
         <Link
             href={`/${canonicalChannelSlug(slug)}`}
-            aria-label={label}
             className="group flex min-h-44 flex-col rounded-card border border-border bg-white p-6 transition-transform hover:-translate-y-1 hover:shadow-elevated"
         >
             <span className={`flex h-12 w-12 items-center justify-center rounded-control ${meta.mediaClass}`}>

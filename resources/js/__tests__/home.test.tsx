@@ -57,8 +57,28 @@ describe('Direction A public homepage', () => {
         expect(screen.getByRole('heading', { name: 'Wildlife corridor project reaches a new milestone' })).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Our mission' })).toBeInTheDocument();
         expect(screen.getByRole('region', { name: 'APES newsroom channels' })).toBeInTheDocument();
+        const apesChannel = screen.getByRole('link', { name: /^APES CIC/ });
+        expect(apesChannel).not.toHaveAttribute('aria-label');
+        expect(apesChannel).toHaveTextContent('APES CIC');
+        expect(screen.getByRole('link', { name: /^Shelter & Rescue/ })).toHaveTextContent('Shelter & Rescue');
+        expect(screen.getByRole('link', { name: /^Pet Care Clinic/ })).toHaveTextContent('Pet Care Clinic');
         expect(screen.getByRole('heading', { name: 'Recent stories' })).toBeInTheDocument();
+        expect(screen.getByText('The latest from the rescue centre.')).toBeInTheDocument();
+        expect(screen.getByText('4 August 2026', { selector: 'time' })).toHaveAttribute(
+            'datetime',
+            '2026-08-04T09:00:00Z',
+        );
         expect(screen.queryByText('Browse archive')).not.toBeInTheDocument();
+
+        const squareLogo = screen.getByRole('img', { name: 'Association of Protecting Exotic Species CIC' });
+        expect(squareLogo).toHaveAttribute('src', '/brand/apes-logo-square.png');
+        expect(squareLogo.parentElement?.tagName).toBe('PICTURE');
+        const responsiveSource = squareLogo.parentElement?.querySelector('source[type="image/webp"]');
+        expect(responsiveSource).toHaveAttribute(
+            'srcset',
+            '/brand/apes-logo-square-384.webp 384w, /brand/apes-logo-square-768.webp 768w',
+        );
+        expect(responsiveSource).toHaveAttribute('sizes', '(min-width: 768px) 384px, calc(100vw - 6.5rem)');
 
         const menuButton = screen.getByRole('button', { name: 'Open main menu' });
         await user.click(menuButton);

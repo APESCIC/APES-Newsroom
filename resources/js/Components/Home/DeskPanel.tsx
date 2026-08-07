@@ -46,7 +46,7 @@ export default function DeskPanel({ featured }: { featured?: PostCard }) {
                 <LineIcon name={meta?.icon ?? 'document'} className="h-4 w-4" />
                 {featured.channel}
             </p>
-            <h1 className="mt-4 text-4xl leading-[1.1] font-extrabold tracking-tight text-body sm:text-5xl">
+            <h1 className="mt-4 text-4xl leading-[1.1] font-bold tracking-tight text-body sm:text-5xl">
                 <Link href={`/articles/${featured.slug}`} className="hover:text-teal-deep hover:underline">
                     {featured.title}
                 </Link>

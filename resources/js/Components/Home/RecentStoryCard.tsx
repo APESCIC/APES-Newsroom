@@ -1,10 +1,12 @@
 import { Link } from '@inertiajs/react';
 import { channelMeta } from '../../channelMeta';
 import LineIcon from '../Icons/LineIcon';
-import type { PostCard } from './DeskPanel';
+import { formatStoryDate, type PostCard } from './DeskPanel';
 
 export default function RecentStoryCard({ post }: { post: PostCard }) {
     const meta = channelMeta(post.channel_slug);
+    const published = formatStoryDate(post.published_at);
+
     return (
         <article className="group">
             <div className={`flex aspect-video items-center justify-center overflow-hidden rounded-control border border-border ${meta?.mediaClass ?? 'bg-brand-mist text-teal-deep'}`}>
@@ -18,6 +20,12 @@ export default function RecentStoryCard({ post }: { post: PostCard }) {
                     {post.title}
                 </Link>
             </h3>
+            {post.excerpt && <p className="mt-3 text-sm leading-6 text-muted">{post.excerpt}</p>}
+            {published && (
+                <time dateTime={post.published_at ?? undefined} className="mt-3 block text-xs font-semibold text-muted">
+                    {published}
+                </time>
+            )}
         </article>
     );
 }

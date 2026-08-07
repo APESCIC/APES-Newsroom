@@ -20,7 +20,13 @@ teal and typography but prioritise dense, calm task completion.
 
 The supplied horizontal, square and compact APES logo files are the only brand
 marks. Their artwork and aspect ratios remain unchanged without filters or
-recolouring.
+recolouring. The square PNG remains the canonical fallback and is served with
+deterministic 384px and 768px WebP derivatives for responsive delivery.
+
+Instrument Sans Variable 5.3.0 is self-hosted from the application bundle so
+the restrictive content security policy does not depend on a remote font host.
+Direction A uses supported weights 400–700; headings that were initially
+specified at a synthetic 800 weight use 700.
 
 ## Page decisions
 
@@ -29,7 +35,8 @@ recolouring.
 - Featured story and mission artwork form a 7/5 desktop hero.
 - Three labelled channel entry cards preserve APES CIC, Shelter & Rescue and
   Pet Care Clinic identities.
-- Recent stories follow in a responsive editorial grid.
+- Recent stories follow in a responsive editorial grid and expose their
+  nullable excerpt and semantic publication date when supplied.
 - Public navigation and account actions remain source- and role-aware; no new
   archive route is introduced.
 

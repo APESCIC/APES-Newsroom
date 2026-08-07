@@ -1,10 +1,11 @@
+@import '@fontsource-variable/instrument-sans/wght.css';
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
 
     --color-brand-ink: #061A1A;
     --color-brand-teal: #00BFC7;
@@ -22,6 +23,8 @@
     --color-apes-primary: #2D6A4F;
     --color-shelter-accent: #BC6C25;
     --color-clinic-accent: #457B9D;
+    --color-shelter-text: #8A4B12;
+    --color-clinic-text: #2F617D;
     --color-apes-mist: #E5F6F4;
     --color-shelter-mist: #F4EBE3;
     --color-clinic-mist: #E3EDF4;
@@ -88,7 +91,7 @@
     .eyebrow {
         color: var(--color-teal-deep);
         font-size: 0.75rem;
-        font-weight: 800;
+        font-weight: 700;
         letter-spacing: 0.14em;
         text-transform: uppercase;
     }
@@ -156,7 +159,7 @@
         padding: 0.25rem 0.75rem;
         color: var(--color-warning);
         font-size: 0.75rem;
-        font-weight: 800;
+        font-weight: 700;
     }
 }
 

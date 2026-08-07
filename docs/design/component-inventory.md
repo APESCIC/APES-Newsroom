@@ -13,10 +13,10 @@
 | `SiteFooter` | Compact brand mark and privacy, cookies, rights, mailing links | default |
 | `DeskPanel` | Featured-story media panel, channel, headline, excerpt, byline/date and story action | empty, populated |
 | `ChannelTrailTile` | Labelled line icon, channel name, description and channel link | default, focus |
-| `RecentStoryCard` | Source-backed channel treatment, title, excerpt and date | default |
+| `RecentStoryCard` | Source-backed channel treatment, title, nullable excerpt and semantic publication time | default, missing metadata |
 | `WorkspaceLayout` | Dark role-labelled rail, account controls, light task canvas and mobile disclosure | staff, admin |
 | `LineIcon` | First-party current-colour line icons without emoji dependencies | decorative |
-| `ApesLogo` | Unfiltered horizontal, square, or compact supplied APES artwork | per placement |
+| `ApesLogo` | Unfiltered horizontal, square, or compact supplied APES artwork; square placement uses 384/768 WebP sources with PNG fallback | per placement, responsive |
 
 ## Staff posts
 
@@ -31,8 +31,8 @@
 
 | Component | Description | States |
 | --- | --- | --- |
-| `ModerationSummaryCard` | Button and count for one source-backed queue | default, active |
-| `ModerationQueueTabs` | Profiles, comments, reports, and suspended selectors | click, Arrow keys, Home/End |
+| `ModerationSummaryCard` | Pressed-state button and count for one source-backed queue | default, active |
+| `ModerationQueueTabs` | Profiles, comments, reports, and suspended selectors with persistent labelled panels and roving focus | click, Arrow keys, Home/End |
 | `ModerationRecordCard` | Source-backed context and existing record actions | per queue, empty |
 
 ## Existing and later epic surfaces

@@ -29,9 +29,9 @@ export const channelMetaBySlug: Record<string, ChannelMeta> = {
         description: 'Updates on rescued animals and adoption successes.',
         accent: 'shelter',
         icon: 'shelter',
-        textClass: 'text-shelter-accent',
+        textClass: 'text-shelter-text',
         borderClass: 'border-shelter-accent',
-        badgeClass: 'bg-shelter-mist text-shelter-accent',
+        badgeClass: 'bg-shelter-mist text-shelter-text',
         mediaClass: 'bg-shelter-mist text-shelter-accent',
     },
     'apes-pet-care-clinic': {
@@ -39,9 +39,9 @@ export const channelMetaBySlug: Record<string, ChannelMeta> = {
         description: 'Expert clinic notes and community health advice.',
         accent: 'clinic',
         icon: 'clinic',
-        textClass: 'text-clinic-accent',
+        textClass: 'text-clinic-text',
         borderClass: 'border-clinic-accent',
-        badgeClass: 'bg-clinic-mist text-clinic-accent',
+        badgeClass: 'bg-clinic-mist text-clinic-text',
         mediaClass: 'bg-clinic-mist text-clinic-accent',
     },
 };

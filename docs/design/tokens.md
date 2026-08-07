@@ -28,17 +28,24 @@ the marks.
 | `--color-warning` | `#9A5B13` | In-review and needs-attention states |
 | `--color-danger` | `#A93030` | Rejection and destructive actions |
 | `--color-apes-primary` | `#2D6A4F` | APES CIC channel |
-| `--color-shelter-accent` | `#BC6C25` | Shelter & Rescue channel |
-| `--color-clinic-accent` | `#457B9D` | Pet Care Clinic channel |
+| `--color-shelter-accent` | `#BC6C25` | Shelter & Rescue borders and decorative icons |
+| `--color-clinic-accent` | `#457B9D` | Pet Care Clinic borders and decorative icons |
+| `--color-shelter-text` | `#8A4B12` | Shelter & Rescue text and badges |
+| `--color-clinic-text` | `#2F617D` | Pet Care Clinic text and badges |
 
 Bright brand teal is decorative on light backgrounds; use deep teal for text
 and controls. Never rely on channel or state colour without a text or icon
-label.
+label. The text-specific Shelter token measures 5.76:1 on Shelter mist and
+6.78:1 on white; the Clinic token measures 5.66:1 on Clinic mist and 6.72:1 on
+white. These WCAG relative-luminance checks exceed the 4.5:1 AA requirement for
+normal text, while the brighter accents remain available for non-text borders
+and decorative icons.
 
 ## Typography
 
-Instrument Sans with system sans-serif fallback is the only type family.
-Display titles use 700–800 weight and compact line height. Body and UI text use
+`Instrument Sans Variable` 5.3.0 is self-hosted through Fontsource with a
+system sans-serif fallback; no remote font request is required. Display titles
+use the supported 700 weight and compact line height. Body and UI text use
 400–600 weight, with 16px primary reading text and 14px minimum compact
 metadata. Article measure is 65–72 characters.
 

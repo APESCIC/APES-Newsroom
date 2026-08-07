@@ -105,6 +105,7 @@ export default function ModerationIndex({
                             }`}
                             onClick={() => setActiveQueue(queue.id)}
                             aria-label={`${queue.summaryLabel}: ${queue.count}`}
+                            aria-pressed={activeQueue === queue.id}
                         >
                             <span className="block text-3xl font-bold text-brand-ink">{queue.count}</span>
                             <span className="mt-3 block text-sm font-semibold text-muted">{queue.summaryLabel}</span>
@@ -123,6 +124,7 @@ export default function ModerationIndex({
                                     role="tab"
                                     aria-selected={activeQueue === queue.id}
                                     aria-controls={`panel-${queue.id}`}
+                                    tabIndex={activeQueue === queue.id ? 0 : -1}
                                     className={`min-h-11 shrink-0 border-b-2 px-4 py-3 text-sm font-semibold ${
                                         activeQueue === queue.id
                                             ? 'border-teal-deep text-teal-deep'
@@ -138,13 +140,13 @@ export default function ModerationIndex({
                     </div>
 
                     <div
-                        id={`panel-${activeQueue}`}
+                        id="panel-profiles"
                         role="tabpanel"
-                        aria-labelledby={`tab-${activeQueue}`}
+                        aria-labelledby="tab-profiles"
+                        hidden={activeQueue !== 'profiles'}
                         className="p-5 sm:p-6"
                     >
-                        {activeQueue === 'profiles' && (
-                            profiles.length > 0 ? (
+                        {profiles.length > 0 ? (
                                 <>
                                     <div className="hidden overflow-x-auto md:block">
                                         <table className="w-full text-left text-sm" aria-label="Pending profiles">
@@ -205,11 +207,17 @@ export default function ModerationIndex({
                                         })}
                                     </ul>
                                 </>
-                            ) : <EmptyQueue>No profiles are waiting for review.</EmptyQueue>
-                        )}
+                        ) : <EmptyQueue>No profiles are waiting for review.</EmptyQueue>}
+                    </div>
 
-                        {activeQueue === 'comments' && (
-                            comments.length > 0 ? (
+                    <div
+                        id="panel-comments"
+                        role="tabpanel"
+                        aria-labelledby="tab-comments"
+                        hidden={activeQueue !== 'comments'}
+                        className="p-5 sm:p-6"
+                    >
+                        {comments.length > 0 ? (
                                 <ul className="space-y-4">
                                     {comments.map((comment) => (
                                         <li key={comment.id} className="rounded-card border border-border bg-white p-6">
@@ -226,11 +234,17 @@ export default function ModerationIndex({
                                         </li>
                                     ))}
                                 </ul>
-                            ) : <EmptyQueue>No comments are waiting for review.</EmptyQueue>
-                        )}
+                        ) : <EmptyQueue>No comments are waiting for review.</EmptyQueue>}
+                    </div>
 
-                        {activeQueue === 'reports' && (
-                            reports.length > 0 ? (
+                    <div
+                        id="panel-reports"
+                        role="tabpanel"
+                        aria-labelledby="tab-reports"
+                        hidden={activeQueue !== 'reports'}
+                        className="p-5 sm:p-6"
+                    >
+                        {reports.length > 0 ? (
                                 <ul className="space-y-4">
                                     {reports.map((report) => (
                                         <li key={report.id} className="rounded-card border border-border bg-white p-6">
@@ -249,11 +263,17 @@ export default function ModerationIndex({
                                         </li>
                                     ))}
                                 </ul>
-                            ) : <EmptyQueue>No reports are open.</EmptyQueue>
-                        )}
+                        ) : <EmptyQueue>No reports are open.</EmptyQueue>}
+                    </div>
 
-                        {activeQueue === 'suspended' && (
-                            suspended.length > 0 ? (
+                    <div
+                        id="panel-suspended"
+                        role="tabpanel"
+                        aria-labelledby="tab-suspended"
+                        hidden={activeQueue !== 'suspended'}
+                        className="p-5 sm:p-6"
+                    >
+                        {suspended.length > 0 ? (
                                 <ul className="grid gap-4 xl:grid-cols-2">
                                     {suspended.map((profile) => {
                                         const name = profile.display_name ?? profile.user_name;
@@ -267,8 +287,7 @@ export default function ModerationIndex({
                                         );
                                     })}
                                 </ul>
-                            ) : <EmptyQueue>No profiles are suspended.</EmptyQueue>
-                        )}
+                        ) : <EmptyQueue>No profiles are suspended.</EmptyQueue>}
                     </div>
                 </section>
             </main>

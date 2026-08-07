@@ -15,7 +15,7 @@ describe('Direction A admin moderation workspace', () => {
         });
     });
 
-    it('summarises queues and switches between complete moderation views', async () => {
+    it('exposes complete keyboard-operated queues and preserves every moderation payload', async () => {
         const user = userEvent.setup();
 
         render(
@@ -41,25 +41,65 @@ describe('Direction A admin moderation workspace', () => {
             '/brand/apes-logo-compact.png',
         );
         expect(screen.getByRole('navigation', { name: 'Admin workspace' })).toBeInTheDocument();
-        expect(screen.getByText('Profiles awaiting review')).toBeInTheDocument();
-        expect(screen.getByText('Comments awaiting review')).toBeInTheDocument();
-        expect(screen.getByText('Open reports')).toBeInTheDocument();
-        expect(screen.getByText('Suspended profiles')).toBeInTheDocument();
+        const profileSummary = screen.getByRole('button', { name: 'Profiles awaiting review: 1' });
+        const commentSummary = screen.getByRole('button', { name: 'Comments awaiting review: 1' });
+        expect(profileSummary).toHaveAttribute('aria-pressed', 'true');
+        expect(commentSummary).toHaveAttribute('aria-pressed', 'false');
+        expect(screen.getByRole('button', { name: 'Open reports: 1' })).toHaveAttribute('aria-pressed', 'false');
+        expect(screen.getByRole('button', { name: 'Suspended profiles: 1' })).toHaveAttribute('aria-pressed', 'false');
 
         const tabs = screen.getByRole('tablist', { name: 'Moderation queues' });
         expect(tabs).toBeInTheDocument();
+        const allPanels = screen.getAllByRole('tabpanel', { hidden: true });
+        expect(allPanels).toHaveLength(4);
+        for (const queue of ['profiles', 'comments', 'reports', 'suspended']) {
+            const tab = screen.getByRole('tab', { name: new RegExp(queue, 'i') });
+            const panel = document.getElementById(`panel-${queue}`);
+            expect(tab).toHaveAttribute('aria-controls', `panel-${queue}`);
+            expect(panel).toHaveAttribute('aria-labelledby', `tab-${queue}`);
+            expect(panel?.hidden).toBe(queue !== 'profiles');
+        }
 
-        screen.getByRole('tab', { name: /Profiles/ }).focus();
+        const profileTab = screen.getByRole('tab', { name: /Profiles/ });
+        expect(profileTab).toHaveAttribute('tabindex', '0');
+        expect(screen.getByRole('tab', { name: /Comments/ })).toHaveAttribute('tabindex', '-1');
+
+        await user.click(screen.getByRole('button', { name: 'Approve profile for Sam Keeper' }));
+        expect(getInertiaMock().post).toHaveBeenCalledWith('/admin/moderation/profiles/2', { status: 'approved' });
+        await user.click(screen.getByRole('button', { name: 'Reject profile for Sam Keeper' }));
+        expect(getInertiaMock().post).toHaveBeenCalledWith('/admin/moderation/profiles/2', { status: 'rejected' });
+        await user.click(screen.getByRole('button', { name: 'Suspend profile for Sam Keeper' }));
+        expect(getInertiaMock().post).toHaveBeenCalledWith('/admin/moderation/profiles/2', { status: 'suspended' });
+
+        profileTab.focus();
         await user.keyboard('{ArrowRight}');
-        expect(screen.getByRole('tab', { name: /Comments/ })).toHaveAttribute('aria-selected', 'true');
+        const commentsTab = screen.getByRole('tab', { name: /Comments/ });
+        expect(commentsTab).toHaveAttribute('aria-selected', 'true');
+        expect(commentsTab).toHaveAttribute('tabindex', '0');
+        expect(profileTab).toHaveAttribute('tabindex', '-1');
+        expect(commentSummary).toHaveAttribute('aria-pressed', 'true');
         expect(screen.getByText('A thoughtful comment.')).toBeInTheDocument();
         await user.click(screen.getByRole('button', { name: 'Approve comment by reader' }));
         expect(getInertiaMock().post).toHaveBeenCalledWith('/admin/moderation/comments/3', { status: 'approved' });
+        await user.click(screen.getByRole('button', { name: 'Reject comment by reader' }));
+        expect(getInertiaMock().post).toHaveBeenCalledWith('/admin/moderation/comments/3', { status: 'rejected' });
 
         await user.click(screen.getByRole('tab', { name: /Reports/ }));
         expect(screen.getByText('Needs review')).toBeInTheDocument();
+        await user.click(screen.getByRole('button', { name: 'Resolve report 4' }));
+        expect(getInertiaMock().post).toHaveBeenCalledWith('/admin/moderation/reports/4', { status: 'resolved' });
+        await user.click(screen.getByRole('button', { name: 'Dismiss report 4' }));
+        expect(getInertiaMock().post).toHaveBeenCalledWith('/admin/moderation/reports/4', { status: 'dismissed' });
 
         await user.click(screen.getByRole('tab', { name: /Suspended/ }));
-        expect(screen.getByRole('button', { name: 'Lift suspension for Taylor' })).toBeInTheDocument();
+        await user.click(screen.getByRole('button', { name: 'Lift suspension for Taylor' }));
+        expect(getInertiaMock().post).toHaveBeenCalledWith('/admin/moderation/profiles/5', { status: 'private' });
+
+        screen.getByRole('tab', { name: /Suspended/ }).focus();
+        await user.keyboard('{Home}');
+        expect(profileTab).toHaveFocus();
+        expect(profileTab).toHaveAttribute('aria-selected', 'true');
+        await user.keyboard('{End}');
+        expect(screen.getByRole('tab', { name: /Suspended/ })).toHaveFocus();
     });
 });

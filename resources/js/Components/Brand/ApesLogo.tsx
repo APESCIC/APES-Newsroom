@@ -17,6 +17,26 @@ export default function ApesLogo({
 }) {
     const logo = logoFiles[variant];
 
+    if (variant === 'square') {
+        return (
+            <picture>
+                <source
+                    type="image/webp"
+                    srcSet="/brand/apes-logo-square-384.webp 384w, /brand/apes-logo-square-768.webp 768w"
+                    sizes="(min-width: 768px) 384px, calc(100vw - 6.5rem)"
+                />
+                <img
+                    src={logo.src}
+                    width={logo.width}
+                    height={logo.height}
+                    alt={alt}
+                    className={className}
+                    decoding="async"
+                />
+            </picture>
+        );
+    }
+
     return (
         <img
             src={logo.src}

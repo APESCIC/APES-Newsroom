@@ -14,11 +14,12 @@ track work via GitHub Issues per [`AGENTS.md`](AGENTS.md).
 
 ## Repository status
 
-Last verified: **2026-08-07T11:42:21+01:00**. APES Newsroom is in active
+Last verified: **2026-08-07T13:38:11+01:00**. APES Newsroom is in active
 pre-release development. The PHP formatting baseline was restored through
 [issue #33](https://github.com/APESCIC/APES-Newsroom/issues/33); the Direction A
-homepage, staff desk, and admin workspace are implemented in
-[PR #34](https://github.com/APESCIC/APES-Newsroom/pull/34) and under review.
+homepage, staff desk, and admin workspace are tracked by
+[issue #32](https://github.com/APESCIC/APES-Newsroom/issues/32) and delivered for
+review in [PR #34](https://github.com/APESCIC/APES-Newsroom/pull/34).
 Production deployment and the Ghost cutover remain separately authorized work.
 
 ## Stack
