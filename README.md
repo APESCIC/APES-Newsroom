@@ -14,12 +14,12 @@ track work via GitHub Issues per [`AGENTS.md`](AGENTS.md).
 
 ## Repository status
 
-Last verified: **2026-08-07T17:24:38+01:00**. APES Newsroom is in active
+Last verified: **2026-08-09T01:30:42+01:00**. APES Newsroom is in active
 pre-release development. The PHP formatting baseline was restored through
 [issue #33](https://github.com/APESCIC/APES-Newsroom/issues/33); the Direction A
-homepage, staff desk, and admin workspace are tracked by
-[issue #32](https://github.com/APESCIC/APES-Newsroom/issues/32) and delivered for
-review in [PR #34](https://github.com/APESCIC/APES-Newsroom/pull/34).
+homepage, staff desk, and admin workspace were completed in
+[issue #32](https://github.com/APESCIC/APES-Newsroom/issues/32) and merged in
+[PR #34](https://github.com/APESCIC/APES-Newsroom/pull/34).
 Production deployment and the Ghost cutover remain separately authorized work.
 
 ## Stack
@@ -42,7 +42,8 @@ php artisan serve
 
 No MySQL or Redis needed for local dev - `.env.example` defaults to
 sqlite, database-backed sessions/cache/queue. For production-like local
-testing with Redis and OIDC, see [`docs/local-dev.md`](docs/local-dev.md).
+testing with Redis, OpenLDAP, and OIDC, see
+[`docs/local-dev.md`](docs/local-dev.md).
 In Cloudron, `CloudronEnvironmentServiceProvider` (`app/Providers`) overrides
 these from the platform's `CLOUDRON_*` environment variables automatically; see
 that file and `.env.example` for what's mapped.
