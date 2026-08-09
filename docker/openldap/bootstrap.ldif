@@ -1,5 +1,6 @@
 # Test users and groups for local OpenLDAP (docker compose openldap service).
-# Group CNs must match keys in config/rbac.php.
+# Group CNs must match keys in config/rbac.php. Users must be created before
+# groups because the image's memberOf overlay ignores dangling members.
 
 dn: ou=users,dc=apes,dc=local
 objectClass: organizationalUnit
@@ -8,21 +9,6 @@ ou: users
 dn: ou=groups,dc=apes,dc=local
 objectClass: organizationalUnit
 ou: groups
-
-dn: cn=newsroom-staff,ou=groups,dc=apes,dc=local
-objectClass: groupOfNames
-cn: newsroom-staff
-member: cn=staffer,ou=users,dc=apes,dc=local
-
-dn: cn=newsroom-admins,ou=groups,dc=apes,dc=local
-objectClass: groupOfNames
-cn: newsroom-admins
-member: cn=admin,ou=users,dc=apes,dc=local
-
-dn: cn=newsroom-super-admins,ou=groups,dc=apes,dc=local
-objectClass: groupOfNames
-cn: newsroom-super-admins
-member: cn=superadmin,ou=users,dc=apes,dc=local
 
 dn: cn=staffer,ou=users,dc=apes,dc=local
 objectClass: inetOrgPerson
@@ -47,3 +33,18 @@ sn: Admin
 uid: superadmin
 mail: superadmin@apes.local
 userPassword: superadmin
+
+dn: cn=newsroom-staff,ou=groups,dc=apes,dc=local
+objectClass: groupOfUniqueNames
+cn: newsroom-staff
+uniqueMember: cn=staffer,ou=users,dc=apes,dc=local
+
+dn: cn=newsroom-admins,ou=groups,dc=apes,dc=local
+objectClass: groupOfUniqueNames
+cn: newsroom-admins
+uniqueMember: cn=admin,ou=users,dc=apes,dc=local
+
+dn: cn=newsroom-super-admins,ou=groups,dc=apes,dc=local
+objectClass: groupOfUniqueNames
+cn: newsroom-super-admins
+uniqueMember: cn=superadmin,ou=users,dc=apes,dc=local

@@ -36,6 +36,7 @@ class LdapGroupLookup
             $results = Container::getConnection('default')
                 ->query()
                 ->in($usersBaseDn)
+                ->select(['*', 'memberOf'])
                 ->where('mail', '=', $email)
                 ->get();
         } catch (Throwable $e) {

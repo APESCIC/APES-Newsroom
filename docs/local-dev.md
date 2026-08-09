@@ -58,7 +58,13 @@ docker compose down
 ```
 
 OpenLDAP is seeded from `docker/openldap/bootstrap.ldif` with test users
-and groups matching `config/rbac.php`.
+and groups matching `config/rbac.php`. The tracked Compose service uses the
+image's `--copy-service` option so its startup scripts can safely process the
+bind-mounted LDIF on Windows and Docker Desktop.
+
+The fixture creates users before its `groupOfUniqueNames` groups. This order
+and the groups' `uniqueMember` attributes match the image's enabled `memberOf`
+overlay, which ignores membership references to users that do not yet exist.
 
 ### 2. Configure `.env`
 
@@ -154,6 +160,39 @@ composer test
 LdapRecord's directory emulator. `LoginPageTest` verifies the staff
 button appears only when OIDC is configured.
 
+### Live OpenLDAP smoke test
+
+The live integration test is intentionally outside the default PHPUnit suites,
+so everyday development and CI do not require Docker. To rebuild only the
+disposable OpenLDAP fixture from the tracked Compose configuration:
+
+```powershell
+docker compose -f docker-compose.yml config
+docker compose -f docker-compose.yml stop openldap
+docker compose -f docker-compose.yml rm -f openldap
+docker compose -f docker-compose.yml up -d openldap
+```
+
+After OpenLDAP is ready, run the opt-in application-level test:
+
+```powershell
+$env:RUN_LIVE_LDAP_TESTS = '1'
+php artisan test tests/Integration/LocalOpenLdapTest.php
+Remove-Item Env:\RUN_LIVE_LDAP_TESTS
+```
+
+The test queries `LdapGroupLookup` for all three fixture users and requires the
+staff, admin, and super-admin group DNs. To inspect only the staff result:
+
+```powershell
+$code = 'echo json_encode(app(\App\Services\Auth\LdapGroupLookup::class)->groupsForEmail("staffer@apes.local"));'
+php artisan tinker --execute=$code
+```
+
+The expected result contains
+`cn=newsroom-staff,ou=groups,dc=apes,dc=local`. Never use production LDAP
+credentials for this fixture test.
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
@@ -161,5 +200,6 @@ button appears only when OIDC is configured.
 | `cache: false` on `/health` | Redis not running or wrong host | `docker compose up -d redis`; check `REDIS_HOST` |
 | OIDC redirect mismatch | Wrong redirect URI on client | Register exact callback URL in Cloudron dashboard |
 | Staff login denied (no group) | `memberof` values don't match `config/rbac.php` | Run ldapsearch (see `docs/deployment.md`) and update keys |
+| OpenLDAP exits while loading the fixture on Windows | Container is not using the tracked copy-service behavior | Recreate only OpenLDAP with the commands in the live smoke-test section |
 | LDAP connection timeout | Cloudron LDAP not reachable locally | Use Docker OpenLDAP (option B) |
 | Queue jobs not processing | Worker not running | Start `php artisan queue:work` in a second terminal |
