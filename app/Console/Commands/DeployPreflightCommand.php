@@ -170,7 +170,9 @@ class DeployPreflightCommand extends Command
         try {
             Artisan::call('migrate:status', ['--pending' => true]);
             $output = Artisan::output();
-            $hasPending = trim($output) !== '' && ! str_contains($output, 'No migrations found');
+            $hasPending = trim($output) !== ''
+                && ! str_contains($output, 'No pending migrations')
+                && ! str_contains($output, 'No migrations found');
 
             $this->record(
                 'database.migrations_pending',
