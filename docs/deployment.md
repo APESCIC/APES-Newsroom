@@ -1,19 +1,16 @@
 # Deploying to Cloudron (issue #3)
 
-This documents the guarded deploy pipeline for the existing Cloudron LAMP
-app (`74a2a784-a161-4787-84ff-2b8efc957bc8`), which currently runs Ghost
-and will be repointed at this app per the epic (#1) plan: build and accept
-at `beta.apesnews.org.uk`, then cut over `apesnews.org.uk` separately (#11).
+This documents the guarded deploy pipeline for the existing Cloudron LAMP app
+(`74a2a784-a161-4787-84ff-2b8efc957bc8`). The watched beta deployment and
+rollback drill completed on 2026-08-06 under
+[#3](https://github.com/APESCIC/APES-Newsroom/issues/3#issuecomment-5208564154),
+and the separately authorized production cutover completed under
+[#11](https://github.com/APESCIC/APES-Newsroom/issues/11#issuecomment-5208865545).
+The live app is `www.apesnews.org.uk`.
 
-**Local preflight has been run** (2026-08-06); a watched beta deploy against
-Cloudron has not yet been executed from this environment. See
-[`docs/deployment-beta-acceptance.md`](deployment-beta-acceptance.md) for
-the full acceptance checklist. The workflow, scripts, and setup steps below
-are written and internally consistent against Cloudron's documented
-behaviour (docs.cloudron.io), but there is no Cloudron API token or access
-from this environment to test them end to end. Treat the first real run as
-the acceptance exercise issue #3 and #11 both call for — run it against
-beta, watched, with `docs.cloudron.io` open, before trusting it unattended.
+The workflow and scripts remain the operational runbook for future guarded
+deployments. Treat credentials and production execution as separately
+authorized operations even when following this document.
 
 ## How a release is structured on the server
 
@@ -42,9 +39,10 @@ for inspection until manually cleaned up.
 
 These happen once, outside of CI, before the first deploy can work.
 
-1. **Cloudron dashboard, this app's Location/SSO/etc.** already exist
-   (it's the existing Ghost app being repointed) - no change needed here
-   yet. Repointing DNS/hostname is issue #11's guarded cutover, not this.
+1. **Cloudron dashboard, this app's Location/SSO/etc.** are configured for the
+   Newsroom at `www.apesnews.org.uk`. The former Ghost app remains stopped and
+   recoverable at `ghost-legacy.apesnews.org.uk`. Do not retire it or change the
+   unresolved apex DNS record without separate authorization.
 
 2. **Pin PHP to 8.4** (issue #3 requires PHP 8.4; Cloudron LAMP defaults
    to 8.3):
@@ -148,12 +146,13 @@ before trusting a new environment, and it's what
 failures without Cloudron credentials: uncommitted changes, `APP_DEBUG=true`,
 database unreachable. See [`deployment-beta-acceptance.md`](deployment-beta-acceptance.md).
 
-## What this does not do
+## Operational boundary
 
-Production (`apesnews.org.uk`) deployment is a separate, later workflow
-gated on issue #11's beta acceptance and explicit production
-authorization - it doesn't exist yet, on purpose. This pipeline only ever
-touches beta.
+The same guarded release mechanics now support the live Newsroom, but this
+document does not authorize running them. A future production deployment, DNS
+or hostname change, live campaign send, or Ghost retirement requires its own
+explicit approval and current preflight evidence. The apex `apesnews.org.uk`
+record was not switched during the 2026-08-06 cutover.
 
 ## Redis addon
 
