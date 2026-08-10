@@ -24,6 +24,14 @@ vi.mock('@inertiajs/react', async () => {
             return React.createElement(as, as === 'a' ? { ...attributes, href } : attributes, children);
         },
         router: { post: (...args: unknown[]) => getInertiaMock().post(...args) },
+        useForm: <T extends Record<string, unknown>>(initial: T) => ({
+            data: initial,
+            setData: vi.fn(),
+            patch: vi.fn(),
+            processing: false,
+            errors: {},
+            delete: vi.fn(),
+        }),
         usePage: () => getInertiaMock().page,
     };
 });

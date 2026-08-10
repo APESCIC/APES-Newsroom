@@ -8,7 +8,14 @@ type ProfileUser = {
     auth_provider: string | null;
 };
 
-export default function Profile({ user, status }: { user: ProfileUser; status?: string }) {
+type ProfileProps = {
+    user: ProfileUser;
+    status?: string;
+    can_delete_account: boolean;
+    deletion_block_reason: string | null;
+};
+
+export default function Profile({ user, status, can_delete_account, deletion_block_reason }: ProfileProps) {
     const { data, setData, patch, processing, errors, delete: destroy } = useForm({
         name: user.name,
         email: user.email,
@@ -24,6 +31,7 @@ export default function Profile({ user, status }: { user: ProfileUser; status?: 
             destroy('/account');
         }
     };
+    const deleteError = (errors as Record<string, string>).delete_account;
 
     return (
         <>
@@ -83,9 +91,14 @@ export default function Profile({ user, status }: { user: ProfileUser; status?: 
 
                 <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6">
                     <h2 className="text-lg font-medium text-red-800">Danger zone</h2>
-                    <button type="button" onClick={deleteAccount} className="w-fit text-sm text-red-700 underline">
-                        Delete account
-                    </button>
+                    {can_delete_account ? (
+                        <button type="button" onClick={deleteAccount} className="w-fit text-sm text-red-700 underline">
+                            Delete account
+                        </button>
+                    ) : (
+                        <p className="text-sm text-neutral-700">{deletion_block_reason}</p>
+                    )}
+                    {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
                 </section>
 
                 <p className="text-sm">
