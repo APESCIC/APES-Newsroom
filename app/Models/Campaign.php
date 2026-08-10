@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'post_id', 'created_by', 'lists', 'snapshot', 'status',
+    'post_id', 'created_by', 'idempotency_key', 'lists', 'snapshot', 'status',
     'is_test', 'test_recipient', 'queued_at', 'completed_at',
 ])]
 class Campaign extends Model

@@ -15,7 +15,7 @@ Ghost completed on 2026-08-06 under
 
 ## Repository status
 
-Last verified: **2026-08-10T21:48:37+01:00**.
+Last verified: **2026-08-10T23:54:55+01:00**.
 
 - `main` is the remote default branch and its CI workflow is current.
 - The public Newsroom is live at `www.apesnews.org.uk`; the apex
