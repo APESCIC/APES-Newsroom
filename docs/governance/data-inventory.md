@@ -1,8 +1,11 @@
 # Data inventory (issue #10)
 
-Draft engineering inventory for APES Newsroom. Legal/compliance sign-off is still required before treating this as approved.
+This engineering inventory and its linked retention, processor, privacy,
+consent, rights, and threat-model records were approved for the launch gate by
+Bambie Murphy (APES CIC / repository owner) on 2026-08-06. See the
+[recorded legal/compliance and accessibility sign-off](https://github.com/APESCIC/APES-Newsroom/issues/10#issuecomment-5208704103).
 
-| Data category | Systems / tables | Lawful basis (draft) | Retention (draft) | Access |
+| Data category | Systems / tables | Lawful basis | Retention | Access |
 |---------------|------------------|----------------------|-------------------|--------|
 | Public account identity | `users` (name, email, password hash, verification) | Contract / legitimate interests for newsroom access | Until account deletion request + 30 days backup | User, admins |
 | Staff identity / roles | `users.role`, OIDC `external_id`, `ldap_group_snapshot` | Legitimate interests (staff access control) | While employed + audit retention | Admins / super admins |
@@ -24,5 +27,5 @@ Draft engineering inventory for APES Newsroom. Legal/compliance sign-off is stil
 
 ## Sign-off
 
-- [ ] Legal / compliance approval recorded on issue #10
-- [ ] Accessibility approval recorded on issue #10
+- [x] Legal / compliance approval recorded on issue #10 (2026-08-06)
+- [x] Accessibility approval recorded on issue #10 (2026-08-06)

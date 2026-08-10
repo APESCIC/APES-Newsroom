@@ -1,6 +1,10 @@
-# APES Newsroom — Accessibility Notes (draft)
+# APES Newsroom — Accessibility Notes
 
-> **Status:** First-pass draft targeting WCAG 2.2 AA (#2, #10).
+> **Status:** WCAG 2.2 AA launch evidence and named accessibility approval were
+> accepted on 2026-08-06 in
+> [issue #10](https://github.com/APESCIC/APES-Newsroom/issues/10#issuecomment-5208704103).
+> The checklists below remain regression criteria for future changes rather
+> than an indication that the launch gate is open.
 
 ## Global requirements
 
@@ -65,11 +69,11 @@
 
 ## Sign-off
 
-- [ ] Design review complete
-- [ ] Automated checks green
-- [ ] Manual keyboard pass
-- [ ] Screen reader smoke pass
-- [ ] Named accessibility approver recorded
+- [x] Design review complete
+- [x] Automated checks accepted for launch
+- [x] Manual accessibility evidence accepted for launch
+- [ ] A distinct screen-reader smoke run is not separately identified in the durable issue record
+- [x] Named accessibility approver recorded: Bambie Murphy, APES CIC / repository owner, 2026-08-06
 
 ## Test evidence pointers (code-complete v1)
 
@@ -77,4 +81,5 @@
 - Branded error page `Errors/Show` for 404/410/429/500
 - Engagement controls expose `aria-pressed` on reactions
 - Feature tests cover public reading, engagement gates, and form validation
-- Formal WCAG audit + accessibility sign-off remain open on issue #10
+- Named legal/compliance and accessibility sign-off is recorded on issue #10.
+  This repository record does not claim a separate third-party certification.

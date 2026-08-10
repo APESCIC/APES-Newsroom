@@ -2,17 +2,35 @@
 
 Source: [Issue #1](https://github.com/APESCIC/APES-Newsroom/issues/1) and its sub-issues (#2–#11, #18).
 
-**Code-complete v1 status (2026-08-06):** Engineering acceptance for #5–#9 and #18 is on `main`. Live ops: #2 design approved, #3 beta deploy+rollback done, #4 live OIDC/LDAP proved on beta, #10 governance sign-off recorded. Still open / gated: #11 production cutover (requires separate explicit authorization — not granted by closing #2–#10).
+**Delivery status (2026-08-06):** Engineering acceptance for #2–#10 and #18
+landed on `main`; the watched beta deploy, rollback drill, live OIDC/LDAP proof,
+and named governance/accessibility approvals were recorded on their issues.
+Production cutover was separately authorized and completed under
+[#11](https://github.com/APESCIC/APES-Newsroom/issues/11#issuecomment-5208865545).
+The Newsroom is live at `www.apesnews.org.uk`; the former Ghost app remains
+stopped and recoverable, its retirement is not authorized, and the apex DNS
+record was not switched during cutover.
 
-## What we're building
+## Delivered system
 
-One Laravel 13 + Inertia/React app on the existing Cloudron LAMP app (`74a2a784-a161-4787-84ff-2b8efc957bc8`), with two surfaces: a public SEO newsroom for three APES channels (CIC, Shelter & Rescue, Pet Care Clinic), and authenticated workspaces for publishing, campaigns, moderation, and governance. Public accounts use password/magic-link login; staff use Cloudron OIDC + LDAP role mapping. Content is versioned Editor.js JSON with a server-enforced block allowlist. Mailing lists are per-channel, double opt-in, queued through Cloudron SMTP. Ghost content is imported from Admin export files (content JSON + media archive); mailing lists are imported later via an admin-panel importer that uploads a Ghost members CSV; Ghost isn't retired until a separately authorized cutover.
+One Laravel 13 + Inertia/React app runs on the existing Cloudron LAMP app
+(`74a2a784-a161-4787-84ff-2b8efc957bc8`), with two surfaces: a public SEO
+newsroom for three APES channels (CIC, Shelter & Rescue, Pet Care Clinic), and
+authenticated workspaces for publishing, campaigns, moderation, and governance.
+Public accounts use password/magic-link login; staff use Cloudron OIDC + LDAP
+role mapping. Content is versioned Editor.js JSON with a server-enforced block
+allowlist. Mailing lists are per-channel, double opt-in, and queued through
+Cloudron SMTP. Ghost content and members were imported from exported files with
+fail-closed consent handling; no import sent email.
 
 Shared contracts used across multiple issues: `Role` (public/staff/admin/super_admin), `PostStatus` (draft/in_review/scheduled/published/unpublished/deleted), `MailingList` (apes_cic/apes_shelter_rescue/apes_pet_care_clinic), `ModerationStatus` (private/pending/approved/rejected/suspended), `ReactionType` (helpful/support/thank_you).
 
 ## Authorization boundary (applies throughout)
 
-Every sub-issue repeats some version of this, so it's worth stating once: completing any issue, including the epic, does **not** authorize production deployment, Cloudron hostname changes, live campaign sends, or deleting/retiring Ghost. Those each require separate, explicit sign-off from Bambie when the time comes — this plan doesn't change that.
+Completion of an issue does **not** authorize a new production deployment,
+Cloudron hostname or DNS change, live campaign send, or deletion/retirement of
+Ghost. Production cutover received its own recorded authorization on #11; that
+authorization does not extend to later operational actions.
 
 ## Dependency map
 
@@ -99,12 +117,15 @@ Every sub-issue repeats some version of this, so it's worth stating once: comple
 **Phase 6 — Cutover**
 - **#11 Validate, cut over apesnews.org.uk, retire Ghost safely.** Depends on everything above. Beta acceptance across every surface (including separate content import and **admin-panel** mailing CSV dry-runs), throughput benchmarking, backup/restore/rollback drills, then — only after separate production authorization — the guarded cutover with final content import then final admin-panel mailing import from the uploaded Ghost members CSV, and a defined rollback window. Ghost retirement is a further separate authorization after that window.
 
-## Open questions worth resolving before/while work starts
+## Current follow-up boundaries
 
-Who is doing the #2 design work — is that Bambie/a designer producing wireframes and tokens outside this session, or should I produce a first-pass sitemap/component inventory as a working draft? Access to Cloudron env values, the Cloudron OIDC client, LDAP group names, and Ghost Admin exports (content JSON + media archive for #9; members CSV for #18) will be needed before env wiring and import work can be more than scaffolding — no live Ghost API access is required. And #10's legal/compliance sign-off needs a named approver — worth confirming who that is early rather than at the #11 gate.
-
-## Suggested next step
-
-**Beta is ready.** Remaining gated step:
-
-1. Explicit production authorization from Bambie, then guarded cutover on #11 (final content + mailing imports, hostname move, rollback window). Ghost stays recoverable until a further separate retirement approval.
+- [Issue #36](https://github.com/APESCIC/APES-Newsroom/issues/36) is a new
+  stakeholder-gated theme exploration and is not evidence that the original
+  delivery phases remain incomplete.
+- Ghost stays recoverable until a separate retirement/deletion approval.
+- The apex `apesnews.org.uk` DNS record remains a separately governed change if
+  APES CIC chooses to point it at Cloudron/`www`.
+- Live campaign sends require an explicit operational decision and fresh
+  consent/suppression checks.
+- Dated plans in `docs/superpowers/plans/` are historical implementation
+  records; unchecked boxes there are not the current backlog.
