@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler, useEffect, useRef, useState } from 'react';
+import { FormEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import type { OutputData } from '@editorjs/editorjs';
 import EditorJsField from '../../../Components/editor/EditorJsField';
 
@@ -51,9 +51,48 @@ type PostForm = {
     canonical_url: string;
     email_on_publish: boolean;
     mailing_lists: string[];
-    tags: string[];
+    tags_text: string;
     expected_updated_at: string;
 };
+
+function formFromPost(post: PostData | null, channels: Channel[]): PostForm {
+    return {
+        title: post?.title ?? '',
+        slug: post?.slug ?? '',
+        excerpt: post?.excerpt ?? '',
+        content: post?.content ?? emptyContent,
+        channel: post?.channel ?? channels[0]?.value ?? 'apes_cic',
+        hero_image: post?.hero_image ?? '',
+        hero_image_alt: post?.hero_image_alt ?? '',
+        hero_image_caption: post?.hero_image_caption ?? '',
+        hero_image_credit: post?.hero_image_credit ?? '',
+        meta_title: post?.meta_title ?? '',
+        meta_description: post?.meta_description ?? '',
+        canonical_url: post?.canonical_url ?? '',
+        email_on_publish: post?.email_on_publish ?? false,
+        mailing_lists: post?.mailing_lists ?? [],
+        tags_text: (post?.tags ?? []).join(', '),
+        expected_updated_at: post?.updated_at ?? '',
+    };
+}
+
+function parseTags(value: string): string[] {
+    return value
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+}
+
+function reconcileSavedForm(current: PostForm, submitted: PostForm, authoritative: PostForm): PostForm {
+    return Object.fromEntries(
+        Object.entries(authoritative).map(([key, value]) => {
+            const field = key as keyof PostForm;
+            const changedSinceSubmit = JSON.stringify(current[field]) !== JSON.stringify(submitted[field]);
+
+            return [field, field === 'expected_updated_at' || !changedSinceSubmit ? value : current[field]];
+        }),
+    ) as PostForm;
+}
 
 export default function PostEdit({
     post,
@@ -69,41 +108,61 @@ export default function PostEdit({
     revisions: Revision[];
 }) {
     const isNew = post === null;
-    const { errors } = usePage().props as { errors: Record<string, string> };
+    const { errors = {} } = usePage().props as { errors?: Record<string, string> };
+    const hasErrors = Object.keys(errors).length > 0;
     const [scheduleAt, setScheduleAt] = useState(post?.scheduled_for ?? '');
     const [rejectNotes, setRejectNotes] = useState('');
-    const [tagInput, setTagInput] = useState((post?.tags ?? []).join(', '));
     const autosaveTimer = useRef<number | null>(null);
+    const previousPostId = useRef<number | null>(post?.id ?? null);
 
-    const { data, setData, post: submitPost, patch, processing, transform } = useForm<PostForm>({
-        title: post?.title ?? '',
-        slug: post?.slug ?? '',
-        excerpt: post?.excerpt ?? '',
-        content: post?.content ?? emptyContent,
-        channel: post?.channel ?? channels[0]?.value ?? 'apes_cic',
-        hero_image: post?.hero_image ?? '',
-        hero_image_alt: post?.hero_image_alt ?? '',
-        hero_image_caption: post?.hero_image_caption ?? '',
-        hero_image_credit: post?.hero_image_credit ?? '',
-        meta_title: post?.meta_title ?? '',
-        meta_description: post?.meta_description ?? '',
-        canonical_url: post?.canonical_url ?? '',
-        email_on_publish: post?.email_on_publish ?? false,
-        mailing_lists: post?.mailing_lists ?? [],
-        tags: post?.tags ?? [],
-        expected_updated_at: post?.updated_at ?? '',
-    });
+    const {
+        data,
+        setData,
+        post: submitPost,
+        patch,
+        processing,
+        transform,
+        setDefaults,
+        isDirty,
+    } = useForm<PostForm>(formFromPost(post, channels));
 
-    transform((form) => ({
-        ...form,
-        tags: tagInput
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean),
-    }));
+    transform(({ tags_text: tagsText, ...form }) => ({ ...form, tags: parseTags(tagsText) }));
 
     useEffect(() => {
-        if (isNew || !post) {
+        const nextPostId = post?.id ?? null;
+        if (nextPostId === null || previousPostId.current === nextPostId) {
+            return;
+        }
+
+        previousPostId.current = nextPostId;
+        const authoritativeForm = formFromPost(post, channels);
+        setData(authoritativeForm);
+        setDefaults(authoritativeForm);
+        setScheduleAt(post?.scheduled_for ?? '');
+    }, [channels, post, setData, setDefaults]);
+
+    const saveExisting = useCallback((submittedData: PostForm) => {
+        if (!post) {
+            return;
+        }
+
+        patch(`/staff/posts/${post.id}`, {
+            preserveScroll: true,
+            onSuccess: (page) => {
+                const savedPost = (page.props as { post?: PostData }).post;
+                if (!savedPost?.updated_at) {
+                    return;
+                }
+
+                const authoritativeForm = formFromPost(savedPost, channels);
+                setDefaults(authoritativeForm);
+                setData((current) => reconcileSavedForm(current, submittedData, authoritativeForm));
+            },
+        });
+    }, [channels, patch, post, setData, setDefaults]);
+
+    useEffect(() => {
+        if (isNew || !post || !isDirty || processing || hasErrors) {
             return;
         }
 
@@ -112,7 +171,7 @@ export default function PostEdit({
         }
 
         autosaveTimer.current = window.setTimeout(() => {
-            patch(`/staff/posts/${post.id}`, { preserveScroll: true });
+            saveExisting(data);
         }, 8000);
 
         return () => {
@@ -120,14 +179,14 @@ export default function PostEdit({
                 window.clearTimeout(autosaveTimer.current);
             }
         };
-    }, [data, isNew, post, patch]);
+    }, [data, hasErrors, isDirty, isNew, post, processing, saveExisting]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         if (isNew) {
             submitPost('/staff/posts');
         } else {
-            patch(`/staff/posts/${post.id}`);
+            saveExisting(data);
         }
     };
 
@@ -195,6 +254,7 @@ export default function PostEdit({
                             onChange={(e) => setData('slug', e.target.value)}
                             className="w-full rounded border px-3 py-2"
                         />
+                        {errors.slug && <p className="text-sm text-red-600">{errors.slug}</p>}
                     </div>
                     <div>
                         <label htmlFor="channel">Channel</label>
@@ -225,8 +285,8 @@ export default function PostEdit({
                         <label htmlFor="tags">Tags (comma-separated)</label>
                         <input
                             id="tags"
-                            value={tagInput}
-                            onChange={(e) => setTagInput(e.target.value)}
+                            value={data.tags_text}
+                            onChange={(e) => setData('tags_text', e.target.value)}
                             className="w-full rounded border px-3 py-2"
                         />
                     </div>

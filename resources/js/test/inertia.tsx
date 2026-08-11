@@ -12,11 +12,15 @@ const inertiaMock = {
         } as SharedPageProps,
     },
     post: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
 };
 
 export function setMockPage(props: SharedPageProps) {
     inertiaMock.page = { props };
     inertiaMock.post.mockReset();
+    inertiaMock.patch.mockReset();
+    inertiaMock.delete.mockReset();
 }
 
 export function getInertiaMock() {
