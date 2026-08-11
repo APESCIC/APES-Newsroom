@@ -23,34 +23,53 @@ class CampaignService
      */
     public function createFromPublishedPost(Post $post, User $actor): ?Campaign
     {
-        if (! $post->email_on_publish) {
-            return null;
-        }
+        return DB::transaction(function () use ($post, $actor) {
+            $lockedPost = Post::query()->lockForUpdate()->findOrFail($post->id);
 
-        $lists = $this->normalizeListValues($post->mailing_lists ?? []);
-        if ($lists === []) {
-            return null;
-        }
+            if (! $lockedPost->email_on_publish) {
+                return null;
+            }
 
-        $existing = Campaign::query()
-            ->where('post_id', $post->id)
-            ->where('is_test', false)
-            ->first();
+            if (! $lockedPost->status->isPubliclyVisible()) {
+                throw new \LogicException('A live campaign can only be created for a published post.');
+            }
 
-        if ($existing) {
-            return $existing;
-        }
+            $lists = $this->normalizeListValues($lockedPost->mailing_lists ?? []);
+            if ($lists === []) {
+                return null;
+            }
 
-        return DB::transaction(function () use ($post, $actor, $lists) {
-            $campaign = Campaign::create([
-                'post_id' => $post->id,
+            $idempotencyKey = 'post:'.$lockedPost->id.':live';
+            $legacyCampaign = Campaign::query()
+                ->where('post_id', $lockedPost->id)
+                ->where('is_test', false)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->first();
+
+            if ($legacyCampaign) {
+                if ($legacyCampaign->idempotency_key === null) {
+                    $legacyCampaign->update(['idempotency_key' => $idempotencyKey]);
+                }
+
+                return $legacyCampaign->load('recipients');
+            }
+
+            $campaign = Campaign::query()->firstOrCreate([
+                'idempotency_key' => $idempotencyKey,
+            ], [
+                'post_id' => $lockedPost->id,
                 'created_by' => $actor->id,
                 'lists' => $lists,
-                'snapshot' => $this->buildSnapshot($post),
+                'snapshot' => $this->buildSnapshot($lockedPost),
                 'status' => CampaignStatus::Queued,
                 'is_test' => false,
                 'queued_at' => now(),
             ]);
+
+            if (! $campaign->wasRecentlyCreated) {
+                return $campaign->load('recipients');
+            }
 
             $emails = $this->consent->confirmedEmailsForLists($lists);
 
@@ -131,20 +150,33 @@ class CampaignService
 
     private function dispatchRecipients(Campaign $campaign): void
     {
+        $recipients = $campaign->recipients()
+            ->where('status', CampaignRecipientStatus::Queued)
+            ->orderBy('id')
+            ->get();
+
+        if ($recipients->isEmpty()) {
+            $campaign->update([
+                'status' => CampaignStatus::Completed,
+                'completed_at' => now(),
+            ]);
+
+            return;
+        }
+
         $delaySeconds = 0;
         $perMinute = (int) config('mailing.throttle_per_minute', 60);
         $interval = $perMinute > 0 ? (int) ceil(60 / $perMinute) : 1;
 
-        $campaign->recipients()
-            ->where('status', CampaignRecipientStatus::Queued)
-            ->orderBy('id')
-            ->each(function (CampaignRecipient $recipient) use (&$delaySeconds, $interval) {
+        $campaign->update(['status' => CampaignStatus::Sending]);
+
+        DB::afterCommit(function () use ($recipients, &$delaySeconds, $interval) {
+            $recipients->each(function (CampaignRecipient $recipient) use (&$delaySeconds, $interval) {
                 SendCampaignRecipientJob::dispatch($recipient->id)
                     ->delay(now()->addSeconds($delaySeconds));
                 $delaySeconds += $interval;
             });
-
-        $campaign->update(['status' => CampaignStatus::Sending]);
+        });
     }
 
     /**

@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Notifications\ConfirmMailingListNotification;
 use App\Services\Mailing\CampaignService;
 use App\Services\Mailing\ConsentService;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
@@ -178,6 +179,121 @@ class MailingConsentTest extends TestCase
 
         $post->update(['title' => 'Changed After Publish']);
         $this->assertSame('Original Title', $campaign->fresh()->snapshot['title']);
+    }
+
+    public function test_live_campaign_uses_a_stable_database_idempotency_key(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $post = Post::factory()->published()->create([
+            'author_id' => $admin->id,
+            'email_on_publish' => true,
+            'mailing_lists' => [MailingList::ApesCic->value],
+        ]);
+
+        $service = app(CampaignService::class);
+        $first = $service->createFromPublishedPost($post, $admin);
+        $second = $service->createFromPublishedPost($post->fresh(), $admin);
+
+        $this->assertNotNull($first);
+        $this->assertTrue($first->is($second));
+        $this->assertSame('post:'.$post->id.':live', $first->idempotency_key);
+        $this->assertSame(1, Campaign::query()->where('post_id', $post->id)->where('is_test', false)->count());
+    }
+
+    public function test_database_rejects_duplicate_live_campaign_idempotency_keys(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $posts = Post::factory()->count(2)->published()->create(['author_id' => $admin->id]);
+        $duplicateKey = 'post:shared:live';
+
+        Campaign::query()->create([
+            'post_id' => $posts[0]->id,
+            'created_by' => $admin->id,
+            'idempotency_key' => $duplicateKey,
+            'lists' => [MailingList::ApesCic->value],
+            'snapshot' => ['title' => 'First campaign'],
+            'status' => CampaignStatus::Draft,
+            'is_test' => false,
+        ]);
+
+        try {
+            Campaign::query()->create([
+                'post_id' => $posts[1]->id,
+                'created_by' => $admin->id,
+                'idempotency_key' => $duplicateKey,
+                'lists' => [MailingList::ApesCic->value],
+                'snapshot' => ['title' => 'Duplicate campaign'],
+                'status' => CampaignStatus::Draft,
+                'is_test' => false,
+            ]);
+            $this->fail('The database accepted a duplicate live campaign idempotency key.');
+        } catch (QueryException) {
+            $this->assertSame(1, Campaign::query()->where('idempotency_key', $duplicateKey)->count());
+        }
+    }
+
+    public function test_legacy_live_campaign_is_reused_and_backfilled_with_the_stable_key(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $post = Post::factory()->published()->create([
+            'author_id' => $admin->id,
+            'email_on_publish' => true,
+            'mailing_lists' => [MailingList::ApesCic->value],
+        ]);
+        $legacy = Campaign::create([
+            'post_id' => $post->id,
+            'created_by' => $admin->id,
+            'idempotency_key' => null,
+            'lists' => [MailingList::ApesCic->value],
+            'snapshot' => ['title' => $post->title],
+            'status' => CampaignStatus::Completed,
+            'is_test' => false,
+            'queued_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        $campaign = app(CampaignService::class)->createFromPublishedPost($post, $admin);
+
+        $this->assertTrue($legacy->is($campaign));
+        $this->assertSame('post:'.$post->id.':live', $campaign->idempotency_key);
+        $this->assertSame(1, Campaign::query()->where('post_id', $post->id)->where('is_test', false)->count());
+    }
+
+    public function test_zero_recipient_live_campaign_completes_immediately(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $post = Post::factory()->published()->create([
+            'author_id' => $admin->id,
+            'email_on_publish' => true,
+            'mailing_lists' => [MailingList::ApesCic->value],
+        ]);
+
+        $campaign = app(CampaignService::class)->createFromPublishedPost($post, $admin);
+
+        $this->assertNotNull($campaign);
+        $this->assertSame(CampaignStatus::Completed, $campaign->status);
+        $this->assertNotNull($campaign->completed_at);
+        $this->assertSame(0, $campaign->recipients()->count());
+    }
+
+    public function test_test_sends_remain_independent_of_live_idempotency(): void
+    {
+        Mail::fake();
+
+        $admin = User::factory()->admin()->create();
+        $post = Post::factory()->create([
+            'author_id' => $admin->id,
+            'mailing_lists' => [MailingList::ApesCic->value],
+        ]);
+        $service = app(CampaignService::class);
+
+        $first = $service->createTestSend($post, $admin, 'tester@example.com');
+        $second = $service->createTestSend($post, $admin, 'tester@example.com');
+
+        $this->assertFalse($first->is($second));
+        $this->assertNull($first->idempotency_key);
+        $this->assertNull($second->idempotency_key);
+        $this->assertSame(2, Campaign::query()->where('post_id', $post->id)->where('is_test', true)->count());
     }
 
     public function test_test_send_cannot_become_live_campaign(): void

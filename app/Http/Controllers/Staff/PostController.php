@@ -21,6 +21,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -224,22 +225,36 @@ class PostController extends Controller
     {
         $this->authorizeAdmin();
 
-        if ($post->status === PostStatus::Published) {
-            return back();
-        }
+        $didPublish = false;
+        $publishedPost = DB::transaction(function () use ($request, $post, &$didPublish) {
+            $lockedPost = Post::query()->lockForUpdate()->findOrFail($post->id);
 
-        DB::transaction(function () use ($request, $post) {
-            $post->update([
+            if ($lockedPost->status === PostStatus::Published) {
+                return $lockedPost;
+            }
+
+            if ($lockedPost->status === PostStatus::Deleted) {
+                throw ValidationException::withMessages([
+                    'status' => 'Deleted posts cannot be published.',
+                ]);
+            }
+
+            $lockedPost->update([
                 'status' => PostStatus::Published,
                 'published_at' => now(),
                 'scheduled_for' => null,
                 'review_notes' => null,
             ]);
 
-            $this->campaigns->createFromPublishedPost($post->fresh(), $request->user());
+            $this->campaigns->createFromPublishedPost($lockedPost->fresh(), $request->user());
+            $didPublish = true;
+
+            return $lockedPost->fresh();
         });
 
-        $this->audit->record($request->user(), 'post.published', $post->fresh(), [], $request);
+        if ($didPublish) {
+            $this->audit->record($request->user(), 'post.published', $publishedPost, [], $request);
+        }
 
         return back();
     }

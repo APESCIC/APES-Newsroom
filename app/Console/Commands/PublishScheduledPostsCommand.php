@@ -23,11 +23,11 @@ class PublishScheduledPostsCommand extends Command
 
     public function handle(): int
     {
-        $posts = Post::query()
+        $postIds = Post::query()
             ->where('status', PostStatus::Scheduled)
             ->whereNotNull('scheduled_for')
             ->where('scheduled_for', '<=', now('Europe/London'))
-            ->get();
+            ->pluck('id');
 
         $systemActor = User::query()
             ->where('role', Role::SuperAdmin)
@@ -35,23 +35,43 @@ class PublishScheduledPostsCommand extends Command
             ->first()
             ?? User::query()->where('role', Role::Admin)->orderBy('id')->first();
 
-        foreach ($posts as $post) {
-            DB::transaction(function () use ($post, $systemActor) {
+        $publishedCount = 0;
+
+        foreach ($postIds as $postId) {
+            $title = DB::transaction(function () use ($postId, $systemActor) {
+                $post = Post::query()
+                    ->whereKey($postId)
+                    ->where('status', PostStatus::Scheduled)
+                    ->whereNotNull('scheduled_for')
+                    ->where('scheduled_for', '<=', now('Europe/London'))
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $post) {
+                    return null;
+                }
+
+                $actor = $systemActor ?? $post->author()->firstOrFail();
+                $publishedAt = $post->scheduled_for;
+
                 $post->update([
                     'status' => PostStatus::Published,
-                    'published_at' => $post->scheduled_for,
+                    'published_at' => $publishedAt,
                     'scheduled_for' => null,
                 ]);
 
-                if ($systemActor) {
-                    $this->campaigns->createFromPublishedPost($post->fresh(), $systemActor);
-                }
+                $this->campaigns->createFromPublishedPost($post->fresh(), $actor);
+
+                return $post->title;
             });
 
-            $this->line("Published: {$post->title}");
+            if ($title !== null) {
+                $publishedCount++;
+                $this->line("Published: {$title}");
+            }
         }
 
-        $this->info("Published {$posts->count()} scheduled post(s).");
+        $this->info("Published {$publishedCount} scheduled post(s).");
 
         return self::SUCCESS;
     }
