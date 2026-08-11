@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateAccountRequest;
 use App\Services\Account\AccountDeletionPolicy;
+use App\Services\Account\AccountEmailChangeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AccountController extends Controller
 {
-    public function __construct(private readonly AccountDeletionPolicy $deletionPolicy) {}
+    public function __construct(
+        private readonly AccountDeletionPolicy $deletionPolicy,
+        private readonly AccountEmailChangeService $accountUpdater,
+    ) {}
 
     public function show(Request $request): Response
     {
@@ -30,18 +34,12 @@ class AccountController extends Controller
 
     public function update(UpdateAccountRequest $request): RedirectResponse
     {
-        $user = $request->user();
-        $validated = $request->validated();
-
-        if ($validated['email'] !== $user->email) {
-            $validated['email_verified_at'] = null;
-        }
-
-        $user->update($validated);
-
-        if ($user->wasChanged('email')) {
-            $user->sendEmailVerificationNotification();
-        }
+        $this->accountUpdater->update(
+            $request->user(),
+            $request->validated(),
+            $request->ip(),
+            $request->userAgent(),
+        );
 
         return back()->with('status', 'profile-updated');
     }

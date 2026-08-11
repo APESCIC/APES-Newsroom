@@ -25,6 +25,8 @@ class UpdateAccountRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:255',
+                Rule::prohibitedIf(fn () => $this->user()?->auth_provider === 'cloudron_oidc'
+                    && $this->input('email') !== $this->user()?->email),
                 Rule::unique('users')->ignore($this->user()?->id),
             ],
         ];
