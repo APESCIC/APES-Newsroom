@@ -1,5 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
+import ProtectedEmail from '../../Components/Layout/ProtectedEmail';
 import PublicLayout from '../../Components/Layout/PublicLayout';
+import { ORG_PHONE_DISPLAY, ORG_PHONE_TEL, ORG_POSTAL_ADDRESS } from '../../organisationContact';
 
 export default function Privacy() {
     return (
@@ -25,7 +27,14 @@ export default function Privacy() {
                     mailing preference controls.
                 </p>
                 <h2>Contact</h2>
-                <p>Privacy questions: use the contact channels published on the APES CIC website.</p>
+                <p>Privacy questions: write to APES CIC at the address below, call, or email.</p>
+                <address className="not-italic">
+                    {ORG_POSTAL_ADDRESS}
+                    <br />
+                    <a href={`tel:${ORG_PHONE_TEL}`}>{ORG_PHONE_DISPLAY}</a>
+                    <br />
+                    <ProtectedEmail />
+                </address>
             </main>
         </PublicLayout>
     );

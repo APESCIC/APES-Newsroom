@@ -5,6 +5,7 @@ import { formatStoryDate } from '../Components/Home/DeskPanel';
 import Home from '../Pages/home';
 import { setMockPage } from '../test/inertia';
 import appCss from '../../css/app.css?raw';
+import protectedEmailSource from '../Components/Layout/ProtectedEmail.tsx?raw';
 
 describe('Direction A public homepage', () => {
     let desktopMatches: boolean;
@@ -192,5 +193,15 @@ describe('Direction A public homepage', () => {
         for (const link of within(footerNavigation).getAllByRole('link')) {
             expect(link).toHaveClass('inline-flex', 'min-h-11', 'min-w-11', 'items-center', 'justify-center');
         }
+
+        const footer = screen.getByRole('contentinfo');
+        expect(footer).toHaveTextContent('40 Morris Street, St Helens, Merseyside, WA9 3EN');
+        expect(within(footer).getByRole('link', { name: '01744 374 015' })).toHaveAttribute('href', 'tel:+441744374015');
+
+        const assembledEmail = ['info', '@', ['apes', 'org', 'uk'].join('.')].join('');
+        const emailLink = within(footer).getByRole('link', { name: assembledEmail });
+        expect(emailLink).toHaveAttribute('href', `mailto:${assembledEmail}`);
+        expect(emailLink).toHaveAttribute('rel', 'nofollow');
+        expect(protectedEmailSource).not.toContain(assembledEmail);
     });
 });
