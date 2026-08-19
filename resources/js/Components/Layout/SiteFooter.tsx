@@ -1,13 +1,29 @@
 import { Link } from '@inertiajs/react';
+import { ORG_PHONE_DISPLAY, ORG_PHONE_TEL, ORG_POSTAL_ADDRESS } from '../../organisationContact';
 import ApesLogo from '../Brand/ApesLogo';
+import ProtectedEmail from './ProtectedEmail';
+
+const contactLinkClassName =
+    'inline-flex min-h-11 min-w-11 items-center hover:text-body';
 
 export default function SiteFooter() {
     return (
         <footer className="border-t border-border bg-white py-10">
-            <div className="mx-auto flex max-w-public flex-col gap-6 px-5 sm:px-6 md:flex-row md:items-center md:justify-between">
+            <div className="mx-auto flex max-w-public flex-col gap-6 px-5 sm:px-6 md:flex-row md:items-start md:justify-between">
                 <Link href="/" aria-label="APES Newsroom home" className="inline-flex w-fit rounded-control">
                     <ApesLogo variant="footer" alt="" className="h-16 w-16 object-contain" />
                 </Link>
+                <div className="text-sm not-italic text-muted">
+                    <address className="not-italic">{ORG_POSTAL_ADDRESS}</address>
+                    <p className="mt-1">
+                        <a href={`tel:${ORG_PHONE_TEL}`} className={contactLinkClassName}>
+                            {ORG_PHONE_DISPLAY}
+                        </a>
+                    </p>
+                    <p>
+                        <ProtectedEmail className={contactLinkClassName} />
+                    </p>
+                </div>
                 <nav aria-label="Legal and subscriptions">
                     <ul className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted">
                         <li><Link href="/legal/privacy" className="inline-flex min-h-11 min-w-11 items-center justify-center hover:text-body">Privacy</Link></li>

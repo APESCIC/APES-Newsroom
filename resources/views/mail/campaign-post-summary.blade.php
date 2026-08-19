@@ -19,6 +19,7 @@ Thanks,<br>
 {{ config('app.name') }}
 
 <x-mail::subcopy>
-APES CIC · Manage your [preferences]({{ $preferencesUrl }}) or [unsubscribe]({{ $unsubscribeUrl }}).
+APES CIC · 40 Morris Street, St Helens, Merseyside, WA9 3EN · 01744 374 015<br>
+Manage your [preferences]({{ $preferencesUrl }}) or [unsubscribe]({{ $unsubscribeUrl }}).
 </x-mail::subcopy>
 </x-mail::message>
