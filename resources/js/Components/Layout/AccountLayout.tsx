@@ -21,11 +21,11 @@ export default function AccountLayout({
         <PublicLayout>
             <main id="main-content" className="mx-auto max-w-lg px-5 py-12 sm:px-6">
                 {backHref && (
-                    <Link href={backHref} className="text-sm font-semibold text-teal-deep hover:underline">
+                    <Link href={backHref} className="link-on-glass text-sm font-semibold hover:underline">
                         {backLabel}
                     </Link>
                 )}
-                <div className={`form-panel ${backHref ? 'mt-6' : ''}`}>
+                <div className={`glass-form-panel ${backHref ? 'mt-6' : ''}`}>
                     <h1 className="text-2xl font-bold text-body">{title}</h1>
                     {description && <p className="mt-2 text-sm text-muted">{description}</p>}
                     {children}

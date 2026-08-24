@@ -62,11 +62,11 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     }, [menuOpen]);
 
     return (
-        <div className="min-h-screen bg-page-tint text-body">
+        <div className="public-gradient-shell text-on-glass">
             <a href="#main-content" className="skip-link">
                 Skip to main content
             </a>
-            <header className="sticky top-0 z-40 border-b-2 border-brand-teal/30 bg-brand-ink text-white">
+            <header className="glass-panel sticky top-0 z-40 border-b border-white/10">
                 <div className="mx-auto flex h-16 max-w-public items-center justify-between gap-6 px-5 sm:px-6">
                     <Link href="/" className="inline-flex shrink-0 rounded-control py-1">
                         <ApesLogo variant="masthead" className="h-12 w-auto object-contain" />
@@ -121,7 +121,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                     <div
                         ref={mobileMenuRef}
                         id={menuId}
-                        className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-white/15 px-5 py-4 lg:hidden"
+                        className="glass-panel max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-white/10 px-5 py-4 lg:hidden"
                     >
                         <nav aria-label="Primary navigation">
                             <ul className="mx-auto flex max-w-public flex-col gap-1">

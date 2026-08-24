@@ -1,20 +1,19 @@
 # APES Newsroom — Component inventory
 
-> **Status:** Direction A approved under #31/#32. Direction B (Magazine Bold
-> Grid) components implemented under #53.
+> **Status:** Direction C (Glassmorphism Modern) components implemented under #55.
+> Supersedes Direction B (Magazine Bold Grid, #53).
 
 ## Direction A layout and content
 
 | Component | Description | States |
 | --- | --- | --- |
-| `PublicLayout` | Sticky dark brand header with a tightly bounded masthead mark, offset skip target, primary channels, Search, Account, page canvas and footer; the short-height mobile disclosure scrolls, nested Escape closes one layer at a time, and breakpoint changes transfer focus between visible mobile and desktop navigation | guest, signed-in, mobile disclosure, nested disclosure, short viewport, breakpoint change |
-| `AccountMenu` | Login/Register or Account disclosure with Profile, Admin, Staff, Sign out; Escape closes only this disclosure and restores its trigger, while breakpoint changes close a presentation that becomes hidden and transfer its focus to visible navigation | guest, public, staff, admin, nested mobile disclosure, breakpoint change |
-| `SiteFooter` | Dedicated 64px brand mark and privacy, cookies, rights, mailing links with minimum 44×44px touch targets | default |
-| `DeskPanel` | Featured-story media panel, channel, headline, excerpt, byline/London publication date and story action | empty, populated |
-| `ChannelTrailTile` | Labelled line icon, channel name, description and channel link with `.channel-block` mist background and left accent stripe | default, focus |
-| `RecentStoryCard` | Source-backed channel treatment, title, nullable excerpt, hero image and semantic Europe/London publication time | default, lead, missing metadata |
-| `AccountLayout` | Public chrome wrapper with centred `.form-panel` card for account and mailing settings | default, status messages |
-| `AuthCard` | Compact logo header and centred form card for authentication pages | login, register, password reset |
+| `PublicLayout` | Gradient shell with frosted glass sticky header, skip target, channels, Search, Account, page canvas and glass footer; mobile disclosure behaviour unchanged | guest, signed-in, mobile disclosure |
+| `SiteFooter` | Glass panel footer with 64px brand mark and legal/mailing links | default |
+| `DeskPanel` | Featured story in `.glass-hero` with white/teal typography | empty, populated |
+| `ChannelTrailTile` | Channel entry card with `.glass-channel` tinted glass overlay | default, focus |
+| `RecentStoryCard` | Glass story card with channel label, title, excerpt, hero image | default, missing metadata |
+| `AccountLayout` | Public gradient wrapper with centred `.glass-form-panel` | default, status messages |
+| `AuthCard` | Gradient shell with compact logo header and `.glass-form-panel` | login, register, password reset |
 | `WorkspaceLayout` | Dark role-labelled rail, account controls, light task canvas, measured skip-link offset and scrollable modal mobile drawer with contained focus, inert and scroll-locked background, and automatic close to the active desktop destination at the desktop breakpoint | staff, admin, wrapped task header, short viewport, breakpoint change |
 | `LineIcon` | First-party current-colour line icons without emoji dependencies | decorative |
 | `ApesLogo` | Unfiltered horizontal, masthead, footer, square, or compact APES artwork; the masthead uses a deterministic tight crop, the footer uses a 64px derivative, and square placement uses 384/768 WebP sources with PNG fallback | per placement, responsive |
