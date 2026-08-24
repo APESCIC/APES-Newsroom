@@ -168,6 +168,89 @@
         font-size: 0.75rem;
         font-weight: 700;
     }
+
+    .display-headline {
+        font-size: 2.25rem;
+        line-height: 1.05;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--color-brand-ink);
+    }
+
+    @media (min-width: 640px) {
+        .display-headline {
+            font-size: 3.75rem;
+        }
+    }
+
+    .editorial-rule {
+        border-left: 4px solid var(--color-brand-teal);
+        padding-left: 1.5rem;
+    }
+
+    .channel-block {
+        display: flex;
+        min-height: 11rem;
+        flex-direction: column;
+        border-radius: var(--radius-card);
+        border: 1px solid var(--color-border);
+        border-left-width: 4px;
+        padding: 1.5rem;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+
+    .channel-block:hover {
+        transform: translateY(-0.25rem);
+        box-shadow: var(--shadow-elevated);
+    }
+
+    .form-panel {
+        border-radius: var(--radius-card);
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        padding: 2rem;
+    }
+
+    .form-input {
+        display: block;
+        width: 100%;
+        border-radius: var(--radius-control);
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        padding: 0.625rem 0.75rem;
+        font-size: 0.875rem;
+        color: var(--color-body);
+    }
+
+    .form-input:focus {
+        border-color: var(--color-teal-deep);
+        outline: none;
+    }
+
+    .status-badge-success,
+    .status-badge-warning,
+    .status-badge-danger {
+        display: inline-flex;
+        border-radius: 999px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .status-badge-success {
+        background: var(--color-success-mist);
+        color: var(--color-success);
+    }
+
+    .status-badge-warning {
+        background: var(--color-warning-mist);
+        color: var(--color-warning);
+    }
+
+    .status-badge-danger {
+        background: #fce8e8;
+        color: var(--color-danger);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -183,7 +266,7 @@
 
 .prose {
     line-height: 1.7;
-    color: var(--color-neutral-900);
+    color: var(--color-body);
 }
 
 .prose p,

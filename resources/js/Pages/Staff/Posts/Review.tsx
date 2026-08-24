@@ -23,7 +23,7 @@ export default function ReviewQueue({ posts }: { posts: Post[] }) {
                     </Link>
                 </div>
                 {posts.length === 0 ? (
-                    <p className="mt-8 text-neutral-600">No posts awaiting review.</p>
+                    <p className="mt-8 text-muted">No posts awaiting review.</p>
                 ) : (
                     <table className="mt-8 w-full text-left text-sm">
                         <thead>

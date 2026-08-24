@@ -1,8 +1,7 @@
 # APES Newsroom — Component inventory
 
-> **Status:** Direction A approved under #31. Homepage, admin moderation, and
-> staff posts components are implemented under #32; remaining rows describe
-> established or later epic surfaces.
+> **Status:** Direction A approved under #31/#32. Direction B (Magazine Bold
+> Grid) components implemented under #53.
 
 ## Direction A layout and content
 
@@ -12,8 +11,10 @@
 | `AccountMenu` | Login/Register or Account disclosure with Profile, Admin, Staff, Sign out; Escape closes only this disclosure and restores its trigger, while breakpoint changes close a presentation that becomes hidden and transfer its focus to visible navigation | guest, public, staff, admin, nested mobile disclosure, breakpoint change |
 | `SiteFooter` | Dedicated 64px brand mark and privacy, cookies, rights, mailing links with minimum 44×44px touch targets | default |
 | `DeskPanel` | Featured-story media panel, channel, headline, excerpt, byline/London publication date and story action | empty, populated |
-| `ChannelTrailTile` | Labelled line icon, channel name, description and channel link | default, focus |
-| `RecentStoryCard` | Source-backed channel treatment, title, nullable excerpt and semantic Europe/London publication time | default, missing metadata |
+| `ChannelTrailTile` | Labelled line icon, channel name, description and channel link with `.channel-block` mist background and left accent stripe | default, focus |
+| `RecentStoryCard` | Source-backed channel treatment, title, nullable excerpt, hero image and semantic Europe/London publication time | default, lead, missing metadata |
+| `AccountLayout` | Public chrome wrapper with centred `.form-panel` card for account and mailing settings | default, status messages |
+| `AuthCard` | Compact logo header and centred form card for authentication pages | login, register, password reset |
 | `WorkspaceLayout` | Dark role-labelled rail, account controls, light task canvas, measured skip-link offset and scrollable modal mobile drawer with contained focus, inert and scroll-locked background, and automatic close to the active desktop destination at the desktop breakpoint | staff, admin, wrapped task header, short viewport, breakpoint change |
 | `LineIcon` | First-party current-colour line icons without emoji dependencies | decorative |
 | `ApesLogo` | Unfiltered horizontal, masthead, footer, square, or compact APES artwork; the masthead uses a deterministic tight crop, the footer uses a 64px derivative, and square placement uses 384/768 WebP sources with PNG fallback | per placement, responsive |

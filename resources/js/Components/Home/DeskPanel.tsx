@@ -10,6 +10,8 @@ export type PostCard = {
     channel_slug: string;
     author: string;
     published_at: string | null;
+    hero_image?: string | null;
+    hero_image_alt?: string | null;
 };
 
 export function formatStoryDate(value: string | null) {
@@ -28,10 +30,10 @@ export function formatStoryDate(value: string | null) {
 export default function DeskPanel({ featured }: { featured?: PostCard }) {
     if (!featured) {
         return (
-            <section className="flex min-h-80 items-center">
+            <section className="editorial-rule flex min-h-80 items-center">
                 <div>
                     <p className="eyebrow">Featured story</p>
-                    <h1 className="mt-3 text-3xl font-bold tracking-tight text-brand-ink">News from across APES</h1>
+                    <h1 className="display-headline mt-3">News from across APES</h1>
                     <p className="mt-4 max-w-xl text-muted">No published stories yet. Please check back soon.</p>
                 </div>
             </section>
@@ -42,12 +44,12 @@ export default function DeskPanel({ featured }: { featured?: PostCard }) {
     const published = formatStoryDate(featured.published_at);
 
     return (
-        <article className="max-w-[45rem]">
+        <article className="editorial-rule max-w-[45rem]">
             <p className={`eyebrow flex items-center gap-2 ${meta?.textClass ?? 'text-teal-deep'}`}>
                 <LineIcon name={meta?.icon ?? 'document'} className="h-4 w-4" />
                 {featured.channel}
             </p>
-            <h1 className="mt-4 text-4xl leading-[1.1] font-bold tracking-tight text-body sm:text-5xl">
+            <h1 className="display-headline mt-4">
                 <Link href={`/articles/${featured.slug}`} className="hover:text-teal-deep hover:underline">
                     {featured.title}
                 </Link>

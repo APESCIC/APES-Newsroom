@@ -18,10 +18,10 @@ function postStatus(status: string) {
         draft: { label: 'Draft', className: 'bg-brand-mist text-teal-deep' },
         in_review: { label: 'In review', className: 'bg-warning-mist text-warning' },
         published: { label: 'Published', className: 'bg-success-mist text-success' },
-        archived: { label: 'Archived', className: 'bg-neutral-100 text-muted' },
+        archived: { label: 'Archived', className: 'bg-page-tint text-muted' },
     };
 
-    return labels[status] ?? { label: status.replaceAll('_', ' '), className: 'bg-neutral-100 text-muted' };
+    return labels[status] ?? { label: status.replaceAll('_', ' '), className: 'bg-page-tint text-muted' };
 }
 
 function formatDate(value: string | null) {
@@ -36,7 +36,7 @@ function StatusBadge({ status }: { status: string }) {
 function ChannelLabel({ value }: { value: string }) {
     const meta = channelMeta(value);
     return (
-        <span className={`inline-flex rounded border border-border px-2 py-1 text-[0.625rem] font-bold tracking-wide uppercase ${meta?.badgeClass ?? 'bg-neutral-100 text-muted'}`}>
+        <span className={`inline-flex rounded border border-border px-2 py-1 text-[0.625rem] font-bold tracking-wide uppercase ${meta?.badgeClass ?? 'bg-page-tint text-muted'}`}>
             {meta?.label ?? value.replaceAll('_', ' ')}
         </span>
     );

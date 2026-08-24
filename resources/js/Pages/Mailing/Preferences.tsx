@@ -1,5 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import AccountLayout from '../../Components/Layout/AccountLayout';
 
 type ListState = { list: string; label: string; purpose: string; status: string | null };
 
@@ -35,17 +36,19 @@ export default function Preferences({
     return (
         <>
             <Head title="Mailing preferences" />
-            <main className="mx-auto max-w-lg px-6 py-12">
-                <h1 className="text-2xl font-semibold">Mailing preferences</h1>
-                <p className="mt-2 text-sm text-neutral-600">Manage lists for {email}. New lists need email confirmation.</p>
-
+            <AccountLayout
+                title="Mailing preferences"
+                description={`Manage lists for ${email}. New lists need email confirmation.`}
+                backHref={signed ? undefined : '/account'}
+                backLabel="← Account"
+            >
                 {status === 'preferences-updated' && (
-                    <p className="mt-4 text-sm text-green-700">Preferences saved. Confirm any new lists via email.</p>
+                    <p className="status-badge-success mt-4">Preferences saved. Confirm any new lists via email.</p>
                 )}
 
-                <form onSubmit={submit} className="mt-8 flex flex-col gap-4">
+                <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
                     <fieldset className="flex flex-col gap-3">
-                        <legend className="font-medium">Lists</legend>
+                        <legend className="text-sm font-bold text-body">Lists</legend>
                         {lists.map((list) => (
                             <label key={list.list} className="flex gap-3 text-sm">
                                 <input
@@ -54,21 +57,21 @@ export default function Preferences({
                                     onChange={() => toggleList(list.list)}
                                 />
                                 <span>
-                                    <span className="font-medium">{list.label}</span>
+                                    <span className="font-bold text-body">{list.label}</span>
                                     {list.status && (
-                                        <span className="ml-2 text-xs text-neutral-500">({list.status})</span>
+                                        <span className="ml-2 text-xs text-muted">({list.status})</span>
                                     )}
-                                    <span className="block text-neutral-600">{list.purpose}</span>
+                                    <span className="block text-muted">{list.purpose}</span>
                                 </span>
                             </label>
                         ))}
-                        {errors.lists && <p className="text-sm text-red-600">{errors.lists}</p>}
+                        {errors.lists && <p className="text-sm text-danger">{errors.lists}</p>}
                     </fieldset>
-                    <button type="submit" disabled={processing} className="w-fit rounded bg-apes-primary px-4 py-2 text-white">
+                    <button type="submit" disabled={processing} className="button-primary w-fit">
                         Save preferences
                     </button>
                 </form>
-            </main>
+            </AccountLayout>
         </>
     );
 }

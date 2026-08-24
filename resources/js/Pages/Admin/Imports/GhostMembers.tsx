@@ -30,7 +30,7 @@ export default function GhostMembersImport({ runs }: { runs: Run[] }) {
             <Head title="Ghost members import" />
             <main className="mx-auto max-w-3xl px-6 py-12">
                 <h1 className="text-2xl font-semibold">Ghost members CSV import</h1>
-                <p className="mt-2 text-sm text-neutral-600">
+                <p className="mt-2 text-sm text-muted">
                     Upload a Ghost Admin members export. Imports create mailing contacts only (not accounts). All-three-list
                     activation is fail-closed without historic evidence labels. No email is sent from import runs.
                 </p>
@@ -88,9 +88,9 @@ export default function GhostMembersImport({ runs }: { runs: Run[] }) {
                                 <p>
                                     #{run.id} — {run.status} — {run.dry_run ? 'dry-run' : 'import'}
                                 </p>
-                                <p className="text-neutral-600">Checksum: {run.source_checksum}</p>
+                                <p className="text-muted">Checksum: {run.source_checksum}</p>
                                 {run.report && (
-                                    <pre className="mt-2 overflow-auto rounded bg-neutral-100 p-2 text-xs">
+                                    <pre className="mt-2 overflow-auto rounded-control bg-page-tint p-2 text-xs">
                                         {JSON.stringify(run.report, null, 2)}
                                     </pre>
                                 )}
@@ -103,7 +103,7 @@ export default function GhostMembersImport({ runs }: { runs: Run[] }) {
                                 </button>
                             </li>
                         ))}
-                        {runs.length === 0 && <li className="text-neutral-600">No import runs yet.</li>}
+                        {runs.length === 0 && <li className="text-muted">No import runs yet.</li>}
                     </ul>
                 </section>
             </main>

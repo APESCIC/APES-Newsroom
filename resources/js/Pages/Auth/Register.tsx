@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import AuthCard from '../../Components/Auth/AuthCard';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -19,48 +20,35 @@ export default function Register() {
     return (
         <>
             <Head title="Register" />
-            <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
-                <h1 className="text-2xl font-semibold text-neutral-900">Create an account</h1>
+            <AuthCard title="Create an account">
                 <form onSubmit={submit} className="flex flex-col gap-4">
                     <div>
-                        <label htmlFor="name">Name</label>
-                        <input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} required autoFocus />
-                        {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
+                        <label htmlFor="name" className="text-sm font-bold text-body">Name</label>
+                        <input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} required autoFocus className="form-input mt-1" />
+                        {errors.name && <p className="text-sm text-danger">{errors.name}</p>}
                     </div>
                     <div>
-                        <label htmlFor="email">Email</label>
-                        <input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} required />
-                        {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+                        <label htmlFor="email" className="text-sm font-bold text-body">Email</label>
+                        <input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} required className="form-input mt-1" />
+                        {errors.email && <p className="text-sm text-danger">{errors.email}</p>}
                     </div>
                     <div>
-                        <label htmlFor="password">Password</label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            required
-                        />
-                        {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+                        <label htmlFor="password" className="text-sm font-bold text-body">Password</label>
+                        <input id="password" type="password" value={data.password} onChange={(e) => setData('password', e.target.value)} required className="form-input mt-1" />
+                        {errors.password && <p className="text-sm text-danger">{errors.password}</p>}
                     </div>
                     <div>
-                        <label htmlFor="password_confirmation">Confirm password</label>
-                        <input
-                            id="password_confirmation"
-                            type="password"
-                            value={data.password_confirmation}
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
-                            required
-                        />
+                        <label htmlFor="password_confirmation" className="text-sm font-bold text-body">Confirm password</label>
+                        <input id="password_confirmation" type="password" value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} required className="form-input mt-1" />
                     </div>
-                    <button type="submit" disabled={processing}>
+                    <button type="submit" disabled={processing} className="button-primary">
                         Register
                     </button>
                 </form>
-                <p className="text-sm">
-                    Already have an account? <Link href="/login">Log in</Link>
+                <p className="mt-6 text-sm text-muted">
+                    Already have an account? <Link href="/login" className="text-teal-deep hover:underline">Log in</Link>
                 </p>
-            </main>
+            </AuthCard>
         </>
     );
 }

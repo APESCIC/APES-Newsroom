@@ -9,15 +9,20 @@ export default function ChannelTrailTile({ slug }: { slug: string }) {
         return null;
     }
 
+    const mistClass =
+        meta.accent === 'apes' ? 'bg-apes-mist border-apes-primary' :
+        meta.accent === 'shelter' ? 'bg-shelter-mist border-shelter-accent' :
+        'bg-clinic-mist border-clinic-accent';
+
     return (
         <Link
             href={`/${canonicalChannelSlug(slug)}`}
-            className="group flex min-h-44 flex-col rounded-card border border-border bg-white p-6 transition-transform hover:-translate-y-1 hover:shadow-elevated"
+            className={`channel-block group ${mistClass}`}
         >
-            <span className={`flex h-12 w-12 items-center justify-center rounded-control ${meta.mediaClass}`}>
+            <span className={`flex h-12 w-12 items-center justify-center rounded-control bg-white/60 ${meta.textClass}`}>
                 <LineIcon name={meta.icon} className="h-7 w-7" />
             </span>
-            <span className="mt-4 text-lg font-bold text-body">{meta.label}</span>
+            <span className="mt-4 text-xl font-bold text-body">{meta.label}</span>
             <span className="mt-2 text-sm leading-6 text-muted">{meta.description}</span>
         </Link>
     );

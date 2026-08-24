@@ -148,12 +148,12 @@ export default function PostEdit({
         <>
             <Head title={isNew ? 'New post' : `Edit: ${post.title}`} />
             <main className="mx-auto max-w-3xl px-6 py-12">
-                <Link href="/staff/posts" className="text-sm text-neutral-600 hover:underline">
+                <Link href="/staff/posts" className="text-sm text-teal-deep hover:underline">
                     ← Posts
                 </Link>
                 <h1 className="mt-4 text-2xl font-semibold">{isNew ? 'New draft' : 'Edit draft'}</h1>
                 {!isNew && (
-                    <p className="mt-1 text-sm text-neutral-600">
+                    <p className="mt-1 text-sm text-muted">
                         Status: {post.status}{' '}
                         <Link href={`/staff/posts/${post.id}/preview`} className="underline">
                             Preview

@@ -1,5 +1,6 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { channelMeta } from '../../channelMeta';
 import PublicLayout from '../../Components/Layout/PublicLayout';
 
 type Comment = {
@@ -87,15 +88,15 @@ export default function ArticleShow({
                 <div className="bg-amber-100 px-4 py-2 text-center text-sm text-amber-900">Preview — not indexed</div>
             )}
             <main id="main-content" className="mx-auto max-w-3xl px-6 py-12">
-                <Link href={`/${article.channel_slug}`} className="text-sm text-apes-primary">
+                <span className={`inline-flex rounded-control px-2 py-1 text-[0.625rem] font-bold tracking-wide uppercase ${channelMeta(article.channel_slug)?.badgeClass ?? 'bg-brand-mist text-teal-deep'}`}>
                     {article.channel}
-                </Link>
+                </span>
                 <article>
-                    <h1 className="mt-4 text-4xl font-semibold text-neutral-900">{article.title}</h1>
-                    <p className="mt-2 text-sm text-neutral-600">
+                    <h1 className="display-headline mt-4">{article.title}</h1>
+                    <p className="mt-2 text-sm text-muted">
                         By{' '}
                         {article.author_id ? (
-                            <Link href={`/authors/${article.author_id}`} className="underline">
+                            <Link href={`/authors/${article.author_id}`} className="text-teal-deep hover:underline">
                                 {article.author}
                             </Link>
                         ) : (
@@ -107,7 +108,7 @@ export default function ArticleShow({
                                 ·{' '}
                                 <Link
                                     href={`/archive/${new Date(article.published_at).getUTCFullYear()}`}
-                                    className="underline"
+                                    className="text-teal-deep hover:underline"
                                 >
                                     {new Date(article.published_at).toLocaleDateString('en-GB')}
                                 </Link>
@@ -121,7 +122,7 @@ export default function ArticleShow({
                                 const slug = typeof tag === 'string' ? tag.toLowerCase().replace(/\s+/g, '-') : tag.slug;
                                 return (
                                     <li key={slug}>
-                                        <Link href={`/tags/${slug}`} className="rounded border px-2 py-0.5 underline">
+                                        <Link href={`/tags/${slug}`} className="rounded-control border border-border px-2 py-0.5 text-teal-deep hover:underline">
                                             {name}
                                         </Link>
                                     </li>
@@ -130,14 +131,14 @@ export default function ArticleShow({
                         </ul>
                     )}
                     <div
-                        className="prose prose-neutral mt-8 max-w-none"
+                        className="prose mt-8 max-w-none"
                         dangerouslySetInnerHTML={{ __html: article.html }}
                     />
                 </article>
 
                 {!preview && (
-                    <section className="mt-12 border-t border-neutral-200 pt-8" aria-label="Reactions">
-                        <h2 className="text-lg font-medium">Reactions</h2>
+                    <section className="mt-12 border-t border-border pt-8" aria-label="Reactions">
+                        <h2 className="text-lg font-bold text-body">Reactions</h2>
                         <div className="mt-3 flex flex-wrap gap-3">
                             {Object.entries(reactionLabels).map(([type, label]) => {
                                 const active = reactions.mine.includes(type);
@@ -149,7 +150,7 @@ export default function ArticleShow({
                                         disabled={!canEngage}
                                         onClick={() => toggleReaction(type)}
                                         aria-pressed={active}
-                                        className={`rounded border px-3 py-1.5 text-sm ${active ? 'border-apes-primary bg-apes-primary/10' : 'border-neutral-300'}`}
+                                        className={`min-h-11 rounded-control border px-3 py-1.5 text-sm ${active ? 'border-apes-primary bg-apes-mist text-apes-primary' : 'border-border text-body'}`}
                                     >
                                         {label} <span className="tabular-nums">({count})</span>
                                     </button>
@@ -157,8 +158,8 @@ export default function ArticleShow({
                             })}
                         </div>
                         {!canEngage && (
-                            <p className="mt-2 text-sm text-neutral-600">
-                                <Link href="/login" className="underline">
+                            <p className="mt-2 text-sm text-muted">
+                                <Link href="/login" className="text-teal-deep hover:underline">
                                     Sign in
                                 </Link>{' '}
                                 with a verified account to react.
@@ -168,21 +169,21 @@ export default function ArticleShow({
                 )}
 
                 {!preview && (
-                    <section className="mt-10 border-t border-neutral-200 pt-8" aria-label="Comments">
-                        <h2 className="text-lg font-medium">Comments</h2>
+                    <section className="mt-10 border-t border-border pt-8" aria-label="Comments">
+                        <h2 className="text-lg font-bold text-body">Comments</h2>
                         {status === 'comment-pending' && (
-                            <p className="mt-2 text-sm text-green-700">Thanks — your comment is awaiting moderation.</p>
+                            <p className="status-badge-success mt-2">Thanks — your comment is awaiting moderation.</p>
                         )}
 
                         <ul className="mt-4 flex flex-col gap-4">
                             {comments.map((comment) => (
-                                <li key={comment.id} className="border-b border-neutral-100 pb-4">
-                                    <p className="text-sm font-medium">{comment.author.display_name}</p>
-                                    <p className="mt-1 text-neutral-800">{comment.body}</p>
+                                <li key={comment.id} className="border-b border-border pb-4">
+                                    <p className="text-sm font-bold text-body">{comment.author.display_name}</p>
+                                    <p className="mt-1 text-body">{comment.body}</p>
                                     {canEngage && (
                                         <button
                                             type="button"
-                                            className="mt-2 text-xs text-neutral-600 underline"
+                                            className="mt-2 text-xs text-muted hover:underline"
                                             onClick={() => {
                                                 const reason = window.prompt('Why are you reporting this comment?');
                                                 if (!reason) {
@@ -200,12 +201,12 @@ export default function ArticleShow({
                                     )}
                                 </li>
                             ))}
-                            {comments.length === 0 && <li className="text-sm text-neutral-600">No approved comments yet.</li>}
+                            {comments.length === 0 && <li className="text-sm text-muted">No approved comments yet.</li>}
                         </ul>
 
                         {canEngage ? (
                             <form onSubmit={submitComment} className="mt-6 flex flex-col gap-3">
-                                <label htmlFor="comment-body" className="text-sm font-medium">
+                                <label htmlFor="comment-body" className="text-sm font-bold text-body">
                                     Add a comment
                                 </label>
                                 <textarea
@@ -215,22 +216,22 @@ export default function ArticleShow({
                                     rows={3}
                                     required
                                     maxLength={2000}
-                                    className="w-full rounded border px-3 py-2"
+                                    className="form-input"
                                 />
                                 {commentForm.errors.body && (
-                                    <p className="text-sm text-red-600">{commentForm.errors.body}</p>
+                                    <p className="text-sm text-danger">{commentForm.errors.body}</p>
                                 )}
                                 <button
                                     type="submit"
                                     disabled={commentForm.processing}
-                                    className="w-fit rounded bg-apes-primary px-4 py-2 text-white"
+                                    className="button-primary w-fit"
                                 >
                                     Submit for moderation
                                 </button>
                             </form>
                         ) : (
-                            <p className="mt-4 text-sm text-neutral-600">
-                                <Link href="/login" className="underline">
+                            <p className="mt-4 text-sm text-muted">
+                                <Link href="/login" className="text-teal-deep hover:underline">
                                     Sign in
                                 </Link>{' '}
                                 with a verified account to comment.
