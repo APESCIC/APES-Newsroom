@@ -1,5 +1,6 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import AccountLayout from '../../Components/Layout/AccountLayout';
 
 type ProfileData = {
     display_name: string | null;
@@ -26,58 +27,56 @@ export default function PublicProfile({ profile, status }: { profile: ProfileDat
     return (
         <>
             <Head title="Public profile" />
-            <main className="mx-auto max-w-lg px-6 py-12">
-                <Link href="/account" className="text-sm underline">
-                    ← Account
-                </Link>
-                <h1 className="mt-4 text-2xl font-semibold">Public profile</h1>
-                <p className="mt-2 text-sm text-neutral-600">
-                    Profiles are private by default. Opting in submits your profile for moderation before it appears
-                    publicly.
-                </p>
-                <p className="mt-2 text-sm">
+            <AccountLayout
+                title="Public profile"
+                description="Profiles are private by default. Opting in submits your profile for moderation before it appears publicly."
+                backHref="/account"
+                backLabel="← Account"
+            >
+                <p className="mt-4 text-sm text-body">
                     Status: <strong>{profile.moderation_status}</strong>
                 </p>
                 {profile.moderation_notes && (
-                    <p className="mt-1 text-sm text-red-700">Moderator note: {profile.moderation_notes}</p>
+                    <p className="status-badge-danger mt-2">Moderator note: {profile.moderation_notes}</p>
                 )}
                 {status === 'profile-submitted' && (
-                    <p className="mt-2 text-sm text-green-700">Profile saved. Public changes await moderation.</p>
+                    <p className="status-badge-success mt-2">Profile saved. Public changes await moderation.</p>
                 )}
 
-                <form onSubmit={submit} className="mt-8 flex flex-col gap-4">
+                <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
                     <div>
-                        <label htmlFor="display_name">Display name</label>
+                        <label htmlFor="display_name" className="text-sm font-bold text-body">Display name</label>
                         <input
                             id="display_name"
                             value={data.display_name}
                             onChange={(e) => setData('display_name', e.target.value)}
-                            className="w-full rounded border px-3 py-2"
+                            className="form-input mt-1"
                         />
-                        {errors.display_name && <p className="text-sm text-red-600">{errors.display_name}</p>}
+                        {errors.display_name && <p className="text-sm text-danger">{errors.display_name}</p>}
                     </div>
                     <div>
-                        <label htmlFor="bio">Bio</label>
+                        <label htmlFor="bio" className="text-sm font-bold text-body">Bio</label>
                         <textarea
                             id="bio"
                             value={data.bio}
                             onChange={(e) => setData('bio', e.target.value)}
                             rows={4}
                             maxLength={500}
-                            className="w-full rounded border px-3 py-2"
+                            className="form-input mt-1"
                         />
                     </div>
                     <div>
-                        <label htmlFor="avatar">Avatar</label>
+                        <label htmlFor="avatar" className="text-sm font-bold text-body">Avatar</label>
                         <input
                             id="avatar"
                             type="file"
                             accept="image/jpeg,image/png,image/webp"
                             onChange={(e) => setData('avatar', e.target.files?.[0] ?? null)}
+                            className="mt-1 block text-sm"
                         />
-                        {errors.avatar && <p className="text-sm text-red-600">{errors.avatar}</p>}
+                        {errors.avatar && <p className="text-sm text-danger">{errors.avatar}</p>}
                     </div>
-                    <label className="flex gap-2 text-sm">
+                    <label className="flex gap-2 text-sm text-body">
                         <input
                             type="checkbox"
                             checked={data.public_opt_in}
@@ -85,11 +84,11 @@ export default function PublicProfile({ profile, status }: { profile: ProfileDat
                         />
                         Make my profile public after approval
                     </label>
-                    <button type="submit" disabled={processing} className="w-fit rounded bg-apes-primary px-4 py-2 text-white">
+                    <button type="submit" disabled={processing} className="button-primary w-fit">
                         Save profile
                     </button>
                 </form>
-            </main>
+            </AccountLayout>
         </>
     );
 }

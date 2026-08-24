@@ -15,8 +15,8 @@ export default function SearchIndex({ query, results }: { query: string; results
     return (
         <PublicLayout>
             <Head title="Search" />
-            <main id="main-content" className="mx-auto max-w-3xl px-6 py-12">
-                <h1 className="text-2xl font-semibold">Search</h1>
+            <main id="main-content" className="mx-auto max-w-public px-5 py-12 sm:px-6">
+                <h1 className="text-2xl font-bold text-body">Search</h1>
                 <form onSubmit={submit} className="mt-4 flex gap-2">
                     <label htmlFor="q" className="sr-only">
                         Search
@@ -25,20 +25,20 @@ export default function SearchIndex({ query, results }: { query: string; results
                         id="q"
                         value={data.q}
                         onChange={(e) => setData('q', e.target.value)}
-                        className="flex-1 rounded border border-neutral-300 px-3 py-2"
+                        className="form-input flex-1"
                         placeholder="Search articles…"
                     />
-                    <button type="submit" className="rounded bg-apes-primary px-4 py-2 text-white">
+                    <button type="submit" className="button-primary">
                         Search
                     </button>
                 </form>
                 <ul className="mt-8 space-y-4">
                     {results.map((r) => (
-                        <li key={r.slug}>
-                            <Link href={`/articles/${r.slug}`} className="text-lg font-medium hover:underline">
+                        <li key={r.slug} className="rounded-card border border-border bg-white p-4">
+                            <Link href={`/articles/${r.slug}`} className="text-lg font-bold text-body hover:text-teal-deep hover:underline">
                                 {r.title}
                             </Link>
-                            {r.excerpt && <p className="text-sm text-neutral-600">{r.excerpt}</p>}
+                            {r.excerpt && <p className="mt-1 text-sm text-muted">{r.excerpt}</p>}
                         </li>
                     ))}
                 </ul>

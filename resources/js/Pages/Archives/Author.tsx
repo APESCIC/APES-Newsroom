@@ -28,19 +28,19 @@ function ArchiveShell({
     return (
         <PublicLayout>
             <Head title={title} />
-            <main id="main-content" className="mx-auto max-w-3xl px-6 py-12">
-                <h1 className="text-3xl font-semibold">{heading}</h1>
+            <main id="main-content" className="mx-auto max-w-public px-5 py-12 sm:px-6">
+                <h1 className="text-2xl font-bold text-body">{heading}</h1>
                 {posts.data.length === 0 ? (
-                    <p className="mt-6 text-neutral-600">No published stories in this archive.</p>
+                    <p className="mt-6 text-muted">No published stories in this archive.</p>
                 ) : (
                     <ul className="mt-6 space-y-4">
                         {posts.data.map((post) => (
-                            <li key={post.slug} className="border-b border-neutral-200 pb-4">
-                                <p className="text-sm text-apes-primary">{post.channel}</p>
-                                <Link href={`/articles/${post.slug}`} className="text-lg font-semibold hover:underline">
+                            <li key={post.slug} className="rounded-card border border-border bg-white p-4">
+                                <p className="text-xs font-bold tracking-wide text-apes-primary uppercase">{post.channel}</p>
+                                <Link href={`/articles/${post.slug}`} className="text-lg font-bold text-body hover:text-teal-deep hover:underline">
                                     {post.title}
                                 </Link>
-                                {post.excerpt && <p className="mt-1 text-sm text-neutral-600">{post.excerpt}</p>}
+                                {post.excerpt && <p className="mt-1 text-sm text-muted">{post.excerpt}</p>}
                             </li>
                         ))}
                     </ul>

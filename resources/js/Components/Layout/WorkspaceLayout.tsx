@@ -32,8 +32,10 @@ function WorkspaceNavigation({ area, active }: { area: WorkspaceArea; active: 'm
                     key={link.href}
                     href={link.href}
                     aria-current={link.active ? 'page' : undefined}
-                    className={`flex min-h-11 items-center gap-3 rounded-control px-3 py-2 text-sm font-semibold transition-colors ${
-                        link.active ? 'bg-brand-teal text-brand-ink' : 'text-white hover:bg-white/10'
+                    className={`flex min-h-11 items-center gap-3 rounded-control border-l-4 px-3 py-2 text-sm font-semibold transition-colors ${
+                        link.active
+                            ? 'border-brand-teal bg-brand-teal text-brand-ink'
+                            : 'border-transparent text-white hover:bg-white/10'
                     }`}
                 >
                     <LineIcon name={link.icon} className="h-5 w-5 shrink-0" />

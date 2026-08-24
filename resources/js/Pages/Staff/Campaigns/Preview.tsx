@@ -38,12 +38,12 @@ export default function CampaignPreview({
                     <p className="mt-2 text-sm text-green-700">Test send queued. It cannot trigger a live campaign.</p>
                 )}
 
-                <article className="mt-8 rounded border border-neutral-200 p-6">
-                    <p className="text-sm text-neutral-600">
+                <article className="mt-8 rounded-card border border-border p-6">
+                    <p className="text-sm text-muted">
                         {snapshot.channel_label} · {snapshot.author}
                     </p>
-                    <h2 className="mt-2 text-xl font-semibold">{snapshot.title}</h2>
-                    {snapshot.excerpt && <p className="mt-3 text-neutral-700">{snapshot.excerpt}</p>}
+                    <h2 className="mt-2 text-xl font-bold text-body">{snapshot.title}</h2>
+                    {snapshot.excerpt && <p className="mt-3 text-body">{snapshot.excerpt}</p>}
                     <a href={snapshot.read_more_url} className="mt-4 inline-block text-sm underline">
                         Read the full story
                     </a>
@@ -51,7 +51,7 @@ export default function CampaignPreview({
 
                 <form onSubmit={sendTest} className="mt-8 flex flex-col gap-3 border-t pt-6">
                     <h2 className="font-medium">Test send</h2>
-                    <p className="text-sm text-neutral-600">Enter an explicit recipient. Never pre-filled from live lists.</p>
+                    <p className="text-sm text-muted">Enter an explicit recipient. Never pre-filled from live lists.</p>
                     <input
                         type="email"
                         required

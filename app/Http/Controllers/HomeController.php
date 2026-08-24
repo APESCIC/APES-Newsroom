@@ -44,6 +44,8 @@ class HomeController extends Controller
             'channel_slug' => $post->channel->slug(),
             'author' => $post->author->name,
             'published_at' => $post->published_at?->toIso8601String(),
+            'hero_image' => $post->hero_image,
+            'hero_image_alt' => $post->hero_image_alt,
         ];
     }
 }

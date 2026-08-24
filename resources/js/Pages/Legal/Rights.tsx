@@ -5,7 +5,7 @@ export default function Rights() {
     return (
         <PublicLayout>
             <Head title="Your data rights" />
-            <main id="main-content" className="prose prose-neutral mx-auto max-w-3xl px-6 py-12">
+            <main id="main-content" className="prose mx-auto max-w-public px-5 py-12 sm:px-6">
                 <h1>Your data rights</h1>
                 <ul>
                     <li>

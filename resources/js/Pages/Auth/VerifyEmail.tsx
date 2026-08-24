@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import AuthCard from '../../Components/Auth/AuthCard';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});
@@ -12,25 +13,24 @@ export default function VerifyEmail({ status }: { status?: string }) {
     return (
         <>
             <Head title="Verify email" />
-            <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
-                <h1 className="text-2xl font-semibold text-neutral-900">Verify your email</h1>
-                <p className="text-sm text-neutral-600">
-                    Thanks for registering. Please check your email for a verification link before using your account.
-                </p>
+            <AuthCard
+                title="Verify your email"
+                description="Thanks for registering. Please check your email for a verification link before using your account."
+            >
                 {status === 'verification-link-sent' && (
-                    <p className="text-sm text-green-700">A new verification link has been sent to your email address.</p>
+                    <p className="status-badge-success mb-4">A new verification link has been sent to your email address.</p>
                 )}
                 <form onSubmit={submit}>
-                    <button type="submit" disabled={processing}>
+                    <button type="submit" disabled={processing} className="button-primary">
                         Resend verification email
                     </button>
                 </form>
-                <p className="text-sm">
-                    <Link href="/logout" method="post" as="button">
+                <p className="mt-6 text-sm">
+                    <Link href="/logout" method="post" as="button" className="text-teal-deep hover:underline">
                         Log out
                     </Link>
                 </p>
-            </main>
+            </AuthCard>
         </>
     );
 }

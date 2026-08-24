@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -24,5 +25,19 @@ class HomePageTest extends TestCase
                 ->etc())
             ->has('recent')
             ->has('featured'));
+    }
+
+    public function test_homepage_card_payload_includes_hero_image_fields(): void
+    {
+        Post::factory()->published()->create([
+            'hero_image' => 'https://example.test/hero.jpg',
+            'hero_image_alt' => 'A capuchin monkey in habitat',
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('featured.hero_image', 'https://example.test/hero.jpg')
+                ->where('featured.hero_image_alt', 'A capuchin monkey in habitat'));
     }
 }

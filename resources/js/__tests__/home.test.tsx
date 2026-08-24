@@ -7,7 +7,7 @@ import { setMockPage } from '../test/inertia';
 import appCss from '../../css/app.css?raw';
 import protectedEmailSource from '../Components/Layout/ProtectedEmail.tsx?raw';
 
-describe('Direction A public homepage', () => {
+describe('Direction B public homepage', () => {
     let desktopMatches: boolean;
     let desktopChangeListeners: Set<(event: MediaQueryListEvent) => void>;
 
@@ -97,7 +97,9 @@ describe('Direction A public homepage', () => {
             'href',
             '/apes-shelter-rescue',
         );
-        expect(screen.getByRole('heading', { name: 'Wildlife corridor project reaches a new milestone' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Wildlife corridor project reaches a new milestone' })).toHaveClass('display-headline');
+        expect(document.querySelector('.editorial-rule')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /^APES CIC/ })).toHaveClass('channel-block');
         expect(
             screen.getByRole('link', {
                 name: 'Read the story: Wildlife corridor project reaches a new milestone',

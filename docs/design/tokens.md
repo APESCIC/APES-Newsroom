@@ -1,7 +1,8 @@
-# APES Newsroom — Direction A design tokens
+# APES Newsroom — design tokens
 
-> **Status:** Approved with the complete Direction A mock-up set under issue
-> #31 and implemented for homepage, admin moderation, and staff posts under #32.
+> **Status:** Direction A approved under #31/#32. Direction B (Magazine Bold
+> Grid) approved under #36 and implemented under #53; extends these tokens
+> with display and editorial component classes.
 
 ## Brand direction
 
@@ -49,6 +50,17 @@ use the supported 700 weight and compact line height. Body and UI text use
 400–600 weight, with 16px primary reading text and 14px minimum compact
 metadata. Article measure is 65–72 characters.
 
+### Direction B display scale
+
+| Class | Scale | Usage |
+| --- | --- | --- |
+| `.display-headline` | 2.25–3.75rem (36–60px) | Homepage hero and article titles |
+| `.eyebrow` | 0.75rem uppercase | Channel and section labels |
+| Section headings | 1.5rem (24px) bold | Recent stories, archive pages |
+
+Responsive display headlines step from `text-4xl` to `text-6xl` at `sm`
+breakpoint with `leading-[1.05]` and `text-brand-ink`.
+
 ## Spacing, radius and elevation
 
 - 4px base grid; primary gaps are 16, 24, 32 and 48px.
@@ -67,9 +79,27 @@ metadata. Article measure is 65–72 characters.
 - Disable non-essential motion for `prefers-reduced-motion`.
 - Maintain WCAG 2.2 AA contrast and reflow at 200% zoom.
 
+## Direction B component classes
+
+| Class | Purpose |
+| --- | --- |
+| `.display-headline` | Hero-scale bold headlines |
+| `.editorial-rule` | 4px teal decorative left stripe on editorial blocks |
+| `.channel-block` | Full mist background with channel-coloured left border |
+| `.form-panel` | White card on page-tint for account/mailing/auth forms |
+| `.status-badge-success` | Published/approved state pill |
+| `.status-badge-warning` | In-review/needs-attention state pill |
+| `.status-badge-danger` | Rejection/destructive state pill |
+
+## Editorial grid
+
+- Homepage lead story card spans 2 columns on `md+` breakpoints.
+- Channel cards remain three equal columns on desktop; single column on mobile.
+- Grid reflows to single column below 768px for accessibility at 200% zoom.
+
 ## Page-shell mapping
 
-- Public: dark brand masthead, light editorial content and a restrained legal
-  footer.
+- Public: dark brand masthead with teal bottom rule, light editorial content
+  and a restrained legal footer.
 - Staff/admin: dark workspace rail and light working canvas. Workspace links
   remain role-aware; the visual refresh does not broaden authorization.
