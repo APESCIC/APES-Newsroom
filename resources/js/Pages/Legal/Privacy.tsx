@@ -7,7 +7,8 @@ export default function Privacy() {
     return (
         <PublicLayout>
             <Head title="Privacy notice" />
-            <main id="main-content" className="prose mx-auto max-w-public px-5 py-12 sm:px-6">
+            <main id="main-content" className="mx-auto max-w-public px-5 py-12 sm:px-6">
+                <div className="glass-form-panel prose max-w-none">
                 <h1>Privacy notice</h1>
                 <p>
                     APES Newsroom is operated by APES CIC. This draft notice explains how we process personal data for
@@ -35,6 +36,7 @@ export default function Privacy() {
                     <br />
                     <ProtectedEmail />
                 </address>
+            </div>
             </main>
         </PublicLayout>
     );

@@ -38,7 +38,7 @@ export default function Profile({ user, status, can_delete_account, deletion_blo
         <PublicLayout>
             <Head title="Your account" />
             <main id="main-content" className="mx-auto max-w-lg px-5 py-12 sm:px-6">
-                <div className="form-panel">
+                <div className="glass-form-panel">
                     <h1 className="text-2xl font-bold text-body">Your account</h1>
                     <p className="mt-1 text-sm text-muted">Manage your profile and data.</p>
 
@@ -70,28 +70,28 @@ export default function Profile({ user, status, can_delete_account, deletion_blo
                     </form>
                 </div>
 
-                <div className="form-panel mt-6">
+                <div className="glass-form-panel mt-6">
                     <h2 className="text-lg font-bold text-body">Public profile</h2>
                     <Link href="/account/public-profile" className="mt-2 inline-block text-sm text-teal-deep hover:underline">
                         Edit public profile
                     </Link>
                 </div>
 
-                <div className="form-panel mt-6">
+                <div className="glass-form-panel mt-6">
                     <h2 className="text-lg font-bold text-body">Mailing lists</h2>
                     <Link href="/account/mailing" className="mt-2 inline-block text-sm text-teal-deep hover:underline">
                         Manage mailing preferences
                     </Link>
                 </div>
 
-                <div className="form-panel mt-6">
+                <div className="glass-form-panel mt-6">
                     <h2 className="text-lg font-bold text-body">Your data</h2>
                     <Link href="/account/export" className="mt-2 inline-block text-sm text-teal-deep hover:underline">
                         Download account data (JSON)
                     </Link>
                 </div>
 
-                <div className="form-panel mt-6">
+                <div className="glass-form-panel mt-6">
                     <h2 className="text-lg font-bold text-danger">Danger zone</h2>
                     {can_delete_account ? (
                         <button type="button" onClick={deleteAccount} className="button-danger mt-2">
@@ -104,7 +104,7 @@ export default function Profile({ user, status, can_delete_account, deletion_blo
                 </div>
 
                 <p className="mt-6 text-sm">
-                    <Link href="/" className="text-teal-deep hover:underline">Back to home</Link>
+                    <Link href="/" className="link-on-glass hover:underline">Back to home</Link>
                 </p>
             </main>
         </PublicLayout>

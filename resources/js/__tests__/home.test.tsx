@@ -4,10 +4,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { formatStoryDate } from '../Components/Home/DeskPanel';
 import Home from '../Pages/home';
 import { setMockPage } from '../test/inertia';
-import appCss from '../../css/app.css?raw';
 import protectedEmailSource from '../Components/Layout/ProtectedEmail.tsx?raw';
 
-describe('Direction B public homepage', () => {
+describe('Direction C public homepage', () => {
     let desktopMatches: boolean;
     let desktopChangeListeners: Set<(event: MediaQueryListEvent) => void>;
 
@@ -48,7 +47,7 @@ describe('Direction B public homepage', () => {
         });
     });
 
-    it('presents the approved brand-led news hierarchy and navigation', async () => {
+    it('presents the glassmorphism news hierarchy and navigation', async () => {
         const user = userEvent.setup();
         try {
             vi.stubEnv('TZ', 'America/Los_Angeles');
@@ -87,6 +86,9 @@ describe('Direction B public homepage', () => {
             />,
         );
 
+        expect(document.querySelector('.public-gradient-shell')).toBeInTheDocument();
+        expect(document.querySelector('.glass-hero')).toBeInTheDocument();
+
         expect(screen.getByRole('img', { name: 'APES Newsroom' })).toHaveAttribute(
             'src',
             '/brand/apes-logo-masthead.png',
@@ -97,9 +99,9 @@ describe('Direction B public homepage', () => {
             'href',
             '/apes-shelter-rescue',
         );
-        expect(screen.getByRole('heading', { name: 'Wildlife corridor project reaches a new milestone' })).toHaveClass('display-headline');
-        expect(document.querySelector('.editorial-rule')).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: /^APES CIC/ })).toHaveClass('channel-block');
+        expect(screen.getByRole('heading', { name: 'Wildlife corridor project reaches a new milestone' })).toHaveClass('display-headline-on-glass');
+        expect(document.querySelector('.editorial-rule')).not.toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /^APES CIC/ })).toHaveClass('glass-channel');
         expect(
             screen.getByRole('link', {
                 name: 'Read the story: Wildlife corridor project reaches a new milestone',
@@ -190,7 +192,6 @@ describe('Direction B public homepage', () => {
         expect(menuButton).toHaveAttribute('aria-expanded', 'false');
         expect(mastheadHomeLink).toHaveFocus();
 
-        expect(appCss).not.toContain('min-width: 20rem');
         const footerNavigation = screen.getByRole('navigation', { name: 'Legal and subscriptions' });
         for (const link of within(footerNavigation).getAllByRole('link')) {
             expect(link).toHaveClass('inline-flex', 'min-h-11', 'min-w-11', 'items-center', 'justify-center');

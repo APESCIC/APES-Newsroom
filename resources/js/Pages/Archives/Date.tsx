@@ -28,15 +28,15 @@ export default function DateArchive({
         <PublicLayout>
             <Head title={`Archive ${label}`} />
             <main id="main-content" className="mx-auto max-w-public px-5 py-12 sm:px-6">
-                <h1 className="text-2xl font-bold text-body">Archive: {label}</h1>
+                <h1 className="text-2xl font-bold text-on-glass">Archive: {label}</h1>
                 {posts.data.length === 0 ? (
-                    <p className="mt-6 text-muted">No published stories in this period.</p>
+                    <p className="mt-6 text-on-glass-muted">No published stories in this period.</p>
                 ) : (
                     <ul className="mt-6 space-y-4">
                         {posts.data.map((post) => (
-                            <li key={post.slug} className="rounded-card border border-border bg-white p-4">
-                                <p className="text-xs font-bold tracking-wide text-apes-primary uppercase">{post.channel}</p>
-                                <Link href={`/articles/${post.slug}`} className="text-lg font-bold text-body hover:text-teal-deep hover:underline">
+                            <li key={post.slug} className="glass-story-card">
+                                <p className="text-xs font-bold tracking-wide text-brand-teal uppercase">{post.channel}</p>
+                                <Link href={`/articles/${post.slug}`} className="text-lg font-bold text-on-glass hover:text-brand-teal hover:underline">
                                     {post.title}
                                 </Link>
                             </li>

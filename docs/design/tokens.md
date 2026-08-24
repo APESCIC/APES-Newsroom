@@ -1,8 +1,7 @@
 # APES Newsroom — design tokens
 
-> **Status:** Direction A approved under #31/#32. Direction B (Magazine Bold
-> Grid) approved under #36 and implemented under #53; extends these tokens
-> with display and editorial component classes.
+> **Status:** Direction C (Glassmorphism Modern) approved under #36 and
+> implemented under #55. Supersedes Direction B (Magazine Bold Grid, #53).
 
 ## Brand direction
 
@@ -50,16 +49,37 @@ use the supported 700 weight and compact line height. Body and UI text use
 400–600 weight, with 16px primary reading text and 14px minimum compact
 metadata. Article measure is 65–72 characters.
 
-### Direction B display scale
+### Direction C glass scale
 
-| Class | Scale | Usage |
-| --- | --- | --- |
-| `.display-headline` | 2.25–3.75rem (36–60px) | Homepage hero and article titles |
-| `.eyebrow` | 0.75rem uppercase | Channel and section labels |
-| Section headings | 1.5rem (24px) bold | Recent stories, archive pages |
+| Class | Usage |
+| --- | --- |
+| `.public-gradient-shell` | Dark teal gradient page background |
+| `.glass-panel` | Base frosted surface (nav, footer) |
+| `.glass-hero` | Homepage featured story panel |
+| `.glass-channel` | Channel entry card |
+| `.glass-story-card` | Recent story card |
+| `.glass-form-panel` | Forms and long-form reading on gradient |
+| `.text-on-glass` / `.text-on-glass-muted` | Primary/secondary text on dark glass |
+| `.eyebrow-on-glass` | Teal uppercase labels on glass |
+| `.display-headline-on-glass` | Hero headlines on glass (white) |
 
-Responsive display headlines step from `text-4xl` to `text-6xl` at `sm`
-breakpoint with `leading-[1.05]` and `text-brand-ink`.
+## Direction C component classes
+
+| Class | Purpose |
+| --- | --- |
+| `.glass-panel` | Frosted nav, footer, and generic cards |
+| `.glass-hero` | Homepage hero container |
+| `.glass-channel` | Three channel entry cards |
+| `.glass-story-card` | Story grid cards |
+| `.glass-form-panel` | Higher-opacity glass for forms and prose |
+| `.button-glass` | Outlined glass CTA on dark backgrounds |
+| `.form-input-glass` | Inputs on glass form panels |
+| `.status-badge-*` | State pills (unchanged) |
+
+## Page-shell mapping
+
+- Public: teal gradient shell, frosted glass chrome, glass content panels.
+- Staff/admin: dark workspace rail and light working canvas (unchanged).
 
 ## Spacing, radius and elevation
 
@@ -79,27 +99,17 @@ breakpoint with `leading-[1.05]` and `text-brand-ink`.
 - Disable non-essential motion for `prefers-reduced-motion`.
 - Maintain WCAG 2.2 AA contrast and reflow at 200% zoom.
 
-## Direction B component classes
+## Glass tokens
 
-| Class | Purpose |
-| --- | --- |
-| `.display-headline` | Hero-scale bold headlines |
-| `.editorial-rule` | 4px teal decorative left stripe on editorial blocks |
-| `.channel-block` | Full mist background with channel-coloured left border |
-| `.form-panel` | White card on page-tint for account/mailing/auth forms |
-| `.status-badge-success` | Published/approved state pill |
-| `.status-badge-warning` | In-review/needs-attention state pill |
-| `.status-badge-danger` | Rejection/destructive state pill |
+| Token | Value | Usage |
+| --- | --- | --- |
+| `--gradient-public` | `linear-gradient(180deg, #061A1A 0%, #004D52 50%, #006E73 100%)` | Public page background |
+| `--glass-surface` | `rgba(255, 255, 255, 0.08)` | Frosted panel fill |
+| `--glass-border` | `rgba(255, 255, 255, 0.18)` | Glass edge |
+| `--glass-blur` | `12px` | Backdrop blur radius |
 
 ## Editorial grid
 
-- Homepage lead story card spans 2 columns on `md+` breakpoints.
 - Channel cards remain three equal columns on desktop; single column on mobile.
+- Recent stories use uniform glass cards (no lead-column asymmetry).
 - Grid reflows to single column below 768px for accessibility at 200% zoom.
-
-## Page-shell mapping
-
-- Public: dark brand masthead with teal bottom rule, light editorial content
-  and a restrained legal footer.
-- Staff/admin: dark workspace rail and light working canvas. Workspace links
-  remain role-aware; the visual refresh does not broaden authorization.

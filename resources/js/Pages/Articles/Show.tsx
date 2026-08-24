@@ -87,158 +87,160 @@ export default function ArticleShow({
             {preview && (
                 <div className="bg-amber-100 px-4 py-2 text-center text-sm text-amber-900">Preview — not indexed</div>
             )}
-            <main id="main-content" className="mx-auto max-w-3xl px-6 py-12">
-                <span className={`inline-flex rounded-control px-2 py-1 text-[0.625rem] font-bold tracking-wide uppercase ${channelMeta(article.channel_slug)?.badgeClass ?? 'bg-brand-mist text-teal-deep'}`}>
-                    {article.channel}
-                </span>
-                <article>
-                    <h1 className="display-headline mt-4">{article.title}</h1>
-                    <p className="mt-2 text-sm text-muted">
-                        By{' '}
-                        {article.author_id ? (
-                            <Link href={`/authors/${article.author_id}`} className="text-teal-deep hover:underline">
-                                {article.author}
-                            </Link>
-                        ) : (
-                            article.author
-                        )}
-                        {article.published_at && (
-                            <>
-                                {' '}
-                                ·{' '}
-                                <Link
-                                    href={`/archive/${new Date(article.published_at).getUTCFullYear()}`}
-                                    className="text-teal-deep hover:underline"
-                                >
-                                    {new Date(article.published_at).toLocaleDateString('en-GB')}
+            <main id="main-content" className="mx-auto max-w-3xl px-5 py-12 sm:px-6">
+                <div className="glass-form-panel">
+                    <span className={`inline-flex rounded-control px-2 py-1 text-[0.625rem] font-bold tracking-wide uppercase ${channelMeta(article.channel_slug)?.badgeClass ?? 'bg-brand-mist text-teal-deep'}`}>
+                        {article.channel}
+                    </span>
+                    <article>
+                        <h1 className="display-headline mt-4">{article.title}</h1>
+                        <p className="mt-2 text-sm text-muted">
+                            By{' '}
+                            {article.author_id ? (
+                                <Link href={`/authors/${article.author_id}`} className="text-teal-deep hover:underline">
+                                    {article.author}
                                 </Link>
-                            </>
-                        )}
-                    </p>
-                    {article.tags && article.tags.length > 0 && (
-                        <ul className="mt-3 flex flex-wrap gap-2 text-sm">
-                            {article.tags.map((tag) => {
-                                const name = typeof tag === 'string' ? tag : tag.name;
-                                const slug = typeof tag === 'string' ? tag.toLowerCase().replace(/\s+/g, '-') : tag.slug;
-                                return (
-                                    <li key={slug}>
-                                        <Link href={`/tags/${slug}`} className="rounded-control border border-border px-2 py-0.5 text-teal-deep hover:underline">
-                                            {name}
-                                        </Link>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    )}
-                    <div
-                        className="prose mt-8 max-w-none"
-                        dangerouslySetInnerHTML={{ __html: article.html }}
-                    />
-                </article>
-
-                {!preview && (
-                    <section className="mt-12 border-t border-border pt-8" aria-label="Reactions">
-                        <h2 className="text-lg font-bold text-body">Reactions</h2>
-                        <div className="mt-3 flex flex-wrap gap-3">
-                            {Object.entries(reactionLabels).map(([type, label]) => {
-                                const active = reactions.mine.includes(type);
-                                const count = reactions[type as keyof Omit<Reactions, 'mine'>] ?? 0;
-                                return (
-                                    <button
-                                        key={type}
-                                        type="button"
-                                        disabled={!canEngage}
-                                        onClick={() => toggleReaction(type)}
-                                        aria-pressed={active}
-                                        className={`min-h-11 rounded-control border px-3 py-1.5 text-sm ${active ? 'border-apes-primary bg-apes-mist text-apes-primary' : 'border-border text-body'}`}
+                            ) : (
+                                article.author
+                            )}
+                            {article.published_at && (
+                                <>
+                                    {' '}
+                                    ·{' '}
+                                    <Link
+                                        href={`/archive/${new Date(article.published_at).getUTCFullYear()}`}
+                                        className="text-teal-deep hover:underline"
                                     >
-                                        {label} <span className="tabular-nums">({count})</span>
-                                    </button>
-                                );
-                            })}
-                        </div>
-                        {!canEngage && (
-                            <p className="mt-2 text-sm text-muted">
-                                <Link href="/login" className="text-teal-deep hover:underline">
-                                    Sign in
-                                </Link>{' '}
-                                with a verified account to react.
-                            </p>
+                                        {new Date(article.published_at).toLocaleDateString('en-GB')}
+                                    </Link>
+                                </>
+                            )}
+                        </p>
+                        {article.tags && article.tags.length > 0 && (
+                            <ul className="mt-3 flex flex-wrap gap-2 text-sm">
+                                {article.tags.map((tag) => {
+                                    const name = typeof tag === 'string' ? tag : tag.name;
+                                    const slug = typeof tag === 'string' ? tag.toLowerCase().replace(/\s+/g, '-') : tag.slug;
+                                    return (
+                                        <li key={slug}>
+                                            <Link href={`/tags/${slug}`} className="rounded-control border border-border px-2 py-0.5 text-teal-deep hover:underline">
+                                                {name}
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
                         )}
-                    </section>
-                )}
+                        <div
+                            className="prose mt-8 max-w-none"
+                            dangerouslySetInnerHTML={{ __html: article.html }}
+                        />
+                    </article>
 
-                {!preview && (
-                    <section className="mt-10 border-t border-border pt-8" aria-label="Comments">
-                        <h2 className="text-lg font-bold text-body">Comments</h2>
-                        {status === 'comment-pending' && (
-                            <p className="status-badge-success mt-2">Thanks — your comment is awaiting moderation.</p>
-                        )}
-
-                        <ul className="mt-4 flex flex-col gap-4">
-                            {comments.map((comment) => (
-                                <li key={comment.id} className="border-b border-border pb-4">
-                                    <p className="text-sm font-bold text-body">{comment.author.display_name}</p>
-                                    <p className="mt-1 text-body">{comment.body}</p>
-                                    {canEngage && (
+                    {!preview && (
+                        <section className="mt-12 border-t border-border pt-8" aria-label="Reactions">
+                            <h2 className="text-lg font-bold text-body">Reactions</h2>
+                            <div className="mt-3 flex flex-wrap gap-3">
+                                {Object.entries(reactionLabels).map(([type, label]) => {
+                                    const active = reactions.mine.includes(type);
+                                    const count = reactions[type as keyof Omit<Reactions, 'mine'>] ?? 0;
+                                    return (
                                         <button
+                                            key={type}
                                             type="button"
-                                            className="mt-2 text-xs text-muted hover:underline"
-                                            onClick={() => {
-                                                const reason = window.prompt('Why are you reporting this comment?');
-                                                if (!reason) {
-                                                    return;
-                                                }
-                                                router.post('/reports', {
-                                                    type: 'comment',
-                                                    id: comment.id,
-                                                    reason,
-                                                });
-                                            }}
+                                            disabled={!canEngage}
+                                            onClick={() => toggleReaction(type)}
+                                            aria-pressed={active}
+                                            className={`min-h-11 rounded-control border px-3 py-1.5 text-sm ${active ? 'border-apes-primary bg-apes-mist text-apes-primary' : 'border-border text-body'}`}
                                         >
-                                            Report
+                                            {label} <span className="tabular-nums">({count})</span>
                                         </button>
-                                    )}
-                                </li>
-                            ))}
-                            {comments.length === 0 && <li className="text-sm text-muted">No approved comments yet.</li>}
-                        </ul>
+                                    );
+                                })}
+                            </div>
+                            {!canEngage && (
+                                <p className="mt-2 text-sm text-muted">
+                                    <Link href="/login" className="text-teal-deep hover:underline">
+                                        Sign in
+                                    </Link>{' '}
+                                    with a verified account to react.
+                                </p>
+                            )}
+                        </section>
+                    )}
 
-                        {canEngage ? (
-                            <form onSubmit={submitComment} className="mt-6 flex flex-col gap-3">
-                                <label htmlFor="comment-body" className="text-sm font-bold text-body">
-                                    Add a comment
-                                </label>
-                                <textarea
-                                    id="comment-body"
-                                    value={commentForm.data.body}
-                                    onChange={(e) => commentForm.setData('body', e.target.value)}
-                                    rows={3}
-                                    required
-                                    maxLength={2000}
-                                    className="form-input"
-                                />
-                                {commentForm.errors.body && (
-                                    <p className="text-sm text-danger">{commentForm.errors.body}</p>
-                                )}
-                                <button
-                                    type="submit"
-                                    disabled={commentForm.processing}
-                                    className="button-primary w-fit"
-                                >
-                                    Submit for moderation
-                                </button>
-                            </form>
-                        ) : (
-                            <p className="mt-4 text-sm text-muted">
-                                <Link href="/login" className="text-teal-deep hover:underline">
-                                    Sign in
-                                </Link>{' '}
-                                with a verified account to comment.
-                            </p>
-                        )}
-                    </section>
-                )}
+                    {!preview && (
+                        <section className="mt-10 border-t border-border pt-8" aria-label="Comments">
+                            <h2 className="text-lg font-bold text-body">Comments</h2>
+                            {status === 'comment-pending' && (
+                                <p className="status-badge-success mt-2">Thanks — your comment is awaiting moderation.</p>
+                            )}
+
+                            <ul className="mt-4 flex flex-col gap-4">
+                                {comments.map((comment) => (
+                                    <li key={comment.id} className="border-b border-border pb-4">
+                                        <p className="text-sm font-bold text-body">{comment.author.display_name}</p>
+                                        <p className="mt-1 text-body">{comment.body}</p>
+                                        {canEngage && (
+                                            <button
+                                                type="button"
+                                                className="mt-2 text-xs text-muted hover:underline"
+                                                onClick={() => {
+                                                    const reason = window.prompt('Why are you reporting this comment?');
+                                                    if (!reason) {
+                                                        return;
+                                                    }
+                                                    router.post('/reports', {
+                                                        type: 'comment',
+                                                        id: comment.id,
+                                                        reason,
+                                                    });
+                                                }}
+                                            >
+                                                Report
+                                            </button>
+                                        )}
+                                    </li>
+                                ))}
+                                {comments.length === 0 && <li className="text-sm text-muted">No approved comments yet.</li>}
+                            </ul>
+
+                            {canEngage ? (
+                                <form onSubmit={submitComment} className="mt-6 flex flex-col gap-3">
+                                    <label htmlFor="comment-body" className="text-sm font-bold text-body">
+                                        Add a comment
+                                    </label>
+                                    <textarea
+                                        id="comment-body"
+                                        value={commentForm.data.body}
+                                        onChange={(e) => commentForm.setData('body', e.target.value)}
+                                        rows={3}
+                                        required
+                                        maxLength={2000}
+                                        className="form-input"
+                                    />
+                                    {commentForm.errors.body && (
+                                        <p className="text-sm text-danger">{commentForm.errors.body}</p>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        disabled={commentForm.processing}
+                                        className="button-primary w-fit"
+                                    >
+                                        Submit for moderation
+                                    </button>
+                                </form>
+                            ) : (
+                                <p className="mt-4 text-sm text-muted">
+                                    <Link href="/login" className="text-teal-deep hover:underline">
+                                        Sign in
+                                    </Link>{' '}
+                                    with a verified account to comment.
+                                </p>
+                            )}
+                        </section>
+                    )}
+                </div>
             </main>
         </PublicLayout>
     );
